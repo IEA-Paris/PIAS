@@ -264,7 +264,7 @@
   </div>
 </template>
 <script>
-import rawFilters from '~/static/generated/filters'
+import rawFilters from '~/generated/filters'
 
 import debounce from '~/assets/utils/debounce'
 export default {

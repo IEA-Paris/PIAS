@@ -10,8 +10,17 @@ export default {
   phone: '+33(0)1 56 81 00 52',
   email: 'publications@paris-iea.fr',
   subtitle: 'Open source publishing platform for open science.',
+  logo: 'logo.png',
   description: 'Open source publishing platform for open science.',
   splash_title: 'Open source publishing platform for open science.',
+  location: {
+    // the framing of the map component
+    origin:
+      'https://www.openstreetmap.org/export/embed.html?bbox=2.356580793857575%2C48.850586483414915%2C2.361644804477692%2C48.85278204589751&amp;layer=mapnik&amp;marker=48.851684276691216%2C2.359112799167633',
+    // the link to the map on openstreetmap
+    target:
+      'https://www.openstreetmap.org/?mlat=48.85168&amp;mlon=2.35911#map=19/48.85168/2.35911',
+  },
   recaptcha: '6Lc_xuUUAAAAALwowUq0cC0wFtFnZ2NCi3UH4i1j',
   // graphqlEndpoint:
   //   'https://mz3e6z5nlngvdls3zh3possona.appsync-api.eu-west-2.amazonaws.com/graphql',
@@ -46,7 +55,7 @@ export default {
       bibliography: true,
     },
     disseminate: {
-      Zenodo: false,
+      Zenodo: true,
     },
   },
   theme: {

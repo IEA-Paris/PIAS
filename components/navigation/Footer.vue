@@ -20,7 +20,7 @@
                 {{ $config.phone }}
                 <br />
                 <v-icon left>mdi-email</v-icon>
-                <a mailto="information@paris-iea.fr">{{ $config.email }}</a>
+                <a :mailto="$config.email">{{ $config.email }}</a>
               </div>
               <iframe
                 title="openstreetmap"
@@ -30,18 +30,10 @@
                 scrolling="no"
                 marginheight="0"
                 marginwidth="0"
-                src="https://www.openstreetmap.org/export/embed.html?bbox=2.356580793857575%2C48.850586483414915%2C2.361644804477692%2C48.85278204589751&amp;layer=mapnik&amp;marker=48.851684276691216%2C2.359112799167633"
+                :src="$config.location.origin"
                 style="border: 1px solid black"
-                @click="
-                  $router.go(
-                    'https://www.openstreetmap.org/?mlat=48.85168&amp;mlon=2.35911#map=19/48.85168/2.35911'
-                  )
-                "
-                @keyup.enter="
-                  $router.go(
-                    'https://www.openstreetmap.org/?mlat=48.85168&amp;mlon=2.35911#map=19/48.85168/2.35911'
-                  )
-                "
+                @click="$router.go($config.location.target)"
+                @keyup.enter="$router.go($config.location.target)"
               ></iframe>
               <br />
               <small
