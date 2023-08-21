@@ -71,7 +71,7 @@ export default (articles, issues) => {
   const mediaTagFilter = { type: 'Autocomplete', items: mediaTags }
 
   fs.writeFileSync(
-    './static/generated/filters.js',
+    './generated/filters.js',
     `/* eslint-disable prettier/prettier */
   const filters = ${JSON.stringify(filters)};
   const mediaTagFilter = ${JSON.stringify(mediaTagFilter)};

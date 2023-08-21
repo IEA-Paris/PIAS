@@ -1,5 +1,5 @@
 import EventEmitter from 'events'
-import filters from './static/generated/filters'
+import filters from './generated/filters'
 import config from './config.js'
 
 EventEmitter.defaultMaxListeners = 20
@@ -459,7 +459,7 @@ export default {
   },
   // https://i18n.nuxtjs.org/
   i18n: {
-    langDir: 'translations/',
+    langDir: 'submodules/' + config.name + '/translations/',
     locales: config.lang.locales,
     defaultLocale: config.lang.default,
     strategy: 'no_prefix',
@@ -562,6 +562,7 @@ export default {
   },
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
+    followSymlinks: true,
     standalone: true,
     babel: {
       compact: true,
@@ -571,7 +572,7 @@ export default {
       ],
     },
     watchOptions: {
-      ignored: '/static/generated/filters.js',
+      ignored: '/generated/filters.js',
     },
     extend(config, ctx) {
       // extend source map to enable local debug in VScode (breakpoints & co)

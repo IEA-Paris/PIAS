@@ -10,7 +10,7 @@
   </v-chip>
 </template>
 <script>
-import rawFilters from '~/static/generated/filters'
+import rawFilters from '~/generated/filters'
 export default {
   props: {
     issue: {

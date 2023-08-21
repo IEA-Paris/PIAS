@@ -70,7 +70,7 @@
   </aside>
 </template>
 <script>
-import data from '~/static/generated/filters'
+import data from '~/generated/filters'
 export default {
   props: {
     type: {

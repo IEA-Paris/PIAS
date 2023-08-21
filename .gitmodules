@@ -1,0 +1,3 @@
+[submodule "submodules/PFIAS"]
+	path = submodules/PFIAS
+	url = git@github.com:IEA-Paris/PFIAS.git

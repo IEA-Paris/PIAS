@@ -184,7 +184,7 @@
 </template>
 <script>
 import { formatAuthors } from '~/assets/utils/transforms'
-import filtersRaw from '~/static/generated/filters'
+import filtersRaw from '~/generated/filters'
 
 export default {
   layout: 'print',

@@ -91,7 +91,7 @@ export default function (moduleOptions) {
     if (!once) return
     once = false
 
-    // store the registered conflicts in a markdown file @ /static/generated/report.md
+    // store the registered conflicts in a markdown file @ /generated/report.md
     storeReport()
 
     console.log('"GENERATE:DONE"')

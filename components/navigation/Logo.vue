@@ -15,7 +15,7 @@
     "
   >
     <nuxt-img
-      src="/logo_b.png"
+      :src="$config.logo"
       contain
       preload
       alt="Avatar"
