@@ -47,7 +47,7 @@ export const storeReport = () => {
     today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds()
   const dateTime = date + ' ' + time
   return fs.writeFileSync(
-    './static/generated/report.md',
+    './generated/report.md',
     `---
 ${yaml.dump(
   { createdAt: dateTime, conflicts: _conflicts },

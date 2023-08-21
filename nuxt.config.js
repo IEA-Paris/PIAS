@@ -561,6 +561,7 @@ export default {
   },
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
+    followSymlinks: true,
     standalone: true,
     babel: {
       compact: true,
