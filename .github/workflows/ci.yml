@@ -39,7 +39,7 @@ jobs:
       - name: 🧹 clean up runners
         # TODO replace hard coded references to the repo with variables
         run: |
-          ids=$(gh api -H "Accept: application/vnd.github+json" /repos/IEA-Paris/PPIAS/actions/runs | jq -s -c 'sort_by(.created_at) | .[]' | jq '.workflow_runs[] | select([.status] | inside(["in_progress", "queued"])) | .id')
+          ids=$(gh api -H "Accept: application/vnd.github+json" /repos/IEA-Paris/PIAS/actions/runs | jq -s -c 'sort_by(.created_at) | .[]' | jq '.workflow_runs[] | select([.status] | inside(["in_progress", "queued"])) | .id')
           nids=$(echo $ids | wc -w)
           if [ $nids -gt 2 ]; then
             echo "too many runners"
@@ -47,7 +47,7 @@ jobs:
             ids=$(echo $ids | cut -d ' ' -f 2-  | rev | cut -d ' ' -f 2- | rev)
             set -- $ids
             # Stop all runners between first and last
-            for i; do gh api --method POST -H "Accept: application/vnd.github+json" "/repos/IEA-Paris/PPIAS/actions/runs/$i/cancel"; done
+            for i; do gh api --method POST -H "Accept: application/vnd.github+json" "/repos/IEA-Paris/PIAS/actions/runs/$i/cancel"; done
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -111,13 +111,13 @@ jobs:
       - name: 🤫 Getting cloudfront secrets
         uses: 'marvinpinto/action-inject-ssm-secrets@latest'
         with:
-          ssm_parameter: '/ppias/cloudfront/id'
+          ssm_parameter: '/PIAS/cloudfront/id'
           env_variable_name: 'ssm_cloudfront_id'
 
       - name: 🤫 Getting S3 secrets
         uses: 'marvinpinto/action-inject-ssm-secrets@latest'
         with:
-          ssm_parameter: '/ppias/s3/name'
+          ssm_parameter: '/PIAS/s3/name'
           env_variable_name: 'ssm_s3_name'
 
       - name: 🚀 Deploy to S3 🚀🚀
