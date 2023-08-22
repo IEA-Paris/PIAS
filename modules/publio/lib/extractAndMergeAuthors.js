@@ -1,4 +1,5 @@
 import fs from 'fs'
+import { config } from 'process'
 import parseMD from 'parse-md'
 import { mergeDeep, insertDocuments } from '../utils/contentUtilities'
 
@@ -143,7 +144,10 @@ export default async (content, options) => {
     .flat()
   // include the document body from the original document to avoid a round trip md <> JSON AST
   authorsDocs = authorsDocs.map((doc) => {
-    const fileContents = fs.readFileSync('content' + doc.path + '.md', 'utf8')
+    const fileContents = fs.readFileSync(
+      'submodules/' + config.name + '/' + doc.path + '.md',
+      'utf8'
+    )
     const { content } = parseMD(fileContents)
     // remove the articles array from the doc
     delete doc.articles

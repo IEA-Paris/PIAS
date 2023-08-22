@@ -10,7 +10,7 @@ export default (article, media, authors, issues, options) => {
   // generate bibliography if required
   if (article.bibliography?.length) {
     article.biblioFile = article.bibliography
-    const data = fs.readFileSync('./static/' + article.bibliography, 'utf8')
+    const data = fs.readFileSync('./static' + article.bibliography, 'utf8')
     const cites = new Citation(data)
     article.bibliography = cites.data.map((item) => {
       return {

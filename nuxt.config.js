@@ -406,6 +406,7 @@ export default {
   },
   // Content module configuration: https://go.nuxtjs.dev/config-content
   content: {
+    dir: 'submodules/' + config.name,
     /*     basePlugins: [
       'remark-squeeze-paragraphs',
       'rehype-slug',

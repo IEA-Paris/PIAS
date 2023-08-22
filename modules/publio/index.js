@@ -152,7 +152,7 @@ export default function (moduleOptions) {
     if (!once) return
 
     articles = await diagnoseArticles(articles, url)
-    console.log('articles content ready: ', articles.length)
+    console.log('articles content ready: ', articles?.length || 0)
 
     authors = await mergeAndInsertAuthorsDocuments(authors, articles, content)
 

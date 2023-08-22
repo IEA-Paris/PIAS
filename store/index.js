@@ -1,6 +1,7 @@
 import { set } from 'vue'
 import filtersRaw from '~/assets/data/filters'
 import lists from '~/assets/data/lists'
+import config from '~/config'
 
 export const state = () => ({
   scrolled: process.browser ? window.pageYOffset > 0 : false,
@@ -236,7 +237,9 @@ export const actions = {
           pipeline.language = { $containsAny: val }
         } else if (filter === 'issue') {
           pipeline.issue = {
-            $containsAny: val.map((item) => 'content/issues/' + item + '.md'),
+            $containsAny: val.map(
+              (item) => 'submodules/' + config.name + '/issues/' + item + '.md'
+            ),
           }
         } else if (filter === 'years') {
           const yearsToInt = val.map((i) => +i)

@@ -23,7 +23,7 @@ export default async (articles) => {
     .filter((str) => str)
     .map((str) => str.slice(7))
   let count = 0
-  articles = articles.map((article) => {
+  articles = articles?.map((article) => {
     const articleDiffed = diffed.includes(article.path)
     const resolvedPath = path.resolve(
       process.env.NODE_ENV !== 'production' ||
