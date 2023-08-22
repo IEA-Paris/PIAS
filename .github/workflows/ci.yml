@@ -6,14 +6,13 @@ on:
   workflow_dispatch:
     inputs:
       cacheClean:
-        description: "CI Cache Clean"
+        description: 'CI Cache Clean'
         required: false
-        default: ""
+        default: ''
 
   push:
     branches:
       - main
-      - develop
     paths-ignore:
       - 'infra/**'
 

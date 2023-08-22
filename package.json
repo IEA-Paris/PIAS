@@ -11,7 +11,7 @@
     "mock": " yarn prepare && yarn generate && yarn start",
     "start": "nuxt start",
     "deploy": "nuxt generate; aws s3 cp dist s3://ppias --recursive;aws cloudfront create-invalidation --distribution-id __invalidation-batch * E20JX3UOOUCLYC",
-    "generate": "nuxt generate",
+    "generate": "yarn prepare && nuxt generate",
     "lint:js": "eslint --ext \".js,.vue\" --ignore-path .gitignore .",
     "lint": "yarn lint:js",
     "test": "jest"
