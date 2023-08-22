@@ -502,7 +502,7 @@ export const insertDocuments = (data, cat, filenameFlag) => {
     ? data.map((item) => item.issue.slice(15, -3))
     : '0123456789abcdefghijklmnopqrstuvwxyz') {
     const folderPath = path.resolve(
-      'submodule/' + config.name + '/' + cat + '/' + folder
+      'submodules/' + config.name + '/' + cat + '/' + folder
     )
     if (!fs.existsSync(folderPath)) {
       fs.mkdirSync(folderPath, { recursive: true })

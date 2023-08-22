@@ -8,7 +8,6 @@ export default async (authors = [], articles, content) => {
     const chalk = require('chalk')
 
     const authorsDocuments = await content('authors', { deep: true }).fetch()
-    console.log('authorsDocuments: ', authorsDocuments)
 
     const { first, second } = filterAndMerge(authors, authorsDocuments)
 
