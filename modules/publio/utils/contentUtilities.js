@@ -544,9 +544,9 @@ export const insertDocuments = (data, cat, filenameFlag) => {
           ? '_' + doc[filenameFlag[1]] || ''
           : '')
     )
-    /*     console.log('fileName: ', fileName)
+    console.log('fileName: ', fileName)
 
-    console.log('filteredDoc: ', filteredDoc) */
+    console.log('filteredDoc: ', filteredDoc)
     if (
       fs.existsSync(
         cat === 'articles'
@@ -566,6 +566,7 @@ export const insertDocuments = (data, cat, filenameFlag) => {
     } else {
       fileName = fileName + '.md'
     }
+    console.log('fileName: ', fileName)
     fs.writeFileSync(
       cat === 'articles'
         ? './submodules/' + config.name + '/' + cat + '/' + fileName
