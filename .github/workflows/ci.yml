@@ -56,9 +56,14 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
           check-latest: true
-          
+
       - name: Update submodules
-        run: git submodule update --remote --recursive
+        run: |
+          git submodule update --remote --recursive
+          rm -rf ./static/*
+          cp -r ./submodules/PFIAS/config.js config.js 
+          cp -r ./submodules/PFIAS/generated
+          cp -r ./submodules/PFIAS/static .
 
       - name: 🛠 Get yarn cache directory path
         id: yarn-cache-dir-path
