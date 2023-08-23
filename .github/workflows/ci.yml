@@ -56,6 +56,9 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
           check-latest: true
+          
+      - name: Update submodules
+        run: git submodule update --remote --recursive
 
       - name: 🛠 Get yarn cache directory path
         id: yarn-cache-dir-path
