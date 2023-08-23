@@ -33,6 +33,9 @@ jobs:
     steps:
       - name: 🛎 Checkout
         uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.SUBMODULE_GIT_TOKEN }}
 
       # Cancel previous runs to avoid wasting resources
       - name: 🧹 clean up runners
