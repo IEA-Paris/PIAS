@@ -11,7 +11,7 @@
     "clean:cache": "yarn clean:cache:pwa && yarn clean:cache:nuxt",
     "clean:cache:pwa": "rm -rf ./node_modules/.cache/pwa || :",
     "clean:cache:nuxt": "rm -rf ./node_modules/.cache/nuxt || :",
-    "prepare": " APP_ID=${APP_ID:-PFIAS} && git submodule update --recursive --remote --merge && echo `ls /submodules` && echo `ls /submodules/PFIAS` &&  yarn clean &&  cp submodules/$APP_ID/config.js config.js && rm -rf static/* && cp -r submodules/$APP_ID/static .  && cp -r submodules/$APP_ID/generated . ",
+    "prepare": " APP_ID=${APP_ID:-PFIAS} && git submodule update --recursive --remote --merge && echo `ls`  && echo `ls /submodules` && echo `ls /submodules/PFIAS` &&  yarn clean &&  cp submodules/$APP_ID/config.js config.js && rm -rf static/* && cp -r submodules/$APP_ID/static .  && cp -r submodules/$APP_ID/generated . ",
     "dev": "yarn prepare && nuxt",
     "build": "nuxt build",
     "mock": " yarn prepare && yarn generate && yarn start",
