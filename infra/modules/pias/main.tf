@@ -1,5 +1,5 @@
 provider "aws" {
-  region  = var.region
+  region = var.region
 }
 
 #resource "aws_acm_certificate" "this" {}
@@ -65,7 +65,7 @@ resource "aws_cloudfront_distribution" "this" {
   tags_all            = {}
   wait_for_deployment = true
   default_root_object = "index.html"
-  aliases             = var.env == "prod" ? ["france.pias.science"] : []
+  aliases             = var.env == "prod" ? [] : []
 
   default_cache_behavior {
     allowed_methods = [
