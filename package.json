@@ -5,7 +5,7 @@
   "private": true,
   "description": "Open source publishing platform for open science.",
   "scripts": {
-    "clean": "yarn clean:config && yarn clean:nuxt && yarn clean:cache",
+    "clean": " yarn clean:nuxt && yarn clean:cache",
     "clean:config": "rm ./config.js || :",
     "clean:nuxt": "(rm -rf ${NUXT_BUILD_DIR:-.nuxt/} || :) && (rm -rf ${NUXT_GENERATE_DIR:-dist/} || :)",
     "clean:cache": "yarn clean:cache:pwa && yarn clean:cache:nuxt",
