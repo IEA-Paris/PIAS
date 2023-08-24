@@ -65,7 +65,7 @@ resource "aws_cloudfront_distribution" "this" {
   tags_all            = {}
   wait_for_deployment = true
   default_root_object = "index.html"
-  aliases             = var.env == "prod" ? ["paris.pias.science"] : []
+  aliases             = var.env == "prod" ? ["france.pias.science"] : []
 
   default_cache_behavior {
     allowed_methods = [

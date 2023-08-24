@@ -37,9 +37,9 @@ export default (article, media, authors, issues, options) => {
           )?.text || article.issue.slice(15, -3),
       }),
       journal: {
-        name: 'Proceedings of the Paris Institute for Advanced Study', // TODO load from config
-        acronym: 'PPIAS', // TODO load from config
-        shortcode: 'PPIAS', // TODO load from config
+        name: options.config.fullName,
+        acronym: options.config.name,
+        shortcode: options.config.name,
         ...(issue && { issue: issue.name_of_the_issue }),
         ...(article.place && { place: article.place }),
         volume: article.issueIndex,
