@@ -50,7 +50,6 @@ jobs:
       - name: Update submodules
         run: |
           git submodule update --init --recursive --merge --remote
-          git submodule foreach git config pull.rebase true && git pull origin main --allow-unrelated-histories
           cp -r ./submodules/${{ github.event.inputs.name }}/infra .
 
       - name: Setup Terragrunt
