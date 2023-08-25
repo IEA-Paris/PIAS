@@ -28,9 +28,12 @@ jobs:
         node: [14]
 
     steps:
-      - name: Checkout 🛎
-        uses: actions/checkout@master
-
+      - name: 🛎 Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          token: ${{ secrets.SUBMODULE_GIT_TOKEN }}
+          
       - name: 'AWS Creds [DEV]'
         if: env.ENV == 'dev'
         uses: 'aws-actions/configure-aws-credentials@v1'
