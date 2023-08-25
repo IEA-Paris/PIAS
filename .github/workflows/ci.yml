@@ -66,7 +66,7 @@ jobs:
       - name: Update submodules
         # TODO replace hard coded references to the repo with variables
         run: |
-          git submodule update --remote --recursive
+          git submodule update --remote --recursive --allow-unrelated-histories --init
           rm -rf ./static/*
           cp -r ./submodules/${{ github.event.inputs.name }}/config.js ./config.js 
           cp -r ./submodules/${{ github.event.inputs.name }}/generated .
