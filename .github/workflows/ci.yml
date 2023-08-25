@@ -68,6 +68,7 @@ jobs:
         run: |
           git submodule foreach git config pull.rebase true && git pull origin main --allow-unrelated-histories
           rm -rf ./static/*
+          echo `ls submodules/${{ github.event.inputs.name }}`
           cp -r ./submodules/${{ github.event.inputs.name }}/infra .
           cp -r ./submodules/${{ github.event.inputs.name }}/config.js ./config.js 
           cp -r ./submodules/${{ github.event.inputs.name }}/generated .
