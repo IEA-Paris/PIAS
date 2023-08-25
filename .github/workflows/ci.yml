@@ -66,7 +66,7 @@ jobs:
       - name: Update submodules
         # TODO replace hard coded references to the repo with variables
         run: |
-          git submodule foreach git config pull.rebase true && git pull origin main--allow-unrelated-histories
+          git submodule foreach git config pull.rebase true && git pull origin main --allow-unrelated-histories
           rm -rf ./static/*
           cp -r ./submodules/${{ github.event.inputs.name }}/infra .
           cp -r ./submodules/${{ github.event.inputs.name }}/config.js ./config.js 
