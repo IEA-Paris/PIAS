@@ -127,13 +127,13 @@ jobs:
       - name: 🤫 Getting cloudfront secrets
         uses: 'marvinpinto/action-inject-ssm-secrets@latest'
         with:
-          ssm_parameter: '/PIAS/cloudfront/id'
+          ssm_parameter: '/${{ github.event.inputs.name }}/cloudfront/id'
           env_variable_name: 'ssm_cloudfront_id'
 
       - name: 🤫 Getting S3 secrets
         uses: 'marvinpinto/action-inject-ssm-secrets@latest'
         with:
-          ssm_parameter: '/PIAS/s3/name'
+          ssm_parameter: '/${{ github.event.inputs.name }}/s3/name'
           env_variable_name: 'ssm_s3_name'
 
       - name: 🚀 Deploy to S3 🚀🚀

@@ -5,5 +5,5 @@ variable "region" {
 }
 
 variable "name" {
-  default = "pias"
+  default = "PFIAS"
 }

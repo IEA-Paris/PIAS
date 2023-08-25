@@ -3,10 +3,10 @@ name: infra
 on:
   workflow_dispatch:
     inputs:
-      foo:
-        description: ''
-        required: false
-        default: 'bar'
+      name:
+        description: "Name of the proceedings to update"
+        required: true
+        default: "PFIAS"
 
   push:
     branches:
