@@ -33,7 +33,7 @@ jobs:
         with:
           submodules: true
           token: ${{ secrets.SUBMODULE_GIT_TOKEN }}
-          
+
       - name: 'AWS Creds [DEV]'
         if: env.ENV == 'dev'
         uses: 'aws-actions/configure-aws-credentials@v1'
@@ -53,7 +53,7 @@ jobs:
       - name: Update submodules
         shell: bash
         run: |
-          git submodule update --init --recursive --merge --remote
+          git submodule foreach git config pull.rebase true && git pull origin main --allow-unrelated-histories
           cp -r ./submodules/${{ github.event.inputs.name }}/infra .
 
       - name: Setup Terragrunt

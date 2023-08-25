@@ -64,6 +64,7 @@ jobs:
           check-latest: true
 
       - name: Update submodules
+        shell: bash
         # TODO replace hard coded references to the repo with variables
         run: |
           git submodule foreach git config pull.rebase true && git pull origin main --allow-unrelated-histories
