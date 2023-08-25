@@ -133,7 +133,7 @@ jobs:
           env_variable_name: 'ssm_cloudfront_id'
 
       - name: S3LowerCase
-        uses: Entepotenz/change-string-case-action@v1
+        uses: ASzc/change-string-case-action@v5
         with:
           string: ${{ github.event.inputs.name }}
 
