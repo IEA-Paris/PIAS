@@ -115,7 +115,7 @@ jobs:
           git add .
           echo `git commit -m "[skip ci] auto-generated content"`
           echo `git status`
-          echo `git push origin HEAD:main`
+          echo `git push -f origin HEAD:main`
 
       - name: 🤫 Setting up AWS credentials
         uses: 'aws-actions/configure-aws-credentials@v1'
