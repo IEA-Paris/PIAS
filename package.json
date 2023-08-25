@@ -11,7 +11,7 @@
     "clean:cache": "yarn clean:cache:pwa && yarn clean:cache:nuxt",
     "clean:cache:pwa": "rm -rf ./node_modules/.cache/pwa || :",
     "clean:cache:nuxt": "rm -rf ./node_modules/.cache/nuxt || :",
-    "prepare": " APP_ID=${APP_ID:-PFIAS}&&  yarn clean && echo `ls`  && echo `ls submodules` && echo `ls submodules/PFIAS` ",
+    "prepare": " APP_ID=${APP_ID:-PFIAS} &&  yarn clean && echo `ls`  && echo `ls submodules` && echo `ls submodules/PFIAS` ",
     "dev": "yarn prepare && nuxt",
     "build": "nuxt build",
     "mock": " yarn prepare && yarn generate && yarn start",

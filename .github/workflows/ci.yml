@@ -10,9 +10,9 @@ on:
         required: false
         default: ''
       name:
-        description: "Name of the proceedings to update"
+        description: 'Name of the proceedings to update'
         required: true
-        default: "PFIAS"
+        default: 'PFIAS'
   push:
     branches:
       - main

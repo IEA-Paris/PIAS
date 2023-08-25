@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       name:
-        description: "Name of the proceedings to update"
+        description: 'Name of the proceedings to update'
         required: true
-        default: "PFIAS"
+        default: 'PFIAS'
 
   push:
     branches:
