@@ -12,7 +12,7 @@ on:
       name:
         description: "Name of the proceedings to update"
         required: false
-        default: "*"
+        default: "PFIAS"
   push:
     branches:
       - main
