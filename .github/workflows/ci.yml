@@ -132,15 +132,15 @@ jobs:
           ssm_parameter: '/${{ github.event.inputs.name }}/cloudfront/id'
           env_variable_name: 'ssm_cloudfront_id'
 
-      - name: S3LowerCase
+      - id: string
         uses: ASzc/change-string-case-action@v5
         with:
-          string: ${{ github.event.inputs.name }}
+          string: '${{ github.event.inputs.name }}'
 
       - name: 🤫 Getting S3 secrets
         uses: 'marvinpinto/action-inject-ssm-secrets@latest'
         with:
-          ssm_parameter: '/${{ steps.S3LowerCase.outputs.lowercase}}/s3/name'
+          ssm_parameter: '/${{ steps.string.outputs.lowercase}}/s3/name'
           env_variable_name: 'ssm_s3_name'
 
       - name: 🚀 Deploy to S3 🚀🚀
