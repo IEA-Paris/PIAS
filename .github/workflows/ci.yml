@@ -11,7 +11,7 @@ on:
         default: ''
       name:
         description: "Name of the proceedings to update"
-        required: false
+        required: true
         default: "PFIAS"
   push:
     branches:
@@ -66,6 +66,7 @@ jobs:
       - name: Update submodules
         # TODO replace hard coded references to the repo with variables
         run: |
+          git config pull.rebase true
           git submodule foreach git pull origin main --allow-unrelated-histories
           rm -rf ./static/*
           cp -r ./submodules/${{ github.event.inputs.name }}/config.js ./config.js 
