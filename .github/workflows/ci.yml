@@ -9,7 +9,10 @@ on:
         description: 'CI Cache Clean'
         required: false
         default: ''
-
+      name:
+        description: "Name of the proceedings to update"
+        required: false
+        default: "*"
   push:
     branches:
       - main
@@ -65,9 +68,9 @@ jobs:
         run: |
           git submodule update --remote --recursive
           rm -rf ./static/*
-          cp -r ./submodules/PFIAS/config.js ./config.js 
-          cp -r ./submodules/PFIAS/generated .
-          cp -r ./submodules/PFIAS/static .
+          cp -r ./submodules/${{ github.event.inputs.name }}/config.js ./config.js 
+          cp -r ./submodules/${{ github.event.inputs.name }}/generated .
+          cp -r ./submodules/${{ github.event.inputs.name }}/static .
 
       - name: 🛠 Get yarn cache directory path
         id: yarn-cache-dir-path
@@ -105,7 +108,7 @@ jobs:
       - name: ⤴️ Retro push generated content 🧙‍♂️
         # TODO replace hard coded references to the repo with variables
         run: |
-          cd submodules/PFIAS 
+          cd submodules/${{ github.event.inputs.name }} 
           cp -r ../../static .
           git config --global user.name "CI"
           git config --global user.email "username@users.noreply.github.com"
@@ -151,5 +154,5 @@ jobs:
         uses: srt32/uptime@v0.2.1
         # TODO replace hard coded references to the repo with variables
         with:
-          url-to-hit: 'https://paris.pias.science'
+          url-to-hit: 'https://${{ github.event.inputs.name }}.pias.science'
           expected-statuses: '200,301'
