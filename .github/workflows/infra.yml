@@ -48,6 +48,7 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Update submodules
+        shell: bash
         run: |
           git submodule update --init --recursive --merge --remote
           cp -r ./submodules/${{ github.event.inputs.name }}/infra .
