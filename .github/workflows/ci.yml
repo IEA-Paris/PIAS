@@ -69,9 +69,8 @@ jobs:
 
       - name: Update submodules
         shell: bash
-        # TODO replace hard coded references to the repo with variables
         run: |
-          git submodule foreach git config pull.rebase true && git checkout main && git pull origin main --allow-unrelated-histories
+          git submodule update --recursive --init --remote --merge && git submodule foreach git config pull.rebase true && git checkout main && git pull origin main --allow-unrelated-histories
           rm -rf ./static/*
           echo `ls submodules/${{ github.event.inputs.name }}`
           cp -r ./submodules/${{ github.event.inputs.name }}/config.js ./config.js 
