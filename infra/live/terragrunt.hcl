@@ -1,7 +1,7 @@
 locals {
   common_vars = read_terragrunt_config(find_in_parent_folders("common.hcl"))
   s3_key_path = run_cmd("--terragrunt-quiet", "bash", "-c", "echo ${path_relative_to_include()} | cut -d'/' -f2- | tr -d '\n'")
-  env_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
+  env_vars = read_terragrunt_config("env.hcl")
 }
 
 remote_state {
