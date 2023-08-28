@@ -2,8 +2,8 @@ provider "aws" {
   region = var.region
 }
 
-data "http" "git_file" {
-  url = "../../config.js"
+data "file" "config" {
+  template = file("../../config.js")
 }
 
 data "archive_file" "init" {
