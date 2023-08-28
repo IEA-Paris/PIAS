@@ -13,6 +13,10 @@ on:
         description: 'Name of the proceedings to update'
         required: true
         default: 'PFIAS'
+      domain:
+        description: 'Subdomain of the proceedings to update'
+        required: true
+        default: 'france'
   push:
     branches:
       - main
@@ -132,11 +136,6 @@ jobs:
           ssm_parameter: '/${{ github.event.inputs.name }}/cloudfront/id'
           env_variable_name: 'ssm_cloudfront_id'
 
-      - id: string
-        uses: ASzc/change-string-case-action@v5
-        with:
-          string: '${{ github.event.inputs.name }}'
-
       - name: 🤫 Getting S3 secrets
         uses: 'marvinpinto/action-inject-ssm-secrets@latest'
         with:
@@ -161,5 +160,5 @@ jobs:
         uses: srt32/uptime@v0.2.1
         # TODO replace hard coded references to the repo with variables
         with:
-          url-to-hit: 'https://${{ github.event.inputs.name }}.pias.science'
+          url-to-hit: 'https://${{ github.event.inputs.domain }}.pias.science'
           expected-statuses: '200,301'
