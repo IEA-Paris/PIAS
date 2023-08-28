@@ -70,7 +70,7 @@ jobs:
       - name: Update submodules
         shell: bash
         run: |
-          git submodule update --init --remote --rebase && git submodule foreach git config pull.rebase true && git checkout main && git pull origin main --allow-unrelated-histories
+          git submodule update --init --remote --merge && git submodule foreach git config pull.rebase true && git checkout main && git pull origin main --allow-unrelated-histories
           rm -rf ./static/*
           echo `ls submodules/${{ github.event.inputs.name }}`
           cp -r ./submodules/${{ github.event.inputs.name }}/config.js ./config.js 
