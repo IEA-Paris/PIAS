@@ -5,7 +5,7 @@ provider "aws" {
 
 data "local_file" "config" {
 
-  filename = "../../../config.js"
+  filename = "../../config.js"
 
 }
 
