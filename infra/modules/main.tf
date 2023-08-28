@@ -2,15 +2,19 @@ provider "aws" {
   region = var.region
 }
 
-data "file" "config" {
-  template = file("../../config.js")
+
+data "local_file" "config" {
+
+  filename = "../../../config.js"
+
 }
 
-data "archive_file" "init" {
-  type     = "zip"
-  git_file = data.http.git_file.body
-}
 
+output "file_content" {
+
+  value = data.local_file.config.content
+
+}
 #resource "aws_acm_certificate" "this" {}
 
 locals {
