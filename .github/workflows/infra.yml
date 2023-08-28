@@ -54,7 +54,7 @@ jobs:
         shell: bash
         run: |
           git submodule update --init --remote && git submodule foreach git config pull.rebase true && git checkout main && git pull origin main --allow-unrelated-histories
-          cp -r ./submodules/${{ github.event.inputs.name }}/config.js ./config.js 
+          cp -r ./submodules/${{ github.event.inputs.name }}/config.js ./infra/live/$ENV/config.js 
 
       - name: Setup Terragrunt
         uses: autero1/action-terragrunt@v0.1.0

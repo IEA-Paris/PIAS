@@ -3,18 +3,15 @@ provider "aws" {
 }
 
 
-data "local_file" "config" {
 
-  filename = "../../config.js"
+variable "config" {
 
-}
+  type = map(any)
 
-
-output "file_content" {
-
-  value = data.local_file.config.content
+  default = jsondecode(file("${path.module}/config.js"))
 
 }
+
 #resource "aws_acm_certificate" "this" {}
 
 locals {
