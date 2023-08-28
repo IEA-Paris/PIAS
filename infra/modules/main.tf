@@ -4,13 +4,6 @@ provider "aws" {
 
 
 
-variable "config" {
-
-  type = map(any)
-
-  default = jsondecode(file("${path.module}/config.js"))
-
-}
 
 #resource "aws_acm_certificate" "this" {}
 
