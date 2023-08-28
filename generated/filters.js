@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-  const filters = {"years":{"type":"Select","items":[2021]},"language":{"type":"Select","items":["English"]},"issue":{"type":"Autocomplete","items":[{"text":"Your first issue","value":"test issue"}]},"discipline":{"type":"Autocomplete","items":[]},"thematic":{"type":"Autocomplete","items":[]},"type":{"type":"Autocomplete","items":[]},"tag":{"type":"Autocomplete","items":[]}};
+  const filters = {"years":{"type":"Select","items":[2021]},"language":{"type":"Select","items":["English"]},"issue":{"type":"Autocomplete","items":[{"text":"Your first issue","value":"test_issue"}]},"discipline":{"type":"Autocomplete","items":[]},"thematic":{"type":"Autocomplete","items":[]},"type":{"type":"Autocomplete","items":[]},"tag":{"type":"Autocomplete","items":[]}};
   const mediaTagFilter = {"type":"Autocomplete","items":[]};
   export default {
     articles: {

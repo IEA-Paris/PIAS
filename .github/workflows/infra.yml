@@ -53,8 +53,9 @@ jobs:
       - name: Update submodules
         shell: bash
         run: |
-          git submodule foreach git config pull.rebase true && git pull origin main --allow-unrelated-histories
+          git submodule update --init --remote && git submodule foreach git config pull.rebase true && git checkout main && git pull origin main --allow-unrelated-histories
           cp -r ./submodules/${{ github.event.inputs.name }}/infra .
+          cp -r ./submodules/${{ github.event.inputs.name }}/config.js ./config.js 
 
       - name: Setup Terragrunt
         uses: autero1/action-terragrunt@v0.1.0

@@ -1,19 +1,19 @@
 import fs from 'fs'
 
-export default (articles, issues) => {
+export default (articles = [], issues) => {
   const uniqueFilterItems = (filterItems) =>
     [...new Set(filterItems)].filter((item) => item).sort((a, b) => a - b)
 
   // year filter
   const years = uniqueFilterItems(
     articles
-      .map((article) => article.years)
+      .map((article) => article?.years)
       .filter((item) => item !== null && item !== '' && item)
   )
 
   // language filters
   const language = uniqueFilterItems(
-    articles.map((article) => article.language)
+    articles.map((article) => article?.language)
   )
 
   // issue filters (pruned, sorted by date desc)
