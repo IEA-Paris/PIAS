@@ -1,4 +1,4 @@
-export default (node, article, media, authors, issues, options) => {
+export default (node, article, media = [], authors, issues, options) => {
   if (
     node.tag === 'youtube' &&
     !article.media.find((item) => item.id === node.props.yt)
