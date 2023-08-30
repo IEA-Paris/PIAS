@@ -39,7 +39,7 @@ export default {
     console.log('this.item: ', this.item)
     this.issue = (
       await this.$content('issues', { deep: true })
-        .where({ slug: this.item.slice(15, -3) })
+        .where({ slug: this.item.slice(16, -3) })
 
         .fetch()
     )[0]
