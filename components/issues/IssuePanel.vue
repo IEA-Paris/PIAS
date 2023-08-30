@@ -35,9 +35,12 @@ export default {
   },
   async fetch() {
     // TODO rationalize
+    console.log('this.item.slice(15, -3) : ', this.item.slice(15, -3))
+    console.log('this.item: ', this.item)
     this.issue = (
       await this.$content('issues', { deep: true })
         .where({ slug: this.item.slice(15, -3) })
+
         .fetch()
     )[0]
 
