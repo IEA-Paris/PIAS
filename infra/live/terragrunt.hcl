@@ -1,6 +1,5 @@
 locals {
   common_vars = read_terragrunt_config(find_in_parent_folders("common.hcl"))
-  s3_key_path = run_cmd("--terragrunt-quiet", "bash", "-c", "echo ${path_relative_to_include()} | cut -d'/' -f2- | tr -d '\n'")
   env_vars = read_terragrunt_config("env.hcl")
 }
 
@@ -14,7 +13,7 @@ remote_state {
 
   config = {
     bucket  = "${local.common_vars.inputs.project_name}-${local.env_vars.inputs.env}-tfstate"
-    key     = "${local.s3_key_path}/terraform.tfstate"
+    key     = "${run_cmd("--terragrunt-quiet", "bash", "-c", "echo ${get_env("APP_ID")} | tr '[:upper:]' '[:lower:]'")}/terraform.tfstate"
     region  = local.common_vars.inputs.region
     encrypt = true
   }

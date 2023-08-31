@@ -2,9 +2,6 @@ provider "aws" {
   region = var.region
 }
 
-
-
-
 #resource "aws_acm_certificate" "this" {}
 
 locals {
@@ -15,12 +12,14 @@ resource "aws_ssm_parameter" "cloudfront_distribution_id" {
   name  = "/${var.name}/cloudfront/id"
   type  = "String"
   value = aws_cloudfront_distribution.this.id
+  overwrite = true
 }
 
 resource "aws_ssm_parameter" "s3_bucket_name" {
   name  = "/${var.name}/s3/name"
   type  = "String"
   value = aws_s3_bucket.this.bucket
+  overwrite = true
 }
 
 
