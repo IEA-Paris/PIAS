@@ -4,6 +4,9 @@
   "version": "1.1.0",
   "private": true,
   "description": "Open source publishing platform for open science.",
+  "config": {
+    "name": "PFIAS"
+  },
   "scripts": {
     "clean": " yarn clean:nuxt && yarn clean:cache",
     "clean:config": "rm ./config.js || :",
@@ -11,8 +14,9 @@
     "clean:cache": "yarn clean:cache:pwa && yarn clean:cache:nuxt",
     "clean:cache:pwa": "rm -rf ./node_modules/.cache/pwa || :",
     "clean:cache:nuxt": "rm -rf ./node_modules/.cache/nuxt || :",
-    "prepare": " APP_ID=${APP_ID:-PFIAS} &&  yarn clean && echo `ls`  && echo `ls submodules` && echo `ls submodules/PFIAS` ",
-    "dev": "yarn prepare && nuxt",
+    "prepare": " APP_ID=${APP_ID:-PFIAS} &&  yarn clean && echo `ls`  && echo `ls submodules` && echo `ls submodules/$npm_package_config_name` ",
+    "copy": "git submodule update --init --remote && git submodule foreach git config pull.rebase true && git checkout main && git pull origin main --allow-unrelated-histories && rm -rf ./static/*&& cp -r ./submodules/$npm_package_config_name/config.js ./config.js&&cp -r ./submodules/$npm_package_config_name/generated .&&cp -r ./submodules/$npm_package_config_name/static .",
+    "dev": "yarn copy && yarn prepare && nuxt",
     "build": "nuxt build",
     "mock": " yarn prepare && yarn generate && yarn start",
     "start": "nuxt start",
