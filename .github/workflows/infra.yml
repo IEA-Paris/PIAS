@@ -7,7 +7,10 @@ on:
         description: 'Name of the proceedings to update'
         required: true
         default: 'PFIAS'
-
+      domain:
+        description: 'Subdomain of the proceedings to update'
+        required: true
+        default: 'france'
   push:
     branches:
       - main
@@ -55,18 +58,18 @@ jobs:
           git submodule update --init --remote && git submodule foreach git config pull.rebase true && git checkout main && git pull origin main --allow-unrelated-histories
           cat << EOF > ./infra/modules/variables.tf
           variable "env" {}
-          
+
           variable "region" {
           default = "eu-west-3"
           }
-          
+
           variable "name" {
           default = "${{ github.event.inputs.name }}"
           }
           variable "domain" {
           default = "${{ github.event.inputs.domain }}"
           }
-          
+
           variable "acm_certificate_arn" {
           default = "arn:aws:acm:us-east-1:720928668014:certificate/af936a71-516a-40fc-8187-121807242a41"
           }
