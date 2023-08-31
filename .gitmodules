@@ -2,8 +2,3 @@
 	path = submodules/PFIAS
 	url = git@github.com:IEA-Paris/PFIAS.git
 	branch = main
-
-[submodule "submodules/PPIAS"]
-	path = submodules/PPIAS
-	url = git@github.com:IEA-Paris/PPIAS.git
-	branch = main
