@@ -104,3 +104,8 @@ assets/generated
 
 #local history vscode plugin (aka life-saver)
 .history
+
+# folders updated depending on the latest platform run locally
+static
+generated
+config.js

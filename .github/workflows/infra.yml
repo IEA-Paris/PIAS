@@ -14,7 +14,9 @@ on:
       acm_certificate_arn:
         description: 'ARN of the SSL certificate used by cloudfront (used if not managed by route 53, e.g. PIAS.science)'
         required: true
-        default: 'arn:aws:acm:us-east-1:720928668014:certificate/35951fda-9368-462a-8c57-afe5c7556d41'
+        default: 'arn:aws:acm:us-east-1:720928668014:certificate/af936a71-516a-40fc-8187-121807242a41'
+        # PFIAS: arn:aws:acm:us-east-1:720928668014:certificate/af936a71-516a-40fc-8187-121807242a41
+        # PPIAS: arn:aws:acm:us-east-1:720928668014:certificate/35951fda-9368-462a-8c57-afe5c7556d41
   push:
     branches:
       - main
