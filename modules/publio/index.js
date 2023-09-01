@@ -94,13 +94,12 @@ export default function (moduleOptions) {
     // store the registered conflicts in a markdown file @ /generated/report.md
     storeReport()
 
-    console.log('"GENERATE:DONE"')
     routesToPrint = makePrintRoutes(articles, options)
     console.log('routesToPrint: ', routesToPrint)
 
     url = 'http://127.0.0.1:3000'
     if (routesToPrint?.pdfs?.length || routesToPrint?.thumbnails?.length) {
-      console.log('geenrating files')
+      console.log('generating files')
       await generateFiles(
         routesToPrint,
         {
@@ -118,6 +117,7 @@ export default function (moduleOptions) {
       // METADATA/FRONTMATTER
       [publishOnZenodo]
     )
+    console.log('"GENERATE:DONE"')
     return true
   })
 
@@ -127,7 +127,6 @@ export default function (moduleOptions) {
     if (process.env.NODE_ENV !== 'production') {
       // Generate the routes to print
       routesToPrint = makePrintRoutes(articles, options)
-      console.log('routesToPrint: ', routesToPrint)
 
       // Generate PDFs and thumbnails for the print routes using the generateFiles function
       await generateFiles(
