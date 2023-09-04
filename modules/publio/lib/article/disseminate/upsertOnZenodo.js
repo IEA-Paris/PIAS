@@ -117,7 +117,7 @@ export default async (articles, options, queue) => {
         const sameChecksum = hasSameChecksum(sameIdOrDoi || [], document)
         /*  console.log('sameChecksum: ', sameChecksum) */
         if (!sameFrontmatter || !sameChecksum) {
-          console.log('Update required on an existing article')
+          console.log('Update required on an existing article -DISABLED')
           /*  if (sameIdOrDoi.state === 'done') {
             console.log('unlockingedit')
             await queue.add(async () => {
@@ -133,11 +133,15 @@ export default async (articles, options, queue) => {
           // since we de-published the article, we need to republish it once the pdf & data is updated
         }
         if (sameIdOrDoi.state !== 'done') {
-          console.log("Document is not published, let's publish it")
+          console.log(
+            "Document is not published, let's publish it",
+            document?.links
+          )
           document.todo.publishOnZenodo = true
-          if (!document?.links?.bucket)
+          if (!document?.links?.bucket) {
             console.log("No bucket link, let's add this one", sameIdOrDoi)
-          document.links = { bucket: sameIdOrDoi.links.bucket }
+            document.links = { bucket: sameIdOrDoi.links.bucket }
+          }
         }
       } else {
         // this article doesn't exist on Zenodo. Let's create it then.
