@@ -199,7 +199,6 @@ export default {
           })
           .fetch()
       )[0]
-    console.log('item: ', item)
 
     const dirArticle = item.dir.slice(9)
     let articleNumber = 1
