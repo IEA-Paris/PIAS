@@ -136,10 +136,7 @@ export default async (articles, options, queue) => {
           console.log("Document is not published, let's publish it")
           document.todo.publishOnZenodo = true
           if (!document?.links?.bucket)
-            console.log(
-              "No bucket link, let's add this one",
-              sameIdOrDoi.links.bucket
-            )
+            console.log("No bucket link, let's add this one", sameIdOrDoi)
           document.links = { bucket: sameIdOrDoi.links.bucket }
         }
       } else {
