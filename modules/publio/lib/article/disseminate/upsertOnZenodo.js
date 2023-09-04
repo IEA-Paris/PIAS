@@ -2,7 +2,6 @@ import { generateChecksum, deepEqual } from '../../../utils/contentUtilities'
 import buildZenodoDocument from './buildZenodoDocument'
 /// See main fn rationale below the subfunctions
 export default async (articles, options, queue) => {
-  let query
   try {
     const fs = require('fs')
     const path = require('path')
@@ -91,6 +90,7 @@ export default async (articles, options, queue) => {
 
         // get PDF checksum
         document.checksum = generateChecksum(document.fileBuffer)
+        console.log('FOUND a PDF file to upload for ', document.article_title)
       } else {
         console.log(
           'i: ',
@@ -136,7 +136,11 @@ export default async (articles, options, queue) => {
           console.log("Document is not published, let's publish it")
           document.todo.publishOnZenodo = true
           if (!document?.links?.bucket)
-            document.links = { bucket: sameIdOrDoi.links.bucket }
+            console.log(
+              "No bucket link, let's add this one",
+              sameIdOrDoi.links.bucket
+            )
+          document.links = { bucket: sameIdOrDoi.links.bucket }
         }
       } else {
         // this article doesn't exist on Zenodo. Let's create it then.

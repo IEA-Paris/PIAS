@@ -37,10 +37,12 @@ export default async (articles, options, queue) => {
           /*          console.log('it exist (links): ', document.links)
           console.log('it exist (todo): ', document.todo) */
           document.fileBuffer = fs.readFileSync(resolvedPath)
+          console.log('Found the PDF to upload for : ', document.slug)
         } else {
           console.log('The PDF to upload cannot be found for : ', document.slug)
           document.fileBuffer = false
         }
+        console.log('document?.links?.bucket: ', document?.links?.bucket)
 
         if (document.fileBuffer && document?.links?.bucket) {
           console.log(`deposition created on Zenodo for ${document.slug}`)
