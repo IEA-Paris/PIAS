@@ -132,7 +132,18 @@ export default async (articles, options, queue) => {
           } */
           // since we de-published the article, we need to republish it once the pdf & data is updated
         }
-        if (sameIdOrDoi.state !== 'done') {
+        console.log(
+          "Document is not published, let's publish it",
+          document?.links
+        )
+        document.todo.publishOnZenodo = true
+        if (!document?.links?.bucket) {
+          console.log("No bucket link, let's add this one", sameIdOrDoi)
+          document.links = { bucket: sameIdOrDoi.links.bucket }
+        }
+        if (sameIdOrDoi.state === 'done') {
+          document.todo.publishOnZenodo = false
+        } else {
           console.log(
             "Document is not published, let's publish it",
             document?.links

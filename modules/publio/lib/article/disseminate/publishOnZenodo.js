@@ -70,7 +70,11 @@ export default async (articles, options, queue) => {
           await queue.add(async () => {
             try {
               console.log('uploading and publishing on Zenodo ', document.slug)
-              if (document.published && document.needDOI) {
+              if (
+                document.published &&
+                document.needDOI &&
+                document.todo.publishOnZenodo
+              ) {
                 document = await uploadArticleFileOnZenodo(document)
                 document = await publishArticleOnZenodo(document)
               }
