@@ -21,7 +21,9 @@ on:
     branches:
       - main
       - develop
-
+    paths:
+      - infra/**
+      - '.github/workflows/infra.yml'
 env:
   ENV: ${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}
   AWS_REGION: 'eu-west-3' # paris
