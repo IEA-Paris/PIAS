@@ -38,7 +38,7 @@ export default async (articles, options, queue) => {
           console.log('it exist (todo): ', document.todo) */
           document.fileBuffer = fs.readFileSync(resolvedPath)
         } else {
-          console.log('it DOES NOT exist: ', document.slug)
+          console.log('The PDF to upload cannot be found for : ', document.slug)
           document.fileBuffer = false
         }
 
