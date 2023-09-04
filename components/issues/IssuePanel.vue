@@ -1,6 +1,6 @@
 <template>
   <v-card outlined class="pa-3" nuxt :to="'/issue/' + issue.slug">
-    <v-card-title class="mx-6" v-html="issue.name_of_the_issue"></v-card-title>
+    <v-card-title v-html="issue.name_of_the_issue"></v-card-title>
     <v-card-text
       v-if="issue.body && issue.body.children && issue.body.children.length"
     >
