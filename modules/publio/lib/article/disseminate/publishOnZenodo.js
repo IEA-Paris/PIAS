@@ -42,7 +42,7 @@ export default async (articles, options, queue) => {
           console.log('The PDF to upload cannot be found for : ', document.slug)
           document.fileBuffer = false
         }
-        console.log('document?.links?.bucket: ', document?.links?.bucket)
+        console.log('document?.links?.bucket: ', document?.links)
 
         if (document.fileBuffer && document?.links?.bucket) {
           console.log(`deposition created on Zenodo for ${document.slug}`)

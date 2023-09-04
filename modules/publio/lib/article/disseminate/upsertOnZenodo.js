@@ -153,6 +153,7 @@ export default async (articles, options, queue) => {
             document.todo.publishOnZenodo = true
           }
         }
+        console.log('document?.links?.bucket: ', document?.links?.bucket)
         document.todo.generatePDF = true
 
         console.log('document created', document.DOI)

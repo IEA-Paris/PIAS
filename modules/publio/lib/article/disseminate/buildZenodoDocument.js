@@ -24,6 +24,7 @@ export default (document, options) => {
     publication_type: 'conferencepaper',
     ...(document.tags && { keywords: document.tags }),
     references,
+    record_url: options.config.url + '/article/' + document.slug,
     language: 'eng', // TODO bind to i18n config settings
     access_right: 'open',
     license: 'CC-BY-NC-4.0',
