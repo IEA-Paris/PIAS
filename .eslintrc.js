@@ -57,5 +57,6 @@ module.exports = {
     'standard/no-callback-literal': 0,
     'node/no-callback-literal': 0,
     semi: ['error', 'never'],
+    curly: ['error', 'multi-line'],
   },
 }

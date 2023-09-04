@@ -150,10 +150,12 @@ export default async (articles, options, queue) => {
           const rst = (await upsertArticleOnZenodo(document)) || false
           if (rst) {
             if (!document.Zid) document.Zid = rst.data.id
-            if (!document.DOI)
+            if (!document.DOI) {
               document.DOI = rst.data.metadata.prereserve_doi.doi
-            if (!document?.links?.bucket)
+            }
+            if (!document?.links?.bucket) {
               document.links = { bucket: rst.data.links.bucket }
+            }
             document.todo.publishOnZenodo = true
           }
         }
