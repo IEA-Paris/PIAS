@@ -151,7 +151,7 @@
     </table>
     <footer id="footer">
       <div class="footer-content">
-        <div v-if="nameIssue">
+        <div v-if="nameIssue && item.toCite && item.toCite.apa">
           <small v-html="item.toCite.apa"></small>
           <small>
             {{ new Date(item.date).getFullYear() }}/{{ issueNumber }} -
@@ -199,6 +199,7 @@ export default {
           })
           .fetch()
       )[0]
+    console.log('item: ', item)
 
     const dirArticle = item.dir.slice(9)
     let articleNumber = 1
