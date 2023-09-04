@@ -65,26 +65,26 @@ export default async (articles, options, queue) => {
     }
 
     const result = await Promise.all(
-      articles.map(
-        async (document) =>
+      articles.map(async (document) => {
+        if (
+          document.published &&
+          document.needDOI &&
+          document.todo.publishOnZenodo
+        ) {
           await queue.add(async () => {
             try {
               console.log('uploading and publishing on Zenodo ', document.slug)
-              if (
-                document.published &&
-                document.needDOI &&
-                document.todo.publishOnZenodo
-              ) {
-                document = await uploadArticleFileOnZenodo(document)
-                document = await publishArticleOnZenodo(document)
-              }
+
+              document = await uploadArticleFileOnZenodo(document)
+              document = await publishArticleOnZenodo(document)
               return document
             } catch (error) {
               console.log(`Error while upload and publish on Zenodo: ${error}`)
             }
             return document
           })
-      )
+        }
+      })
     )
 
     return result
