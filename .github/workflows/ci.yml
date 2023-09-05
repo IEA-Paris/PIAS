@@ -71,7 +71,7 @@ jobs:
         shell: bash
         run: |
           git submodule update --init --remote && git submodule foreach git config pull.rebase true && git checkout main && git pull origin main --allow-unrelated-histories
-          rm -rf ./static/*
+          rm -rf !(admin) ./static/*
           echo `ls submodules/${{ github.event.inputs.name }}`
           cp -r ./submodules/${{ github.event.inputs.name }}/config.js ./config.js 
           cp -r ./submodules/${{ github.event.inputs.name }}/generated .

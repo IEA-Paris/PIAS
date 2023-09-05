@@ -2,6 +2,7 @@
   "name": "PIAS",
   "author": "Antoine Cordelois",
   "version": "1.1.0",
+  "type": "module",
   "private": true,
   "description": "Open source publishing platform for open science.",
   "config": {
@@ -16,7 +17,8 @@
     "clean:cache:nuxt": "rm -rf ./node_modules/.cache/nuxt || :",
     "prepare": " APP_ID=${APP_ID:-PFIAS} &&  yarn clean && echo `ls`  && echo `ls submodules` && echo `ls submodules/$npm_package_config_name` ",
     "copy": "git submodule update --init --remote && git submodule foreach git config pull.rebase true && git checkout main && git pull origin main --allow-unrelated-histories && rm -rf ./static/*&& cp -r ./submodules/$npm_package_config_name/config.js ./config.js&&cp -r ./submodules/$npm_package_config_name/generated .&&cp -r ./submodules/$npm_package_config_name/static .",
-    "dev": "yarn copy && yarn prepare && nuxt",
+    "configCMS": "node infra/deploy.js",
+    "dev": "yarn copy && yarn prepare && yarn configCMS && nuxt",
     "build": "nuxt build",
     "mock": "yarn copy && yarn prepare && yarn generate && yarn start",
     "start": "nuxt start",
