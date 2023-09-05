@@ -21,6 +21,10 @@ locale: fr
 site_url: ${config.url}
 logo_url: ${config.url}/icon.png
 show_preview_links: false
+slug:
+  encoding: "ascii"
+  clean_accents: true
+  sanitize_replacement: "-"
 i18n:
   structure: multiple_folders
   locales: [en, fr]
