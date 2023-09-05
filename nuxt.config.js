@@ -460,7 +460,7 @@ export default {
   },
   // https://i18n.nuxtjs.org/
   i18n: {
-    langDir: 'submodules/' + config.name + '/translations/',
+    langDir: './translations/',
     locales: config.lang.locales,
     defaultLocale: config.lang.default,
     strategy: 'no_prefix',
