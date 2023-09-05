@@ -10,5 +10,6 @@
 8. Add a secret token (settings > developers > Personal access tokens) `SERVICE_USER_PAT` matching a secret token from the user `service-dev-paris-iea` (dev@paris-iea.fr). It should be a classic token with workflows and repo rights
 9. In the PIAS repo, you need to add the new platform as a submodule. e.g. for a `SANDBOX` identifier `git submodule add git@github.com:IEA-Paris/SANDBBOX.git ./submodules/SANDBOX` from the root of the PIAS repo. stage your changes and push them to PIAS main branch
 10. Trigger the infra CI for the newly created platform. It should fail as you don't have the cloudfront endpoint in your DNS table
-11. Last step: update the DNS table with the newly created cloudfront distribution. e.g. `france 10800 IN CNAME d2hhxxxfthdewz.cloudfront.net.`
-12. update the data repository and check that the CI is triggering correctly, the website is deployed as intended and the CMS is available.
+11. Go to AWS ACM in the parameter store. Add 2 keys: `SANDBOX/cloudfront/id` with the Cloudfront distribution ID as value. Also add `SANDBOX/s3/name` with the S3 name (it's created by terraform and should be the identifier in lowercase)
+12. Last step: update the DNS table with the newly created cloudfront distribution. e.g. `france 10800 IN CNAME d2hhxxxfthdewz.cloudfront.net.`
+13. update the data repository and check that the CI is triggering correctly, the website is deployed as intended and the CMS is available.
