@@ -104,6 +104,7 @@ export default async (articles, options, queue) => {
       /*   console.log('sameIdOrDoi: ', sameIdOrDoi) */
       // check if the article already exists on Zenodo:
       if (sameIdOrDoi) {
+        console.log('sameIdOrDoi: ', sameIdOrDoi)
         console.log(
           'FOUND articles matching on Zenodo for ',
           document.article_title
@@ -137,11 +138,9 @@ export default async (articles, options, queue) => {
           document?.links
         )
         document.todo.publishOnZenodo = true
-        if (!document?.links?.bucket) {
-          console.log("No bucket link, let's add this one", sameIdOrDoi)
-          document.links = { bucket: sameIdOrDoi.links.bucket }
-        }
+
         if (sameIdOrDoi.state === 'done') {
+          console.log('Document published, nothing is needed')
           document.todo.publishOnZenodo = false
         } else {
           console.log(
@@ -178,7 +177,13 @@ export default async (articles, options, queue) => {
     }
     articles = await Promise.all(
       await articles.map(async (document) => {
-        if (document.published && document.needDOI === true) {
+        console.log('processing article: ', document.article_title)
+        console.log('TODO list', document.todo)
+        if (
+          document.published &&
+          document.needDOI === true &&
+          document.todo.upsertOnZenodo
+        ) {
           return await generateDOI(document, records)
         } else {
           return document
