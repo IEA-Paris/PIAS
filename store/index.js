@@ -71,13 +71,15 @@ export const mutations = {
     state[type].itemsPerPage = value
   },
   setPage(state, { page, type }) {
-    if ((this.app.router.currentRoute.params.page || 1) !== page)
+    if ((this.app.router.currentRoute.params.page || 1) !== page) {
       this.app.router.push('/' + type + '/' + page)
+    }
     set(state[type], 'page', page)
   },
   setFilters(state, { filters, type }) {
-    if (filters[Object.keys(filters)[0]].length)
+    if (filters[Object.keys(filters)[0]].length) {
       state[type].loading.push(Object.keys(filters)[0])
+    }
     set(
       state[type].filters,
       Object.keys(filters)[0],
@@ -237,9 +239,7 @@ export const actions = {
           pipeline.language = { $containsAny: val }
         } else if (filter === 'issue') {
           pipeline.issue = {
-            $containsAny: val.map(
-              (item) => 'submodules/' + config.name + '/issues/' + item + '.md'
-            ),
+            $containsAny: val.map((item) => 'content/issues/' + item + '.md'),
           }
         } else if (filter === 'years') {
           const yearsToInt = val.map((i) => +i)
