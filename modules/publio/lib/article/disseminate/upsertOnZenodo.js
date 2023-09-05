@@ -177,13 +177,13 @@ export default async (articles, options, queue) => {
     }
     articles = await Promise.all(
       await articles.map(async (document) => {
-        console.log('processing article: ', document.article_title)
-        console.log('TODO list', document.todo)
         if (
           document.published &&
           document.needDOI === true &&
           document.todo.upsertOnZenodo
         ) {
+          console.log('processing article: ', document.article_title)
+          console.log('TODO list', document.todo)
           return await generateDOI(document, records)
         } else {
           return document
