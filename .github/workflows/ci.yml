@@ -67,7 +67,7 @@ jobs:
           node-version: ${{ matrix.node }}
           check-latest: true
 
-      - name: Update submodules
+      - name: 🔄 Update submodules
         shell: bash
         run: |
           git submodule update --init --remote && git submodule foreach git config pull.rebase true && git checkout main && git pull origin main --allow-unrelated-histories
@@ -101,7 +101,7 @@ jobs:
       #- name: Run tests 🧪
       #  run: yarn test
 
-      - name: 🤞 Generate
+      - name: 🤞 Generate ${{ github.event.inputs.name }}
         run: yarn generate
         env:
           DEEPL_KEY: ${{ secrets.DEEPL_KEY }}
@@ -159,7 +159,7 @@ jobs:
           DISTRIBUTION: ${{ env.SSM_CLOUDFRONT_ID }}
           PATHS: '/*'
 
-      - name: Uptime Action
+      - name: 🔌 Uptime Action
         uses: srt32/uptime@v0.2.1
         # TODO replace hard coded references to the repo with variables
         with:
