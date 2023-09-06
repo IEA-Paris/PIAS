@@ -76,7 +76,7 @@ jobs:
           cp -r ./submodules/${{ github.event.inputs.name }}/config.js ./config.js 
           cp -r ./submodules/${{ github.event.inputs.name }}/generated .
           cp -r ./submodules/${{ github.event.inputs.name }}/static .
-          cp -r ./admin ./static/admin
+          cp -r ./admin ./static
 
       - name: 🛠 Get yarn cache directory path
         id: yarn-cache-dir-path
@@ -94,6 +94,9 @@ jobs:
 
       - name: 👨🏻‍💻 Install dependencies
         run: yarn
+
+      - name: 🧪 Configure the CMS
+        run: yarn configCMS
 
       #- name: Run tests 🧪
       #  run: yarn test
