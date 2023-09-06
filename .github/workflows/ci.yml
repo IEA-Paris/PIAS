@@ -1,6 +1,6 @@
 #https://emojipedia.org for emotes
 
-name: ci
+name: CI ${{ github.event.inputs.name }}
 
 on:
   workflow_dispatch:
