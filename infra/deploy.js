@@ -227,6 +227,8 @@ collections:
               label: "Is institution",
               name: "is_institution",
               widget: "boolean",
+              required: false,
+              default: false,
             },
             {
               label: Firstname,
@@ -376,6 +378,7 @@ collections:
         label: "Issue",
         name: "issue",
         widget: "file",
+        required: false,
         media_folder: "/issues",
         public_folder: "content/issues",
       }
