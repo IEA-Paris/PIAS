@@ -116,6 +116,7 @@ jobs:
 
       - name: ⤴️ Retro push generated content 🧙‍♂️
         # TODO replace hard coded references to the repo with variables
+        shell: bash
         run: |
           cd submodules/${{ github.event.inputs.name }} 
           cp -r !(admin) ../../static .
