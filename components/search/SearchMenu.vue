@@ -10,7 +10,7 @@
         <div class="d-flex flex-column flex-grow-1">
           <div class="d-flex flex-grow-1 align-start">
             <v-img
-              class="mr-2 mt-4"
+              class="mr-2 mt-4 logo-container-white"
               :src="$config.logo_alt"
               contain
               max-height="120"
@@ -256,7 +256,7 @@ export default {
 <style scoped lang="scss">
 $input-font-size: 48px;
 .logo-container-white {
-  //  border: 4px white solid;
+  border: 4px white solid;
 }
 .menu-logo {
   transition-duration: 0.2s;
