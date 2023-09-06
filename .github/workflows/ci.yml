@@ -1,6 +1,6 @@
 #https://emojipedia.org for emotes
 
-name: CI ${{ github.event.inputs.name }}
+name: CI
 
 on:
   workflow_dispatch:
@@ -38,7 +38,7 @@ jobs:
         node: [16]
 
     steps:
-      - name: 🛎 Checkout
+      - name: 🛎 Checkout ${{ github.event.inputs.name }}
         uses: actions/checkout@v3
         with:
           submodules: true
