@@ -406,12 +406,8 @@ export default {
   },
   // Content module configuration: https://go.nuxtjs.dev/config-content
   content: {
-    dir: [
-      'submodules/' + config.name + '/articles',
-      'submodules/' + config.name + '/authors',
-      'submodules/' + config.name + '/media',
-    ],
-    ignores: ['/submodules/' + config.name + '/static/admin', '/static/admin'],
+    dir: 'submodules/' + config.name,
+    ignores: ['submodules/' + config.name + '/static/admin', 'static/admin'],
     /*     basePlugins: [
       'remark-squeeze-paragraphs',
       'rehype-slug',
