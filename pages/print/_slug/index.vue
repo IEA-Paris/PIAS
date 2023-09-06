@@ -2,7 +2,7 @@
   <article class="printpanel page pdf a4" style="background-color: white">
     <header>
       <img
-        src="http://localhost:3000/ppias.svg"
+        src="http://localhost:3000/icon.png"
         alt="Avatar"
         style="width: 70px; height: 70px; margin-top: 5mm"
       />
