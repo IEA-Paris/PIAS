@@ -487,6 +487,9 @@ collections:
   - name: 'pages' # Used in routes, e.g., /admin/collections/blog
     label: 'Pages' # Used in the UI
     i18n: true
+    nested:
+      depth: 2
+      summary: '{{slug}}'
     folder: 'pages' # The path to the folder where the documents are stored
     create: true # Allow users to create new documents in this collection
     fields: # The fields for each document, usually in front matter
