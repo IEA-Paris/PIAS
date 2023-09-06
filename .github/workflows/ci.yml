@@ -17,11 +17,11 @@ on:
         description: 'Subdomain of the proceedings to update'
         required: true
         default: 'france'
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - 'infra/**'
+#  push:
+#    branches:
+#      - main
+#    paths-ignore:
+#      - 'infra/**'
 
 env:
   ENV: ${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}
