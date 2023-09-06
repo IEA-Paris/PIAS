@@ -1,6 +1,6 @@
 #https://emojipedia.org for emotes
 
-name: CI
+name: ci
 
 on:
   workflow_dispatch:
