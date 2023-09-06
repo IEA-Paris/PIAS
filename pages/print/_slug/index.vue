@@ -126,9 +126,9 @@
               v-if="item.bibliography && item.bibliography.length"
               class="bibliography-panel"
             >
-              <div id="bibliography">
+              <h2 id="bibliography">
                 {{ $t('bibliography') }}
-              </div>
+              </h2>
               <ArticleBibliography :item="item"></ArticleBibliography>
             </div>
             <template v-if="item.footnotes && item.footnotes.length">
@@ -340,6 +340,7 @@ export default {
     margin-left: -1rem !important;
     font-size: 14px !important;
     text-align: left;
+    page-break-before: always;
   }
 
   .nuxt-content.article-body h2,
