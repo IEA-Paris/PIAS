@@ -13,7 +13,7 @@
           <div class="d-flex flex-grow-1 align-start">
             <v-img
               class="mr-2 mt-4 logo-container-white"
-              src="/logo_w.png"
+              :src="$config.logo_alt"
               contain
               max-height="120"
               max-width="120"
