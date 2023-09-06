@@ -119,6 +119,7 @@ jobs:
         shell: bash
         run: |
           cd submodules/${{ github.event.inputs.name }} 
+          shopt -s extglob
           cp -r !(admin) ../../static .
           git config --global user.name "CI"
           git config --global user.email "username@users.noreply.github.com"
