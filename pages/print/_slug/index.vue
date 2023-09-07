@@ -220,18 +220,22 @@ export default {
     }
 
     const nameIssue = item.issue && item.issue.slice(15, -3)
-    const issue = (
-      await $content('issues', { deep: true })
-        .where({
-          slug: nameIssue,
-        })
-        .fetch()
-    )[0]
+    const issue = nameIssue
+      ? (
+          await $content('issues', { deep: true })
+            .where({
+              slug: nameIssue,
+            })
+            .fetch()
+        )[0]
+      : false
 
-    const issueNumber = filtersRaw.articles.filters.issue.items.findIndex(
-      (filteredIssue) =>
-        filteredIssue.value.toLowerCase() === nameIssue.toLowerCase()
-    )
+    const issueNumber = nameIssue
+      ? filtersRaw.articles.filters.issue.items.findIndex(
+          (filteredIssue) =>
+            filteredIssue.value.toLowerCase() === nameIssue.toLowerCase()
+        )
+      : false
 
     return {
       item,
