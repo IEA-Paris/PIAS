@@ -36,7 +36,9 @@ export default async (authors = [], articles, content) => {
           exerpt: item.text?.length ? item.text.slice(0, 350) : '',
           positions_and_institutions:
             item.positions_and_institutions &&
-            Object.values(item.positions_and_institutions),
+            Object.keys(item.positions_and_institutions).map((el) => {
+              return item.positions_and_institutions[el]
+            }),
           active: !!authorArticles,
           articles: authorArticles || [],
         }
