@@ -219,7 +219,7 @@ export default {
           .findIndex((article) => article.slug === item.slug) + 1
     }
 
-    const nameIssue = item.issue.slice(15, -3)
+    const nameIssue = item.issue && item.issue.slice(15, -3)
     const issue = (
       await $content('issues', { deep: true })
         .where({
