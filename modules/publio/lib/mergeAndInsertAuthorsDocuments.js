@@ -37,6 +37,7 @@ export default async (authors = [], articles, content) => {
           positions_and_institutions:
             item.positions_and_institutions &&
             Object.keys(item.positions_and_institutions).map((el) => {
+              console.log('el: ', el)
               return item.positions_and_institutions[el]
             }),
           active: !!authorArticles,
