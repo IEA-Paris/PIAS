@@ -10,12 +10,14 @@ export default (article, media, authors, issues, options) => {
     const date = new Date(article.createdAt).toLocaleDateString('EN', {
       timezone: 'UTC',
     })
-    const issue = issues.find((issue, index) => {
-      if (issue.slug === article.issue.slice(15, -3)) {
-        article.issueIndex = index + 1
-        return true
-      } else return false
-    })
+    const issue =
+      article.issue &&
+      issues.find((issue, index) => {
+        if (issue.slug === article.issue.slice(15, -3)) {
+          article.issueIndex = index + 1
+          return true
+        } else return false
+      })
 
     // make a json like object
     const docData = {
