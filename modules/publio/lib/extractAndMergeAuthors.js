@@ -32,7 +32,7 @@ const filterAndMerge = (first, second) => {
   })
 
   first = first.filter((author) => {
-    if (!author.social_channels)
+    if (!author.social_channels) {
       if (author?.social_channels?.orcid) {
         // does it have an orcid?
         // is it matching an existing doc?
@@ -52,6 +52,7 @@ const filterAndMerge = (first, second) => {
           return false
         }
       }
+    }
     return true
   })
 
