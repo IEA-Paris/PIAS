@@ -380,7 +380,7 @@ collections:
           label: 'Issue',
           name: 'issue',
           widget: 'file',
-          required: false,
+          required: true,
           media_folder: '/issues',
           public_folder: 'content/issues',
         }
