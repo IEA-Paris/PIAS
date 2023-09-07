@@ -580,6 +580,7 @@ export default {
       // extend source map to enable local debug in VScode (breakpoints & co)
       if (ctx.isDev) {
         config.devtool = ctx.isClient ? 'source-map' : 'inline-source-map'
+        config.postcss = false
       }
     },
   },
