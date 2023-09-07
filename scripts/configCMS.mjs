@@ -97,16 +97,6 @@ collections:
                 name: 'positions',
                 summary: '{{fields.institution}}',
                 required: false,
-                fields:
-                  [
-                    {
-                      label: 'Position',
-                      name: 'position',
-                      widget: 'string',
-                      default: '',
-                      required: false,
-                    },
-                  ],
               },
             ],
         },
@@ -272,15 +262,7 @@ collections:
                       label: Positions,
                       name: 'positions',
                       summary: '{{fields.institution}}',
-                      fields:
-                        [
-                          {
-                            label: 'Position',
-                            name: 'position',
-                            widget: 'string',
-                            default: '',
-                          },
-                        ],
+                      required: false
                     },
                   ],
               },

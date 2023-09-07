@@ -38,6 +38,21 @@ export default async (authors = [], articles, content) => {
             item.positions_and_institutions &&
             Object.keys(item.positions_and_institutions).map((el) => {
               console.log('el: ', el)
+              console.log(
+                'item.positions_and_institutions[el]: ',
+                item.positions_and_institutions[el]
+              )
+              if (
+                Object.keys(item.positions_and_institutions[el]?.positions)
+                  ?.length
+              ) {
+                item.positions_and_institutions[el].positions = Object.keys(
+                  item.positions_and_institutions[el].positions
+                ).map(
+                  (pos) =>
+                    item.positions_and_institutions[el].positions[pos].position
+                )
+              }
               return item.positions_and_institutions[el]
             }),
           active: !!authorArticles,
