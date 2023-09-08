@@ -76,6 +76,7 @@ jobs:
           cp -r ./submodules/${{ github.event.inputs.name }}/config.js ./config.js 
           cp -r ./submodules/${{ github.event.inputs.name }}/generated .
           cp -r ./submodules/${{ github.event.inputs.name }}/static .
+          cp -r ./submodules/${{ github.event.inputs.name }}/pdfs ./static
           cp -r ./admin ./static
 
       - name: 🛠 Get yarn cache directory path
