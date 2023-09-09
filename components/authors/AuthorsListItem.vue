@@ -51,7 +51,7 @@
           <div :id="slugifyItem(item.lastname)" class="anchor"></div>
           <div
             :class="$vuetify.breakpoint.xl ? 'text-h4' : 'text-h5'"
-            v-html="highlightWord(item.firstname + ' ' + item.lastname)"
+            v-html="highlightWord(item.lastname + ' ' + item.firstname)"
           ></div>
           <div
             class="text-subtitle-2 mb-1"

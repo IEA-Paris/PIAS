@@ -12,7 +12,7 @@
         nuxt
         :to="localePath('/author/' + item.slug)"
         class="text-h5 ma-2 pa-2"
-        v-html="highlightWord(item.firstname + ' ' + item.lastname)"
+        v-html="highlightWord(item.lastname + ' ' + item.firstname)"
       >
       </v-card>
     </v-hover>
