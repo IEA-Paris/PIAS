@@ -43,6 +43,7 @@ export default async (authors = [], articles, content) => {
                 item.positions_and_institutions[el]
               )
               if (
+                item.positions_and_institutions[el]?.positions &&
                 Object.keys(item.positions_and_institutions[el]?.positions)
                   ?.length
               ) {
@@ -60,6 +61,7 @@ export default async (authors = [], articles, content) => {
         }
       }
     )
+    console.log('updatedAuthorsDocuments: ', updatedAuthorsDocuments)
 
     insertDocuments(updatedAuthorsDocuments, 'authors', [
       'lastname',
