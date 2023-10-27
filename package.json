@@ -6,7 +6,7 @@
   "private": true,
   "description": "Open source publishing platform for open science.",
   "config": {
-    "name": "SANDBOX"
+    "name": "PPIAS"
   },
   "scripts": {
     "clean": " yarn clean:nuxt && yarn clean:cache",
@@ -15,7 +15,7 @@
     "clean:cache": "yarn clean:cache:pwa && yarn clean:cache:nuxt",
     "clean:cache:pwa": "rm -rf ./node_modules/.cache/pwa || :",
     "clean:cache:nuxt": "rm -rf ./node_modules/.cache/nuxt || :",
-    "prepare": " APP_ID=${APP_ID:-PFIAS} &&  yarn clean && echo `ls`  && echo `ls submodules` && echo `ls submodules/$npm_package_config_name` ",
+    "prepare": " APP_ID=${APP_ID:-PPIAS} &&  yarn clean && echo `ls`  && echo `ls submodules` && echo `ls submodules/$npm_package_config_name` ",
     "copy": "git submodule update --init --remote && git submodule foreach  && rm -rf ./static/*&& cp -r ./submodules/$npm_package_config_name/config.js ./config.js&&cp -r ./submodules/$npm_package_config_name/generated .&&cp -r ./submodules/$npm_package_config_name/static . && cp -r ./admin ./static/admin",
     "configCMS": "node scripts/configCMS.mjs",
     "dev": "yarn copy && yarn prepare && yarn configCMS && nuxt",
@@ -38,6 +38,7 @@
     "@nuxtjs/pwa": "^3.3.5",
     "@nuxtjs/sentry": "^5.1.4",
     "@nuxtjs/style-resources": "^1.2.1",
+    "@nuxtjs/vuetify": "^1.11.3",
     "core-js": "^3.15.1",
     "d3": "^7.1.1",
     "d3-array": "^3.1.1",
@@ -63,7 +64,6 @@
     "@nuxtjs/html-validator": "0.4.0",
     "@nuxtjs/robots": "^2.5.0",
     "@nuxtjs/sitemap": "^2.4.0",
-    "@nuxtjs/vuetify": "^1.11.3",
     "@vue/test-utils": "^1.2.1",
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "^10.1.0",
