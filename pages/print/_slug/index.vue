@@ -164,7 +164,11 @@
             >
             - {{ $config.identifier.ISSN }}/&copy;
             {{ new Date().getFullYear() }}
-            <span v-html="formatedAuthors"></span>
+            <span
+              v-if="item.authors.length < 4"
+              v-html="formatedAuthors"
+            ></span>
+            <span v-else>{{ $t('the-authors') }}</span>
           </small>
         </div>
         <div>
@@ -378,6 +382,8 @@ export default {
   .article-authors {
     font-family: 'Open sans', sans-serif;
     padding: 1em 0;
+    max-width: 16cm;
+    display: inline-block;
   }
 
   .article-abstract {

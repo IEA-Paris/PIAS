@@ -13,9 +13,7 @@ export default (node, article, media, authors, issues, options) => {
       .forEach((footnote, index) => {
         article.footnotes.push({
           // TODO offset backlink on Y axis
-          backlink:
-            footnote.children[0]?.props?.href ||
-            footnote.children[1]?.props?.href,
+          backlink: footnote.children[1]?.props?.href,
           body: {
             children: [
               {

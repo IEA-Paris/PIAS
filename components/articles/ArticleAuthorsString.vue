@@ -22,7 +22,7 @@
     </template>
     <template v-else>
       <nuxt-link v-if="link" :to="link"> </nuxt-link>
-      <div v-else class="authors" v-html="formatAuthorsProxy()"></div>
+      <span v-else class="authors" v-html="formatAuthorsProxy()"></span>
     </template>
   </div>
 </template>
@@ -80,6 +80,7 @@ export default {
 .authors {
   word-wrap: normal;
   line-break: normal;
+  display: inline-block;
   font-size: 16px;
   max-width: 100%;
 }

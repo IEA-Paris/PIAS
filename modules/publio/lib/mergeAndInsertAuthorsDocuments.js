@@ -1,5 +1,6 @@
 import fs from 'fs'
 import parseMD from 'parse-md'
+import { drawEllipse } from 'pdf-lib'
 import { filterAndMerge, insertDocuments } from '../utils/contentUtilities'
 import config from '../../../config'
 
@@ -13,8 +14,7 @@ export default async (authors = [], articles, content) => {
 
     const updatedAuthorsDocuments = [...(first || []), ...(second || [])].map(
       (item) => {
-        delete item.createdAt
-
+        const { createdAt, ...rest } = item // remove createdAt property
         const authorArticles = item?.articles.filter((article) =>
           articles.find((art) => !(art.slug === article && art.published))
         )
@@ -28,40 +28,48 @@ export default async (authors = [], articles, content) => {
 
         const { content } = fileContents ? parseMD(fileContents) : false
 
-        return {
-          ...item,
-          text: content || false,
-          firstname: (item.firstname && item.firstname.trim()) || '',
-          lastname: (item.lastname && item.lastname.trim()) || '',
-          exerpt: item.text?.length ? item.text.slice(0, 350) : '',
-          positions_and_institutions:
-            item.positions_and_institutions &&
-            Object.keys(item.positions_and_institutions).map((el) => {
-              console.log('el: ', el)
-              console.log(
-                'item.positions_and_institutions[el]: ',
-                item.positions_and_institutions[el]
-              )
+        const positionsAndInstitutions = []
+        // prune empty positions
+        rest.positions_and_institutions =
+          // make sure it existts
+          (rest.positions_and_institutions &&
+            // then only keep the ones that have an institution
+            Object.keys(rest.positions_and_institutions).map((el) => {
+              // only if it has an institution
               if (
-                item.positions_and_institutions[el]?.positions &&
-                Object.keys(item.positions_and_institutions[el]?.positions)
-                  ?.length
+                rest.positions_and_institutions[el] &&
+                rest.positions_and_institutions[el].institution?.length
               ) {
-                item.positions_and_institutions[el].positions = Object.keys(
-                  item.positions_and_institutions[el].positions
-                ).map(
-                  (pos) =>
-                    item.positions_and_institutions[el].positions[pos].position
+                // prune positions as well
+                rest.positions_and_institutions[el].positions =
+                  (rest.positions_and_institutions[el].positions &&
+                    Array.isArray(
+                      rest.positions_and_institutions[el].positions
+                    ) &&
+                    rest.positions_and_institutions[el].positions.filter(
+                      (el) => el && el.length
+                    )) ||
+                  []
+                positionsAndInstitutions.push(
+                  rest.positions_and_institutions[el]
                 )
               }
-              return item.positions_and_institutions[el]
-            }),
+              return el
+            })) ||
+          []
+
+        return {
+          ...rest,
+          text: content || false,
+          firstname: (rest.firstname && rest.firstname.trim()) || '',
+          lastname: (rest.lastname && rest.lastname.trim()) || '',
+          exerpt: rest.text?.length ? rest.text.slice(0, 350) : '',
           active: !!authorArticles,
+          positions_and_institutions: positionsAndInstitutions,
           articles: authorArticles || [],
         }
       }
     )
-    console.log('updatedAuthorsDocuments: ', updatedAuthorsDocuments)
 
     insertDocuments(updatedAuthorsDocuments, 'authors', [
       'lastname',
