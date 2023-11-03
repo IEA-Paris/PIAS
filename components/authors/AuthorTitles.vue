@@ -11,13 +11,13 @@
       class=""
     >
       <template v-if="bio.positions && bio.positions.length">
-        <template v-if="title && title.length">
-          <v-list-item
-            v-for="title in bio.positions"
-            :key="title"
-            class="pl-0"
-            three-lines
-          >
+        <v-list-item
+          v-for="title in bio.positions"
+          :key="title"
+          class="pl-0"
+          three-lines
+        >
+          <template v-if="title && title.length">
             <!-- TODO add image from institution (ROR powered or smthing else) 
               <v-list-item-avatar>
           <v-icon
@@ -30,8 +30,8 @@
               <v-list-item-title v-html="title"></v-list-item-title>
               <v-list-item-subtitle>{{ bio.institution }}</v-list-item-subtitle>
             </v-list-item-content>
-          </v-list-item>
-        </template>
+          </template>
+        </v-list-item>
       </template>
       <v-list-item v-else class="pl-0">
         <v-list-item-content>
