@@ -19,15 +19,12 @@
       class="mr-1"
       :separator="index < item.authors.length - 1"
     ></ArticleAuthorItem>
-    <div v-if="authorInformations.institutions.length" class="mx-0 mt-5">
-      <div class="institutions-wrapper mx-0 mb-3">
-        <div
-          v-for="(institution, index) in authorInformations.institutions"
-          :key="index"
-          class="institution mt-2"
-          :class="{ 'mt-4': $vuetify.breakpoint.smAndDown }"
-          v-html="institution"
-        ></div>
+    <div v-if="institutions.length" class="mx-0 mt-5">
+      <div v-for="(institution, index) in institutions" :key="index">
+        <sup class="institution-number">{{ index + 1 }}</sup
+        ><span :key="institution" class="institution-name">{{
+          institution
+        }}</span>
       </div>
     </div>
   </div>
@@ -61,28 +58,21 @@ export default {
   background-color: transparent !important;
 }
 .institutions-wrapper {
-  .institution {
-    display: flex;
-    color: #5b5b66;
+  display: flex;
+  color: #5b5b66;
 
-    .institution-number {
-      margin-top: 10px;
-      padding-right: 0.4rem;
-    }
-
-    .institution-name {
-      font-size: 12px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-    }
+  .institution-number {
+    margin-top: 10px;
+    padding-right: 0.4rem;
   }
 
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
+  .institution-name {
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
 }
 </style>

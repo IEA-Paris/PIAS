@@ -86,10 +86,10 @@ export default (article, media, authors, issues, options) => {
       issued: {
         'date-parts': [date],
       },
-      month: new Date(article.createdAt).toLocaleString('en-US', {
+      month: new Date(article.date).toLocaleString('en-US', {
         month: 'short',
       }),
-      year: new Date(article.createdAt).getFullYear(),
+      year: new Date(article.date).getFullYear(),
       title: article.article_title,
       author: article.authors.map((item) => {
         // TODO include all title & institution info

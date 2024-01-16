@@ -10,9 +10,34 @@ export default {
     },
   },
   computed: {
+    institutions() {
+      // get a list of unique institutions
+      let institutions = [
+        ...new Set(
+          this.authors.map((author) =>
+            author.positions_and_institutions.map((positionAndInstitution) =>
+              positionAndInstitution.institution.trim()
+            )
+          )
+        ),
+      ].flat()
+      // Prune the case differences
+      console.log('institutions: ', institutions)
+      institutions = [
+        ...institutions
+          .map((s) => s.toLowerCase())
+          .reduce(
+            (map, s, i) => (map.get(s) ? map : map.set(s, institutions[i])),
+            new Map()
+          )
+          .values(),
+      ]
+      console.log('institutions2: ', institutions)
+      return institutions
+    },
     authorInformations() {
       // Generate the authors informations and format them
-      // Will return an object of array with institutions and authors formated with exponential
+      // Will return an object of array with institutions and authors formated with exponent
       //
       // Example:
       // {
@@ -20,8 +45,12 @@ export default {
       //   "authors": ['<a href="...">author1 <sup>0</sup><sup>1</sup>.</a>', '<a href="...">author2<sup>1</sup></a>']
       // }
 
-      let institutions = []
       const authors = []
+      let institutions = []
+      /*       this.authors.forEach((author) => {
+        if (author?.positions_and_institutions?.length) {
+        }
+      }) */
 
       this.authors.forEach((author) => {
         const authorsIndexInstutions = []

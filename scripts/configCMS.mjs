@@ -427,7 +427,8 @@ collections:
               Other,
             ],
         }
-      - { label: 'Article', name: 'body', widget: 'markdown' }
+      - { label: 'Article', name: 'body', widget: 'markdown', media_folder: '/static',
+    }
   - name: 'issues' # Used in routes, e.g., /admin/collections/blog
     label: 'Issues' # Used in the UI
     identifier_field: title
@@ -454,9 +455,9 @@ collections:
       - {
           label: 'Publication Date',
           name: 'date',
-          widget: 'date',
-          format: MM/YY,
+          widget: 'datetime',
           required: true,
+          picker_utc: false
         }
       - { label: 'Cover', name: 'cover', widget: 'image', required: false }
       - {
