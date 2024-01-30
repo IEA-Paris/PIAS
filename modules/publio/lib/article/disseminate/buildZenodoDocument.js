@@ -33,8 +33,7 @@ export default (document, options) => {
     // conference_title:
     // conference_acronym
     // location: [{"lat": 34.02577, "lon": -118.7804, "place": "Los Angeles"}, {"place": "Mt.Fuji, Japan", "description": "Sample found 100ft from the foot of the mountain."}]
-    // TODO uncomment this once we are out of sandbox. Test DOI trigger a 400 (bad request error) since they are not legit
-    // ...(document.DOI && { doi: document.DOI }),
+    ...(document.DOI && { doi: document.DOI }),
     ...(document.issue && {
       journal_issue:
         options.filters.issue.items.find(

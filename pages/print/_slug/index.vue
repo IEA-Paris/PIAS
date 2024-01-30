@@ -162,7 +162,7 @@
               style="text-decoration: none"
               >{{ `${$config.url}/article/${item.slug}` }}</a
             >
-            - {{ $config.identifier.ISSN }}/&copy;
+            - ISSN {{ $config.identifier.ISSN }}/&copy;
             {{ new Date().getFullYear() }}
             <span
               v-if="item.authors.length < 4"
