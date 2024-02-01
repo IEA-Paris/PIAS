@@ -34,7 +34,7 @@
             ></DoiBadge>
 
             <div v-if="item.toCite && item.toCite.apa" class="to-cite-wrapper">
-              <div class="article-label mt-12 mb-4">
+              <div class="article-label my-4">
                 {{ $t('to-cite') }}
               </div>
               <div class="to-cite" v-html="item.toCite.apa"></div>
@@ -333,7 +333,7 @@ export default {
     line-height: 28px !important;
     text-align: justify;
     width: 100%;
-    max-width: 100%;
+    max-width: 18cm;
   }
   .nuxt-content.article-body p {
     text-align: justify;
@@ -389,6 +389,7 @@ export default {
   .article-abstract {
     font-style: italic;
     margin-top: 0.8em;
+    font-size: 14px;
   }
 
   .article-label {

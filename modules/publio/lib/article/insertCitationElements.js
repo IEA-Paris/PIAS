@@ -7,7 +7,7 @@ export default (article, media, authors, issues, options) => {
     const styles = ['apa', 'vanvouver', 'harvard1'] // TODO import from config
 
     // TODO fix the issue with numbered lists in hardvard1 & co
-    const date = new Date(article.createdAt).toLocaleDateString('EN', {
+    const date = new Date(article.date).toLocaleDateString('EN', {
       timezone: 'UTC',
     })
     const issue =
@@ -23,7 +23,7 @@ export default (article, media, authors, issues, options) => {
     const docData = {
       abstract: article.abstract,
       address: options.config.address,
-      type: 'inproceedings',
+      type: 'article-journal',
       keywords: article.tags || [],
       // TODO conference_url: TO BE COMPLETED
       language: article.language || 'en',
@@ -39,7 +39,7 @@ export default (article, media, authors, issues, options) => {
           )?.text || article.issue.slice(15, -3),
       }),
       journal: {
-        name: options.config.fullName,
+        name: options.config.full_name,
         acronym: options.config.name,
         shortcode: options.config.name,
         ...(issue && { issue: issue.name_of_the_issue }),
@@ -72,9 +72,6 @@ export default (article, media, authors, issues, options) => {
       ],
       ...(article.issue && {
         journal_issue: article.issue.slice(15, -3),
-      }),
-      ...(article.issue && {
-        conference_title: article.issue.slice(15, -3),
       }),
       ...(article.issue && {
         conference_title: article.issue.slice(15, -3),

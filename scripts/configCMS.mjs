@@ -201,6 +201,16 @@ collections:
           widget: 'datetime',
         }
       - {
+          label: 'Type',
+          name: 'type',
+          widget: 'select',
+          required: true,
+          multiple: false,
+          default: 'proceedings',
+          options: ['proceedings', 'article'],
+          min: 1,
+        }
+      - {
           label: 'Does it need a DOI?',
           name: 'needDOI',
           widget: 'boolean',

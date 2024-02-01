@@ -21,7 +21,8 @@ export default (document, options) => {
   const metadata = {
     upload_type: 'publication',
     description: document.abstract || 'No description provided',
-    publication_type: 'conferencepaper',
+    publication_type:
+      document?.type === 'article' ? 'article' : 'conferencepaper',
     ...(document.tags && { keywords: document.tags }),
     references,
     record_url: options.config.url + '/article/' + document.slug,
@@ -68,6 +69,7 @@ export default (document, options) => {
       },
     ],
     journal_title: cleanupString(options.config.full_name),
+    ...(document.issueIndex && { journal_volume: document.issueIndex }),
     prereserve_doi: document.needDOI !== false,
     publication_date: new Date(document.date).toLocaleDateString('en-US', {
       timezone: 'UTC',

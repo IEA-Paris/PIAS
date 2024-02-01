@@ -26,7 +26,7 @@
                 small
                 v-on="on"
               >
-                <v-icon>mdi-download</v-icon>
+                <v-icon>mdi-file-pdf-box</v-icon>
               </v-btn>
             </template>
             <span>{{ $t('download-this-article-as-a-pdf-file') }}</span>

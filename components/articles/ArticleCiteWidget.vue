@@ -56,15 +56,15 @@ export default {
       return this.$store.state.articles.style
     },
   },
+
   mounted() {},
   methods: {
     async copyToClipBoard() {
       try {
         await navigator.clipboard.writeText(
-          this.toCite[this.style === 'APA' ? 'apa' : this.style].replace(
-            /(<([^>]+)>)/gi,
-            ''
-          )
+          this.toCite[this.style === 'APA' ? 'apa' : this.style]
+            .replace(/(<([^>]+)>)/gi, '')
+            .replace('&#38;', '&')
         )
       } catch (error) {
         console.log('error: ', error)
