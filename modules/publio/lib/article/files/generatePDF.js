@@ -14,7 +14,7 @@ export default async (route, url, meta) => {
     browser = await puppeteer.launch(
       /*  Object.assign( */
       {
-        headless: true,
+        headless: 'new',
       }
       /*    options.puppeteer 
       ) */

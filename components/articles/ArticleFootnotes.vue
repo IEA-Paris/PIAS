@@ -6,11 +6,7 @@
   >
     <v-list-item v-for="(footnote, index) in item.footnotes" :key="index" nuxt>
       <v-list-item-content>
-        <nuxt-content
-          :document="footnote"
-          style="max-width: 650px"
-          class="page a4"
-        />
+        <nuxt-content :document="footnote" style="max-width: 650px" />
       </v-list-item-content>
     </v-list-item>
   </v-list>

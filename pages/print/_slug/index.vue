@@ -131,15 +131,15 @@
               </h2>
               <ArticleBibliography :item="item"></ArticleBibliography>
             </div>
-            <template v-if="item.footnotes && item.footnotes.length">
-              <div id="footnotes" class="mt-3">
+            <div
+              v-if="item.footnotes && item.footnotes.length"
+              class="footnotes-panel"
+            >
+              <h2 id="footnotes" class="mt-3">
                 {{ $t('footnotes') }}
-              </div>
-              <ArticleFootnotes
-                :item="item"
-                class="footnotes-panel"
-              ></ArticleFootnotes>
-            </template>
+              </h2>
+              <ArticleFootnotes :item="item"></ArticleFootnotes>
+            </div>
           </td>
         </tr>
       </tbody>
@@ -344,7 +344,8 @@ export default {
   .nuxt-content.article-body ul li {
     text-align: left;
   }
-  .bibliography-panel {
+  .bibliography-panel,
+  .footnotes-panel {
     margin-left: -1rem !important;
     font-size: 14px !important;
     text-align: left;
@@ -471,5 +472,8 @@ footer {
 
 .footer-divider {
   margin: 3mm 0 3mm 0;
+}
+.footer-content {
+  line-height: 0.7rem;
 }
 </style>

@@ -437,8 +437,7 @@ collections:
               Other,
             ],
         }
-      - { label: 'Article', name: 'body', widget: 'markdown', media_folder: '/static',
-    }
+      - { label: 'Article', name: 'body', widget: 'markdown', media_folder: '/static'  }
   - name: 'issues' # Used in routes, e.g., /admin/collections/blog
     label: 'Issues' # Used in the UI
     identifier_field: title
