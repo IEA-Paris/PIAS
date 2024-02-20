@@ -22,7 +22,6 @@ export default {
         ),
       ].flat()
       // Prune the case differences
-      console.log('institutions: ', institutions)
       institutions = [
         ...institutions
           .map((s) => s.toLowerCase())
@@ -32,7 +31,6 @@ export default {
           )
           .values(),
       ]
-      console.log('institutions2: ', institutions)
       return institutions
     },
     authorInformations() {

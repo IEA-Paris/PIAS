@@ -51,10 +51,11 @@ export default (options) => {
         article_title,
         issue: 'content/issues/' + slugify(issue) + '.md',
         subissue: subissue || false,
-        published: published === 'TRUE',
+        published: true,
         yt: yt || false,
         start: start || false,
         stop: stop || false,
+        language: 'English',
         needDOI: needDOI === 'TRUE',
         abstract: abstract.replace('|', ';'),
         authors: [
@@ -107,6 +108,7 @@ export default (options) => {
         highlight: highlight === 'TRUE',
       }
     })
+    console.log('json: ', json)
 
     batchInsertArticles(json)
     return options
