@@ -205,11 +205,9 @@ export default {
       )[0]
 
     const dirArticle = item.dir.slice(9)
-    console.log('item.dir: ', item.dir)
     let articleNumber = 1
 
     if (dirArticle.length > 1) {
-      console.log('item.dir.split', item.dir.split('/'))
       articleNumber =
         (
           await $content('articles', { deep: true })

@@ -54,8 +54,8 @@ export default function (moduleOptions) {
   // await tsvToArticles()
   const fs = require('fs')
   const path = require('path')
-  console.log('ARG', process.env.LOCAL)
-  console.log('ARG', process.argv)
+  /*   console.log('ARG', process.env.LOCAL)
+  console.log('ARG', process.argv) */
   const { nuxt } = this
   let options = Object.assign({}, defaults, moduleOptions, this.options.publio)
 

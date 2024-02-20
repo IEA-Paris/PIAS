@@ -10,11 +10,20 @@ export default (article, media, authors, issues, options) => {
     const date = new Date(article.date).toLocaleDateString('EN', {
       timezone: 'UTC',
     })
+
+    // issue filters (pruned, sorted by date desc)
+    let issuesIndex = options.filters.issue.items.reverse()
+    issuesIndex = issuesIndex.map((item, index) => ({
+      index,
+      value: item.value,
+    }))
     const issue =
       article.issue &&
       issues.find((issue, index) => {
         if (issue.slug === article.issue.slice(15, -3)) {
-          article.issueIndex = index + 1
+          article.issueIndex =
+            issuesIndex.find((issueIndex) => issueIndex.value === issue.slug)
+              .index + 1
           return true
         } else return false
       })
