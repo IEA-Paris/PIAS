@@ -108,27 +108,41 @@
                   ></component>
                 </template>
               </div>
-              <v-text-field
-                v-model.trim="search"
-                :placeholder="$t('search-type', [$t(type)])"
-                prepend-inner-icon="mdi-magnify"
-                single-line
-                color="black"
-                :loading="$nuxt.loading || $store.state.loading"
-                class="transition-swing"
-                :class="{ 'mt-3': $store.state.scrolled }"
-                outlined
-                hide-details
-                :dense="$vuetify.breakpoint.smAndDown"
-                clearable
-                style="min-width: 150px"
-              >
-                <template v-if="!search" #label>
-                  <div class="searchLabel">
-                    {{ $t('search-type', [$t(type)]) }}
-                  </div>
-                </template></v-text-field
-              ></v-col
+              <div class="d-flex">
+                <!--            <v-btn
+                  v-if="type === 'authors'"
+                  outlined
+                  :class="{ 'mt-3': $store.state.scrolled }"
+                  class="transition-swing"
+                  :small="$vuetify.breakpoint.smAndDown"
+                  style="height: auto"
+                  ><v-icon>mdi-alphabetical-variant</v-icon></v-btn
+                > -->
+                <v-text-field
+                  v-model.trim="search"
+                  :placeholder="$t('search-type', [$t(type)])"
+                  prepend-inner-icon="mdi-magnify"
+                  single-line
+                  color="black"
+                  :loading="$nuxt.loading || $store.state.loading"
+                  class="transition-swing"
+                  :class="{ 'mt-3': $store.state.scrolled }"
+                  outlined
+                  hide-details
+                  :dense="$vuetify.breakpoint.smAndDown"
+                  clearable
+                  style="min-width: 150px"
+                >
+                  <template v-if="!search" #label>
+                    <div class="searchLabel">
+                      {{ $t('search-type', [$t(type)]) }}
+                    </div>
+                  </template></v-text-field
+                >
+              </div>
+              <!-- <template v-if="type === 'authors'">
+                <AuthorNamePicker @letter="letter = $event"></AuthorNamePicker>
+                <v-divider></v-divider> </template> --></v-col
             ></v-row
           ></v-container
         >
@@ -304,6 +318,7 @@ export default {
   },
   data() {
     return {
+      letter: null,
       filter: this.$store.state[this.type].filtersCount > 0,
       debouncedSearch: debounce(function (v) {
         this.$store.dispatch('updateSearch', { search: v, type: this.type })

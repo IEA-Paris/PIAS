@@ -1,5 +1,5 @@
 <template>
-  <PageContainer>
+  <div>
     <PageTitle :text="$t('authors')" />
     <ListLeftPanel
       type="authors"
@@ -12,7 +12,7 @@
         itemsPerPageArray: [30, 60, 100],
       }"
     ></ListLeftPanel>
-  </PageContainer>
+  </div>
 </template>
 <script>
 export default {
