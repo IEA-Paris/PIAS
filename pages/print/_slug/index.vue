@@ -284,7 +284,10 @@ export default {
     size: 210mm 297mm;
     margin-bottom: 1.5rem; // for page numbers
   }
-
+  .language-text.line-numbers .v-application code {
+    all: initial;
+    max-width: 18cm;
+  }
   .publication-date-content {
     font-size: 13px;
     border-left: 5px #2c2c2d solid;

@@ -13,7 +13,12 @@
       aria-label="Previous Page"
       nuxt
       :to="`/${type}/${currentPage - 1}`"
-      @keyup.enter="$router.push(`/${type}/${currentPage - 1}`)"
+      @keyup.enter="
+        $router.push({
+          path: `/${type}/${currentPage - 1}`,
+          query: $route.query,
+        })
+      "
     >
       <v-icon>mdi-chevron-left </v-icon>
     </v-btn>
@@ -72,7 +77,12 @@
       height="35"
       width="35"
       nuxt
-      @keyup.enter="$router.push(`/${type}/${currentPage + 1}`)"
+      @keyup.enter="
+        $router.push({
+          path: `/${type}/${currentPage + 1}`,
+          query: $route.query,
+        })
+      "
     >
       <v-icon>mdi-chevron-right</v-icon></v-btn
     >

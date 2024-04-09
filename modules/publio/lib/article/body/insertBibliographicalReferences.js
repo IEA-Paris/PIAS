@@ -1,8 +1,18 @@
 import referenceRegex from '../../../utils/referenceRegex'
+import classicReferenceRegex from '../../../utils/classicReferenceRegex'
 
 const insertBibliographicalReferences = (node, biblio) => {
   try {
     const replaceReference = (node) => {
+      // start by matching regular references and replacing them by the related bib key
+      const regularMatches = node.value.match(classicReferenceRegex)
+      if (regularMatches !== null) {
+        regularMatches.map((match) => {
+          const authors = match.split(',')[0].trim()
+          const years = match.split(',')[1].trim()
+          biblio.find((item) => item.id === element.toLowerCase().substring(1))
+        })
+      }
       // only match citation keys (@author_title_year)
       // 'author' 'title' above refer to the first word of these only
 

@@ -127,6 +127,7 @@ export default function (moduleOptions) {
     if (process.env.NODE_ENV !== 'production') {
       // Generate the routes to print
       routesToPrint = makePrintRoutes(articles, options)
+      console.log('routesToPrint: ', routesToPrint)
 
       // Generate PDFs and thumbnails for the print routes using the generateFiles function
       await generateFiles(

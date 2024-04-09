@@ -178,6 +178,7 @@ collections:
     folder: 'articles' # The path to the folder where the documents are stored
     create: true # Allow users to create new documents in this collection
     slug: '{{slug}}' # Filename template, e.g., YYYY-MM-DD-title.md
+    media_folder: '/static',
     sortable_fields: ['date', 'article_title', 'issue'] # The fields on which it should be sortable
     fields: # The fields for each document, usually in front matter
       - {
@@ -364,8 +365,8 @@ collections:
           required: true,
           pattern:
             [
-              '^[^]{12,1500}$',
-              'Minimum 12 characters and maximum 1500 characters',
+              '^[^]{12,2000}$',
+              'Minimum 12 characters and maximum 2000 characters',
             ],
         }
       - {

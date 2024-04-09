@@ -1,5 +1,6 @@
 <template>
   <TextFingerprint
+    id="thumbnail"
     ref="articleBox"
     :item="item"
     :size="size"

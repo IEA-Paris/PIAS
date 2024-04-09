@@ -303,6 +303,21 @@ export const actions = {
       .sortBy(sortArray[2], sortArray[3])
       .skip(skipNumber())
       .limit(rootState[type].itemsPerPage)
+      // TODO reactivate once the thumbnails are pregenerated during CI
+      /*       .only([
+        'abstract',
+        'article_title',
+        'authors',
+        'highlight',
+        'date',
+        'language',
+        'slug',
+        'years',
+        'images',
+        'issue',
+        'issueIndex',
+        'yt',
+      ]) */
       .fetch()
     const defaultView =
       lists[type].views[

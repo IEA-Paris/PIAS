@@ -25,25 +25,36 @@ export default async (articles) => {
   let count = 0
   articles = articles?.map((article) => {
     const articleDiffed = diffed.includes(article.path)
-    const resolvedPath = path.resolve(
+    const resolvedPDFPath = path.resolve(
       process.env.NODE_ENV !== 'production' ||
         (process.env.NODE_ENV === 'production' && process.env.LOCAL === 'true')
         ? 'static/pdfs'
         : 'pdfs',
       article.slug + '.pdf'
     )
+    const resolvedThumbnailPath = path.resolve(
+      process.env.NODE_ENV !== 'production' ||
+        (process.env.NODE_ENV === 'production' && process.env.LOCAL === 'true')
+        ? 'static/thumbnails'
+        : 'thumbnails',
+      article.slug + '.png'
+    )
     let hasPDF = false
-    if (fs.existsSync(resolvedPath)) {
+    if (fs.existsSync(resolvedPDFPath)) {
       hasPDF = true
     } else {
       count++
+    }
+    let hasThumbnail = false
+    if (fs.existsSync(resolvedThumbnailPath)) {
+      hasThumbnail = true
     }
     /*     if (article.slug === 'SynE2_2016_16_obedience-responsibility-punishment')
       console.log('article: ', article) */
     article.todo = {
       gitDiffed: articleDiffed,
       generatePDF: articleDiffed || !hasPDF,
-      generateGraph: articleDiffed,
+      generateGraph: articleDiffed || !hasThumbnail,
       upsertOnZenodo: articleDiffed || !hasPDF,
       obtainDOI: article.needDOI && !article.DOI?.length,
       publishOnZenodo: false,

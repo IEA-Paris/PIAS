@@ -75,7 +75,12 @@
         </div>
       </template></PictureItem
     >
-    <TextFingerprint v-else :item="item" :size="size" :margin="10">
+    <nuxt-img
+      v-else
+      :src="'/thumbnails/' + item.slug + '.png'"
+      :size="size"
+      :margin="10"
+    >
       <!--      <template #categories>
         <ArticleCategories :item="item" />
       </template> -->
@@ -97,7 +102,7 @@
           }}
         </div>
       </template>
-    </TextFingerprint>
+    </nuxt-img>
   </v-card>
 </template>
 <script>

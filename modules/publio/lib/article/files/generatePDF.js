@@ -27,6 +27,7 @@ export default async (route, url, meta) => {
     response = await page.goto(`${url.replace(/\/$/, '')}${route.route}`, {
       waitUntil: ['networkidle0'],
     })
+
     /*     // workaround to allow SVGs to render before the page is saved as PDF
     const loaded = page.waitForNavigation({
       waitUntil: 'load',

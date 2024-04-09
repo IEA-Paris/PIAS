@@ -57,7 +57,7 @@ export default async (routesToPrint, fn, url = 'http://localhost:3000') => {
     const meta = {}
 
     // generate the PDFs, thumbnails, & whatever we need <3
-    for (const category of Object.keys(routesToPrint)) {
+    for (const category of Object.keys(routesToPrint).reverse()) {
       console.log('generating files from category: ', category)
       for (const route of routesToPrint[category]) {
         await fn[category](route, url, meta)
