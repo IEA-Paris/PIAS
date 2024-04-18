@@ -304,10 +304,17 @@ export const actions = {
       .skip(skipNumber())
       .limit(rootState[type].itemsPerPage)
       // TODO reactivate once the thumbnails are pregenerated during CI
-      /*       .only([
+      .only([
         'abstract',
         'article_title',
+        'article_slug',
+        'id',
+        'index',
+        'caption',
+        'picture',
         'authors',
+        'firstname',
+        'lastname',
         'highlight',
         'date',
         'language',
@@ -317,7 +324,7 @@ export const actions = {
         'issue',
         'issueIndex',
         'yt',
-      ]) */
+      ])
       .fetch()
     const defaultView =
       lists[type].views[

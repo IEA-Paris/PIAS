@@ -7,6 +7,24 @@
       type
     "
   >
+    <style>
+      .origin {
+        /*   fill: black; */
+      }
+      .is-hl {
+        fill: white;
+        stroke: white;
+      }
+
+      .heading-placeholder {
+        fill: transparent;
+        stroke: white;
+      }
+      circle {
+        fill: transparent;
+        stroke: white;
+      }
+    </style>
     <line
       :x1="ox"
       :y1="oy"
@@ -103,21 +121,3 @@ export default {
   },
 }
 </script>
-<style lang="scss">
-.origin {
-  /*   fill: black; */
-}
-.is-hl {
-  fill: white;
-  stroke: white;
-}
-
-.heading-placeholder {
-  fill: transparent;
-  stroke: white;
-}
-circle {
-  fill: transparent;
-  stroke: white;
-}
-</style>

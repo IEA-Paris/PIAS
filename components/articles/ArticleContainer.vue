@@ -46,7 +46,7 @@
                 small
                 v-on="on"
               >
-                <v-icon>mdi-open-in-new</v-icon>
+                <v-icon>mdi-open-in-new</v-icon>1
               </v-btn>
             </template>
             <span>Open in a new tab</span>
@@ -109,10 +109,20 @@ export default {
       this.$router.go(-1)
     },
     formatAuthorsProxy() {
-      return highlight(
-        formatAuthors(this.item.authors, this.$i18n.$t, false),
-        this.$store.state.articles.search || ''
-      )
+      if (this.item.authors.length < 1) {
+        return highlight(
+          formatAuthors(
+            this.item.authors,
+            this.$i18n.$t,
+            this.item.authors.length < 3
+          ),
+          this.$store.state.articles.search || ''
+        )
+      } else {
+        return (
+          this.item.authors[0].firstname + ' ' + this.item.authors[0].lastname
+        )
+      }
     },
   },
 }

@@ -180,14 +180,15 @@ export default {
     },
     getSocials(item) {
       const socials = []
-      if (item.website)
+      if (item.website) {
         socials.push({
           link: item.website,
           icon: 'mdi-link-variant',
           tooltip:
             'Visit this ' + (this.mentor ? 'mentor' : 'fellow') + ' website',
         })
-      if (item.wikipedia)
+      }
+      if (item.wikipedia) {
         socials.push({
           link: item.wikipedia,
           icon: 'mdi-wikipedia',
@@ -195,13 +196,15 @@ export default {
             'Check the Wikipedia page of the ' +
             (this.mentor ? 'mentor' : 'fellow'),
         })
-      if (item.linkedin)
+      }
+      if (item.linkedin) {
         socials.push({
           link: item.linkedin,
           icon: 'mdi-linkedin',
           tooltip: 'Get in touch on Linkedin',
         })
-      if (item.twitter)
+      }
+      if (item.twitter) {
         socials.push({
           link: item.twitter,
           icon: 'mdi-twitter',
@@ -210,6 +213,7 @@ export default {
             (this.mentor ? 'mentor' : 'fellow') +
             ' on Twitter',
         })
+      }
       return socials
     },
   },

@@ -64,7 +64,7 @@
             </div>
           </template>
         </PictureItem>
-        <TextFingerprint
+        <ArticleThumbnail
           v-else-if="item.countMap && item.countMap.length"
           :item="item"
           :size="300"
@@ -85,7 +85,7 @@
               }}
             </div>
           </template>
-        </TextFingerprint>
+        </ArticleThumbnail>
       </v-list-item-avatar>
       <!--   TODO fix the witdth of the display not being responsive when the avatar is a graph thumbnail -->
       <div class="article-mobile-text-container">

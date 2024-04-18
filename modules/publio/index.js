@@ -95,7 +95,6 @@ export default function (moduleOptions) {
     storeReport()
 
     routesToPrint = makePrintRoutes(articles, options)
-    console.log('routesToPrint: ', routesToPrint)
 
     url = 'http://127.0.0.1:3000'
     if (routesToPrint?.pdfs?.length || routesToPrint?.thumbnails?.length) {
@@ -127,7 +126,6 @@ export default function (moduleOptions) {
     if (process.env.NODE_ENV !== 'production') {
       // Generate the routes to print
       routesToPrint = makePrintRoutes(articles, options)
-      console.log('routesToPrint: ', routesToPrint)
 
       // Generate PDFs and thumbnails for the print routes using the generateFiles function
       await generateFiles(

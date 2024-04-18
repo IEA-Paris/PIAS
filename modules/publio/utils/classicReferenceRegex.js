@@ -1,3 +1,3 @@
 const referenceRegex =
-  /\p{Lu}[\p{Lu}\p{Ll}'-]*(?:[ \/]\p{Lu}[\p{Lu}\p{Ll}'-]*)*(?: et al\.)?,? [0-9]{4}/i
+  /(\([^)]*,\s*\d\d\d\d(\)|(;[^)])*)\))|(\([^)]*,\s*\d\d\d\d(\)|(;[^)]*))$)|(^[^()]*,\s*\d\d\d\d(\)|(;[^)])*)\))|(^\s*\d\d\d\d\))/i
 export default referenceRegex

@@ -13,8 +13,8 @@
         :src="item.picture"
       >
       </PictureItem>
-      <TextFingerprint v-else :item="item" :size="100" :margin="20">
-      </TextFingerprint>
+      <ArticleThumbnail v-else :item="item" :size="100" :margin="20">
+      </ArticleThumbnail>
     </v-list-item-avatar>
     <v-list-item-content>
       <v-list-item-title class="text-h6">

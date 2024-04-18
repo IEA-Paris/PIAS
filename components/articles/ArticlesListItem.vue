@@ -77,12 +77,7 @@
             </div>
           </template>
         </PictureItem>
-        <TextFingerprint
-          v-else-if="item.countMap && item.countMap.length"
-          :item="item"
-          :size="300"
-          :margin="20"
-        >
+        <ArticleThumbnail v-else :item="item" :size="300" :margin="20">
           <!--           <template #categories>
             <IssueBadge :name="item.issue.slice(15, -3)"></IssueBadge>
           </template> -->
@@ -98,7 +93,7 @@
               }}
             </div>
           </template>
-        </TextFingerprint>
+        </ArticleThumbnail>
       </div>
       <div class="ml-6 my-3 d-flex" :class="index > 0 ? 'mt-n1' : ' mt-0'">
         <div class="article-title-container">
@@ -137,6 +132,7 @@
   </div>
 </template>
 <script>
+import ArticleThumbnail from './ArticleThumbnail.vue'
 import { highlight } from '~/assets/utils/transforms'
 export default {
   props: {

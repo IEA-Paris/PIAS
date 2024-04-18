@@ -3,16 +3,61 @@ import classicReferenceRegex from '../../../utils/classicReferenceRegex'
 
 const insertBibliographicalReferences = (node, biblio) => {
   try {
+    const replaceRegularReference = (node, match) => {
+      console.log('match: ', match)
+      let isOpening = false
+      let isClosing = false
+      if (match?.startsWith('(')) {
+        match = match.slice(1)
+        isOpening = true
+      }
+      if (match?.endsWith(')')) {
+        match = match.slice(0, -1)
+        isClosing = true
+      }
+      const authors = match.split(',')[0]?.trim()
+      console.log('authors: ', authors)
+      const years = match.split(',')[1]?.trim()
+      console.log('years: ', years)
+      const bibMatch = biblio.find((item) => {
+        return (
+          item.id.toLowerCase().includes(authors.toLowerCase()) &&
+          item.id.includes(years)
+        )
+      })
+      if (bibMatch) {
+        console.log('bibMatch: ', bibMatch.id)
+        node.value = node.value.replace(
+          match,
+          (isOpening ? '(' : '') + '@' + bibMatch.id + (isClosing ? ')' : '')
+        )
+        console.log('node.value: ', node.value)
+      }
+
+      return node
+    }
     const replaceReference = (node) => {
       // start by matching regular references and replacing them by the related bib key
-      const regularMatches = node.value.match(classicReferenceRegex)
-      if (regularMatches !== null) {
-        regularMatches.map((match) => {
-          const authors = match.split(',')[0].trim()
-          const years = match.split(',')[1].trim()
-          biblio.find((item) => item.id === element.toLowerCase().substring(1))
+      /*  const regularMatches = node.value.match(classicReferenceRegex)
+      if (regularMatches !== null && regularMatches.length > 0) {
+        let citations = []
+        regularMatches
+          .filter(
+            (match) =>
+              match?.length && !match.startsWith('@') && !match.startsWith('(@')
+          )
+          .forEach((match) => {
+            if (match?.includes(';')) {
+              citations.push(match.split(';'))
+            } else {
+              citations.push(match)
+            }
+          })
+        citations = Array.from(new Set(citations))
+        citations.flat().forEach((citation) => {
+          node = replaceRegularReference(node, citation)
         })
-      }
+ */
       // only match citation keys (@author_title_year)
       // 'author' 'title' above refer to the first word of these only
 

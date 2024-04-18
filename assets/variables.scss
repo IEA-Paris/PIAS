@@ -241,7 +241,12 @@ $stepper-elevation: 0;
   z-index: 1;
   border-radius: 6px;
 }
-
+.nuxt-content figcaption {
+  font-size: 0.8rem;
+  color: rgb(0, 0, 0);
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
 .nuxt-content-highlight > .filename {
   font-family: Lato;
   right: 0;

@@ -75,12 +75,7 @@
         </div>
       </template></PictureItem
     >
-    <nuxt-img
-      v-else
-      :src="'/thumbnails/' + item.slug + '.png'"
-      :size="size"
-      :margin="10"
-    >
+    <ArticleThumbnail v-else :item="item" :size="size" :margin="10">
       <!--      <template #categories>
         <ArticleCategories :item="item" />
       </template> -->
@@ -102,7 +97,7 @@
           }}
         </div>
       </template>
-    </nuxt-img>
+    </ArticleThumbnail>
   </v-card>
 </template>
 <script>
@@ -140,7 +135,7 @@ export default {
       const width = this.$refs?.articleBox?.$el.clientWidth
       const height = this.$refs?.articleBox?.$el.clientHeight
       const smallest = Math.min(...[width, height]) || 250
-      return Math.min(...[smallest - 10, 400])
+      return Math.min(...[smallest - 10, 400]).toString()
       /*    this.$set(this.$refs.articleBox, 'width', widthString) */
     },
   },

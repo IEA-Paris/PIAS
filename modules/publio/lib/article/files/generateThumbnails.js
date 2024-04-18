@@ -28,7 +28,23 @@ export default async (route, url, meta) => {
     const content = await page.$('svg')
 
     const imageBuffer = await content.screenshot({ omitBackground: true })
-    console.log('imageBuffer: ', imageBuffer)
+
+    // in case the target folder does not exist, create it
+
+    // create thumbnails
+    if (
+      !fs.existsSync(
+        process.env.NODE_ENV === 'production' && process.env.LOCAL === 'true'
+          ? 'static/thumbnails'
+          : 'thumbnails'
+      )
+    ) {
+      fs.mkdirSync(
+        process.env.NODE_ENV === 'production' && process.env.LOCAL === 'true'
+          ? 'static/thumbnails'
+          : 'thumbnails'
+      )
+    }
     const resolvedThumbnailPath = path.resolve(
       process.env.NODE_ENV !== 'production' ||
         (process.env.NODE_ENV === 'production' && process.env.LOCAL === 'true')
@@ -36,7 +52,20 @@ export default async (route, url, meta) => {
         : 'thumbnails',
       route.file
     )
-    fs.writeFileSync(resolvedThumbnailPath, imageBuffer)
+
+    if (
+      !fs.existsSync(
+        process.env.NODE_ENV === 'production' && process.env.LOCAL === 'true'
+          ? 'static/svg'
+          : 'svg'
+      )
+    ) {
+      fs.mkdirSync(
+        process.env.NODE_ENV === 'production' && process.env.LOCAL === 'true'
+          ? 'static/svg'
+          : 'svg'
+      )
+    }
 
     const resolvedSVGPath = path.resolve(
       process.env.NODE_ENV !== 'production' ||
@@ -45,10 +74,12 @@ export default async (route, url, meta) => {
         : 'svg',
       route.file.slice(0, -4) + '.svg'
     )
+
+    fs.writeFileSync(resolvedThumbnailPath, imageBuffer)
+
     const svgInline = await page.evaluate(
       () => document.querySelector('svg').outerHTML
     )
-    console.log('svgInline: ', svgInline)
     fs.writeFile(resolvedSVGPath, svgInline, (err) => {
       if (err) {
         console.error(err)

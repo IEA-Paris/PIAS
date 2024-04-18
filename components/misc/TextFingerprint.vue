@@ -19,7 +19,7 @@
         xmlns="http://www.w3.org/2000/svg"
         :viewBox="'-' + size / 2 + ' -' + size / 2 + ' ' + size + ' ' + size"
       >
-        <style scoped>
+        <style>
           .article-fingerprint {
             transform-box: fill-box;
             transform-origin: center;
@@ -152,7 +152,7 @@
             }
           }
         </style>
-        <rect id="overlay" width="100%" height="100%" fill="url(#g1)" />
+        <rect id="overlay" width="100%" height="100%" fill="#000000" />
         <!--  handled by parent component css  
        <linearGradient id="g1" x1="1" y1="1" x2="0">
         <stop stop-color="#2d3436" />
@@ -186,7 +186,7 @@
               r={radius}
             />
           ) : null} -->
-          <circle fill="url(#bgGradient)" :cx="0" :cy="0" :r="radius" />
+          <circle fill="#FFF" :cx="0" :cy="0" :r="radius" />
           <template v-for="(cell, index) in cells">
             <TextFingerprintCell
               v-if="cell.value !== '\n'"
