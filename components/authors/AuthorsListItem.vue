@@ -58,7 +58,7 @@
             v-html="highlightWord(getTitlesAndInstitutions(item))"
           ></div>
           <div
-            v-if="$vuetify.breakpoint.smAndDown"
+            v-if="$vuetify.breakpoint.smAndDown && socials.length"
             class="flex-row justify-center align-center mb-6"
           >
             <AuthorSocials
@@ -102,89 +102,92 @@ export default {
   async fetch() {},
   computed: {
     socials() {
-      return [
-        ...(this.item.social_channels.website
-          ? [
-              {
-                link: this.item.social_channels.website,
-                icon: 'mdi-link-variant',
-                tooltip: 'Visit this author website', // TODO i18n
-              },
-            ]
-          : []),
-        ...(this.item.social_channels.wikipedia
-          ? [
-              {
-                link: this.item.social_channels.wikipedia,
-                icon: 'mdi-wikipedia',
-                tooltip: 'Check the Wikipedia page of the author',
-              },
-            ]
-          : []),
-        ...(this.item.social_channels.orcid
-          ? [
-              {
-                link: this.item.social_channels.orcid,
-                icon: 'mdi-account',
-                tooltip: 'Visit the author Orcid page',
-              },
-            ]
-          : []),
-        ...(this.item.social_channels.google_scholar
-          ? [
-              {
-                link: this.item.social_channels.google_scholar,
-                icon: 'mdi-google',
-                tooltip: 'Visit the author Google Scholar page',
-              },
-            ]
-          : []),
-        ...(this.item.social_channels.mendeley
-          ? [
-              {
-                link: this.item.social_channels.mendeley,
-                icon: 'mdi-school',
-                tooltip: 'Visit the author Mendeley page',
-              },
-            ]
-          : []),
-        ...(this.item.social_channels.researchgate
-          ? [
-              {
-                link: this.item.social_channels.researchgate,
-                icon: 'mdi-flask',
-                tooltip: 'Visit the author Researchgate page',
-              },
-            ]
-          : []),
-        ...(this.item.social_channels.linkedin
-          ? [
-              {
-                link: this.item.social_channels.linkedin,
-                icon: 'mdi-linkedin',
-                tooltip: 'Get in touch on Linkedin',
-              },
-            ]
-          : []),
-        ...(this.item.social_channels.twitter
-          ? [
-              {
-                link: this.item.social_channels.twitter,
-                icon: 'mdi-twitter',
-                tooltip: 'Follow this author on Twitter',
-              },
-            ]
-          : []),
-        ...(this.item.social_channels.instagram
-          ? [
-              {
-                link: this.item.social_channels.instagram,
-                icon: 'mdi-instagram',
-                tooltip: 'Visit the author Instagram page',
-              },
-            ]
-          : []),
-      ]
+      return this.item.social_channels &&
+        Object.keys(this.item.social_channels).length
+        ? [
+            ...(this.item.social_channels.website
+              ? [
+                  {
+                    link: this.item.social_channels.website,
+                    icon: 'mdi-link-variant',
+                    tooltip: 'Visit this author website', // TODO i18n
+                  },
+                ]
+              : []),
+            ...(this.item.social_channels.wikipedia
+              ? [
+                  {
+                    link: this.item.social_channels.wikipedia,
+                    icon: 'mdi-wikipedia',
+                    tooltip: 'Check the Wikipedia page of the author',
+                  },
+                ]
+              : []),
+            ...(this.item.social_channels.orcid
+              ? [
+                  {
+                    link: this.item.social_channels.orcid,
+                    icon: 'mdi-account',
+                    tooltip: 'Visit the author Orcid page',
+                  },
+                ]
+              : []),
+            ...(this.item.social_channels.google_scholar
+              ? [
+                  {
+                    link: this.item.social_channels.google_scholar,
+                    icon: 'mdi-google',
+                    tooltip: 'Visit the author Google Scholar page',
+                  },
+                ]
+              : []),
+            ...(this.item.social_channels.mendeley
+              ? [
+                  {
+                    link: this.item.social_channels.mendeley,
+                    icon: 'mdi-school',
+                    tooltip: 'Visit the author Mendeley page',
+                  },
+                ]
+              : []),
+            ...(this.item.social_channels.researchgate
+              ? [
+                  {
+                    link: this.item.social_channels.researchgate,
+                    icon: 'mdi-flask',
+                    tooltip: 'Visit the author Researchgate page',
+                  },
+                ]
+              : []),
+            ...(this.item.social_channels.linkedin
+              ? [
+                  {
+                    link: this.item.social_channels.linkedin,
+                    icon: 'mdi-linkedin',
+                    tooltip: 'Get in touch on Linkedin',
+                  },
+                ]
+              : []),
+            ...(this.item.social_channels.twitter
+              ? [
+                  {
+                    link: this.item.social_channels.twitter,
+                    icon: 'mdi-twitter',
+                    tooltip: 'Follow this author on Twitter',
+                  },
+                ]
+              : []),
+            ...(this.item.social_channels.instagram
+              ? [
+                  {
+                    link: this.item.social_channels.instagram,
+                    icon: 'mdi-instagram',
+                    tooltip: 'Visit the author Instagram page',
+                  },
+                ]
+              : []),
+          ]
+        : []
     },
   },
   mounted() {},
