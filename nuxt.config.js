@@ -1,7 +1,51 @@
 import EventEmitter from 'events'
 import filters from './generated/filters'
 import config from './config.js'
-
+const routesMap = async function () {
+  const { $content } = require('@nuxt/content')
+  const articles = await $content('articles', { deep: true })
+    .where({ published: true })
+    .fetch()
+  const authors = await $content('authors', { deep: true })
+    .where({ active: true })
+    .fetch()
+  const media = await $content('media', { deep: true }).fetch()
+  const authorsPagination = []
+  for (let index = 1; index < Math.ceil(authors.length / 30); index++) {
+    authorsPagination.push('/authors/' + index)
+  }
+  const mediaPagination = []
+  for (let index = 1; index < Math.ceil(media.length / 9); index++) {
+    mediaPagination.push('/media/' + index)
+  }
+  const articlesPagination = []
+  for (let index = 1; index < Math.ceil(articles.length / 9); index++) {
+    articlesPagination.push('/articles/' + index)
+  }
+  const routes = await Promise.all([
+    '/articles',
+    '/media',
+    '/authors',
+    ...authorsPagination,
+    ...mediaPagination,
+    ...articlesPagination,
+    ...articles.map((file) => {
+      return { route: '/article/' + file.slug, payload: file }
+    }),
+    ...authors.map((file) => {
+      return { route: '/author/' + file.slug, payload: file }
+    }),
+    ...(
+      await $content('issues', { deep: true }).fetch()
+    ).map((file) => {
+      return { route: '/issue/' + file.slug, payload: file }
+    }),
+  ])
+  const pdfs = articles.map((file) => {
+    return '/pdfs/' + file.slug + '.pdf'
+  })
+  return { routes, pdfs }
+}
 EventEmitter.defaultMaxListeners = 20
 export default {
   env: { config },
@@ -24,55 +68,17 @@ export default {
     // Nuxt crawler can't follow all the print routes (besides it doesn't follow vuetify pagination component links).
     // But no sweat, we know what to generate, no need to crawl.
     async routes() {
-      const { $content } = require('@nuxt/content')
-      const articles = await $content('articles', { deep: true })
-        .where({ published: true })
-        .fetch()
-      const authors = await $content('authors', { deep: true })
-        .where({ active: true })
-        .fetch()
-      const media = await $content('media', { deep: true }).fetch()
-      const authorsPagination = []
-      for (let index = 1; index < Math.ceil(authors.length / 30); index++) {
-        authorsPagination.push('/authors/' + index)
-      }
-      const mediaPagination = []
-      for (let index = 1; index < Math.ceil(media.length / 9); index++) {
-        mediaPagination.push('/media/' + index)
-      }
-      const articlesPagination = []
-      for (let index = 1; index < Math.ceil(articles.length / 9); index++) {
-        articlesPagination.push('/articles/' + index)
-      }
-      const files = await Promise.all([
-        '/articles',
-        '/media',
-        '/authors',
-        ...authorsPagination,
-        ...mediaPagination,
-        ...articlesPagination,
-        ...articles.map((file) => {
-          return { route: '/article/' + file.slug, payload: file }
-        }),
-        ...articles.map((file) => {
-          return { route: '/pdf/' + file.slug + '.pdf' }
-        }),
-        ...authors.map((file) => {
-          return { route: '/author/' + file.slug, payload: file }
-        }),
-        ...(
-          await $content('issues', { deep: true }).fetch()
-        ).map((file) => {
-          return { route: '/issue/' + file.slug, payload: file }
-        }),
-      ])
+      const routesMapRst = await routesMap()
       // JavaScript implementation of the Durstenfeld shuffle, an optimized version of Fisher-Yates
       // to allow us to batch process more items by spreading the heavy ones, i.e. the articles
-      for (let i = files.length - 1; i > 0; i--) {
+      for (let i = routesMapRst.routes.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1))
-        ;[files[i], files[j]] = [files[j], files[i]]
+        ;[routesMapRst.routes[i], routesMapRst.routes[j]] = [
+          routesMapRst.routes[j],
+          routesMapRst.routes[i],
+        ]
       }
-      return files
+      return routesMapRst.routes
     },
   },
   /* Global page headers: https://go.nuxtjs.dev/c onfig-head
