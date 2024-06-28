@@ -325,6 +325,14 @@ export default {
     display: none !important;
   }
 
+  .nuxt-content blockquote {
+    border: 0.2rem solid black !important;
+    background-color: #e6e6e658;
+    font-weight: 500;
+    font-size: 0.8rem !important;
+    line-height: 0.8rem !important;
+    padding: 30px;
+  }
   .nuxt-content.article-body p,
   .to-cite .csl-bib-body,
   .footnotes-panel,

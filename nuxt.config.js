@@ -54,6 +54,9 @@ export default {
         ...articles.map((file) => {
           return { route: '/article/' + file.slug, payload: file }
         }),
+        ...articles.map((file) => {
+          return { route: '/pdf/' + file.slug + '.pdf' }
+        }),
         ...authors.map((file) => {
           return { route: '/author/' + file.slug, payload: file }
         }),
@@ -118,6 +121,12 @@ export default {
         content: 'IE=edge, chrome=1',
       },
       {
+        vmid: 'og:title',
+        property: 'og:title',
+        content: config.name,
+        template: (chunk) => `Article - ${chunk}`, // or as string template: '%s - My page'
+      },
+      {
         itemprop: 'name',
         content: `${config.name} • ${config.description}`,
       },
@@ -151,12 +160,6 @@ export default {
       // Example output:
       // <meta charset="utf-8">
       // <meta name="og:title" property="og:title" content="Test title - My page">
-      {
-        vmid: 'og:title',
-        property: 'og:title',
-        content: config.name,
-        template: (chunk) => `Article - ${chunk}`, // or as string template: '%s - My page'
-      },
     ],
     // Each item in the array maps to a newly-created <link> element,
     // where object properties map to attributes.
@@ -238,8 +241,6 @@ export default {
     // https://ackee.nuxtjs.org/
     '@nuxtjs/ackee',
     '@nuxtjs/composition-api/module',
-    // https://github.com/ch99q/nuxt-pdf
-    /*     '~/modules/nuxt-pdf', */
     '~/modules/publio',
   ],
 
@@ -385,7 +386,7 @@ export default {
     UserAgent: '*',
     Disallow: '',
     Allow: '/',
-    Sitemap: `${process.env.BASE_URL}/sitemap.xml`,
+    Sitemap: `${config.url}/sitemap.xml`,
   },
   // https://image.nuxtjs.org
   image: {

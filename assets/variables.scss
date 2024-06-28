@@ -247,6 +247,16 @@ $stepper-elevation: 0;
   font-weight: 600;
   margin-bottom: 1rem;
 }
+
+.nuxt-content blockquote {
+  border: black;
+  background-color: #e6e6e658;
+  font-weight: 500;
+  font-size: 0.8rem;
+  line-height: 0.8rem;
+  padding: 2rem;
+}
+
 .nuxt-content-highlight > .filename {
   font-family: Lato;
   right: 0;
