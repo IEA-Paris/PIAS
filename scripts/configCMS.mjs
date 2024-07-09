@@ -412,7 +412,7 @@ collections:
           label: 'Bibliography',
           name: 'bibliography',
           media_library:
-            { allow_multiple: false, media_folder: '/bibliographies' },
+            { allow_multiple: false, media_folder: '/bibliographies', public_folder: '/' },
           widget: 'file',
           required: false,
         }
@@ -438,7 +438,7 @@ collections:
               Other,
             ],
         }
-      - { label: 'Article', name: 'body', widget: 'markdown', media_folder: '/static'  }
+      - { label: 'Article', name: 'body', widget: 'markdown', media_folder: '/static', public_folder: '/'  }
   - name: 'issues' # Used in routes, e.g., /admin/collections/blog
     label: 'Issues' # Used in the UI
     identifier_field: title
