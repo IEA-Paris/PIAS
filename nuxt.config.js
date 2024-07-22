@@ -584,6 +584,7 @@ export default {
     watchOptions: {
       ignored: '/generated/filters.js',
     },
+    debug: true,
     extend(config, ctx) {
       // extend source map to enable local debug in VScode (breakpoints & co)
       if (ctx.isDev) {
