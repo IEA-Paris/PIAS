@@ -58,7 +58,7 @@ export default function (moduleOptions) {
   console.log('ARG', process.argv) */
   const { nuxt } = this
   let options = Object.assign({}, defaults, moduleOptions, this.options.publio)
-
+  process.on('warning', (e) => console.warn(e.stack))
   let articles, media, authors, issues, url, routesToPrint, changedFiles
 
   // "once" is a dirty way to prevent Nuxt to retrigger the content parsing when we insert new files.
