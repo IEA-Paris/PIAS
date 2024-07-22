@@ -126,11 +126,7 @@
             <ArticleBibliography :item="item"></ArticleBibliography>
           </div>
           <template v-if="item.footnotes && item.footnotes.length">
-            <div
-              id="footnotes"
-              class="text-h4 mt-3 d-flex"
-              :class="$vuetify.breakpoint.xs ? 'ml-0' : 'ml-6'"
-            >
+            <div id="footnotes" class="text-h4 mt-3 d-flex ml-0">
               {{ $t('footnotes') }}
             </div>
             <ArticleFootnotes :item="item"></ArticleFootnotes>
