@@ -35,7 +35,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        node: [14]
+        node: [18]
 
     steps:
       - name: 🛎 Checkout
@@ -101,4 +101,4 @@ jobs:
         id: apply
         run: cd infra/live/$ENV && terragrunt run-all apply --terragrunt-non-interactive
         env:
-          APP_ID: "${{ github.event.inputs.name }}"
+          APP_ID: '${{ github.event.inputs.name }}'
