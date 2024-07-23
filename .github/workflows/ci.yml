@@ -77,6 +77,8 @@ jobs:
           cp -r ./submodules/${{ github.event.inputs.name }}/generated .
           cp -r ./submodules/${{ github.event.inputs.name }}/static .
           cp -r ./submodules/${{ github.event.inputs.name }}/pdfs ./static
+          cp -r ./submodules/${{ github.event.inputs.name }}/thumbnails ./static
+          cp -r ./submodules/${{ github.event.inputs.name }}/svg ./static
           cp -r ./admin ./static
 
       - name: 🛠 Get yarn cache directory path
@@ -120,7 +122,7 @@ jobs:
         shell: bash
         run: |
           cd submodules/${{ github.event.inputs.name }} 
-          rsync -av --exclude 'admin' --exclude 'sw.js' ../../static/ ./static/
+          rsync -av   -a --include='*/' --exclude 'admin' --exclude='*' --exclude 'sw.js' ../../static/ ./static/
           git config --global user.name "CI"
           git config --global user.email "username@users.noreply.github.com"
           git add .
