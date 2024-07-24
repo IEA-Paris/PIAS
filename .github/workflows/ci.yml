@@ -78,6 +78,7 @@ jobs:
           cp -r ./submodules/${{ github.event.inputs.name }}/static .
           cp -r ./submodules/${{ github.event.inputs.name }}/pdfs ./static
           cp -r ./submodules/${{ github.event.inputs.name }}/thumbnails ./static
+          cp -r ./submodules/${{ github.event.inputs.name }}/bibliography ./static
           cp -r ./submodules/${{ github.event.inputs.name }}/svg ./static
           cp -r ./admin ./static
 
