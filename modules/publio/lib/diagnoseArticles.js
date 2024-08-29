@@ -48,6 +48,12 @@ export default async (articles) => {
     let hasThumbnail = false
     if (fs.existsSync(resolvedThumbnailPath)) {
       hasThumbnail = true
+      console.log(
+        'Article already has thumbnail, removing countMap from',
+        article.article_title
+      )
+      delete article.countMap
+      delete article.countRefs
     }
     /*     if (article.slug === 'SynE2_2016_16_obedience-responsibility-punishment')
       console.log('article: ', article) */

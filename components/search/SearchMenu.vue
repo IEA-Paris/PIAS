@@ -220,7 +220,6 @@ export default {
   },
   methods: {
     seeAll(name) {
-      console.log('name: ', name)
       this.open = false
       this.$router.push(
         this.localePath({

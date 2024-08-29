@@ -76,7 +76,7 @@ export default async (route, url, meta) => {
       document.setTitle(await page.title())
     }
 
-    document.setAuthor(route.meta.author || '')
+    document.setAuthor(route.meta.author.replace('&nbsp;', '') || '')
     document.setSubject(route.meta.subject || '')
     document.setProducer(route.meta.producer || '')
     document.setCreationDate(new Date(route.meta.creationDate) || new Date())

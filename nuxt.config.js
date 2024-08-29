@@ -478,7 +478,7 @@ export default {
     baseUrl: config.url,
     lazy: true,
     detectBrowserLanguage: {
-      alwaysRedirect: true,
+      alwaysRedirect: false,
       fallbackLocale: 'en',
     },
   },

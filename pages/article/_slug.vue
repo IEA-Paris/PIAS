@@ -53,8 +53,6 @@
   </ArticleContainer>
 </template>
 <script>
-import filtersRaw from '~/assets/data/filters'
-
 export default {
   beforeRouteUpdate(to, from, next) {
     if (to.hash && to.hash.startsWith('#fn-')) {
@@ -122,6 +120,53 @@ export default {
       note: false,
       loop: false,
       panels: this.$route.hash === '#authors' ? [0, 1] : [1],
+    }
+  },
+  head() {
+    const article = this.item[0]
+    const authors =
+      article?.authors &&
+      article?.authors.map((author) => {
+        return {
+          name: 'citation_author',
+          content: author.firstname + ' ' + author.lastname,
+        }
+      })
+    return {
+      meta: [
+        {
+          name: 'citation_title',
+          content: article.article_title,
+        },
+        ...authors,
+        {
+          name: 'citation_publication_date',
+          content: new Date(article.date).toLocaleDateString('en-GB', {
+            // you can use undefined as first argument
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+          }),
+        },
+        {
+          name: 'citation_journal_title',
+          content: this.$config.full_name,
+        },
+        {
+          name: 'citation_issn',
+          content: this.$config.identifier.ISSN,
+        },
+        {
+          name: 'citation_pdf_url',
+          content: this.$config.url + '/pdfs/' + article.slug + '.pdf',
+        },
+        {
+          title: article.article_title,
+          hid: article.abstract,
+          name: 'title',
+          content: article.article_title,
+        },
+      ],
     }
   },
   computed: {},
