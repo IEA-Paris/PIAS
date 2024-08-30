@@ -24,8 +24,8 @@ RefWorks https://en.wikipedia.org/wiki/RefWorks
 CFF https://citation-file-format.github.io/ https://developers.zenodo.org/#depositions
 Wikipedia Vitation Style 1 templates https://en.wikipedia.org/wiki/Template:Citation_Style_articleation/cs1
 */
-
-  const cites = new Citation(article.bibliography)
+  /*   console.log('gzeenratin cite for: ', article.slug)
+  const cites = new Citation(article.bibliography) */
   // TODO generate da thing
   // https://www.youtube.com/watch?v=btPJPFnesV4
   return [article, media, authors, issues, options]

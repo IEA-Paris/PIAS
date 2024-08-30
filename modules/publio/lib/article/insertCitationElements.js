@@ -132,7 +132,6 @@ export default (article, media, authors, issues, options) => {
         return { [style]: obj }
       })
       .reduce((rst, tick) => Object.assign(rst, tick), {})
-
     return [article, media, authors, issues, options]
   } catch (error) {
     console.log('error generating citation references: ', error)

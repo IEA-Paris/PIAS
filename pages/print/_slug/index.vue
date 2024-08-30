@@ -362,7 +362,9 @@ export default {
     text-align: left;
     page-break-before: always;
   }
-
+  .nuxt-content.article-body blockquote h2 {
+    margin-top: 0px;
+  }
   .nuxt-content.article-body h2,
   #bibliography,
   #footnotes {
