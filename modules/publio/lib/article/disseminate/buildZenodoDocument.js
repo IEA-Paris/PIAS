@@ -71,12 +71,7 @@ export default (document, options) => {
     journal_title: cleanupString(options.config.full_name),
     ...(document.issueIndex && { journal_volume: document.issueIndex }),
     prereserve_doi: document.needDOI !== false,
-    publication_date: new Date(document.date).toLocaleDateString('en-US', {
-      timezone: 'UTC',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    }),
+    publication_date: new Date(document.date).toISOString(),
     // TODO
     // - same issue articles,
     // - cites relation (when a DOI is provided in the citation)
