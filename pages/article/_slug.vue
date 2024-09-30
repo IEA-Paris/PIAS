@@ -132,7 +132,6 @@ export default {
           content: author.firstname + ' ' + author.lastname,
         }
       })
-    console.log(article.bibliography)
     const head = {
       meta: [
         {
@@ -271,7 +270,6 @@ export default {
         },
       ],
     }
-    console.log('head: ', head)
     return head
   },
   computed: {},
