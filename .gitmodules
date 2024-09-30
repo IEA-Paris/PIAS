@@ -5,3 +5,6 @@
 [submodule "submodules/SANDBOX"]
 	path = submodules/SANDBOX
 	url = git@github.com:IEA-Paris/SANDBBOX.git
+[submodule "submodules/PPIAS"]
+	path = submodules/PPIAS
+	url = git@github.com:IEA-Paris/PPIAS.git

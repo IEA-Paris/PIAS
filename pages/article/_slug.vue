@@ -102,9 +102,9 @@ export default {
         })
         .fetch())
 
-    /*     item.issue = await $content(
+    item.issue = await $content(
       item[0]?.issue.split('/').slice(1).join('/').split('.')[0] || false // TODO shameful => fix
-    ).fetch() */
+    ).fetch()
 
     return {
       item,
@@ -132,7 +132,8 @@ export default {
           content: author.firstname + ' ' + author.lastname,
         }
       })
-    return {
+    console.log(article.bibliography)
+    const head = {
       meta: [
         {
           name: 'citation_title',
@@ -141,6 +142,15 @@ export default {
         ...authors,
         {
           name: 'citation_publication_date',
+          content: new Date(article.date).toLocaleDateString('en-GB', {
+            // you can use undefined as first argument
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+          }),
+        },
+        {
+          name: 'citation_date',
           content: new Date(article.date).toLocaleDateString('en-GB', {
             // you can use undefined as first argument
             year: 'numeric',
@@ -160,14 +170,109 @@ export default {
           name: 'citation_pdf_url',
           content: this.$config.url + '/pdfs/' + article.slug + '.pdf',
         },
+        ...(article.DOI
+          ? [
+              {
+                name: 'citation_doi',
+                content: article.DOI,
+              },
+            ]
+          : []),
         {
-          title: article.article_title,
-          hid: article.abstract,
-          name: 'title',
-          content: article.article_title,
+          name: 'citation_volume',
+          content: article.issueIndex,
+        },
+        {
+          name: 'citation_issue',
+          content: article.issue.name_of_the_issue,
+        },
+        {
+          name: 'citation_abstract_html_url',
+          content: this.$config.url + '/articles/' + article.slug,
+        },
+        {
+          name: 'citation_fulltext_html_url',
+          content: this.$config.url + '/articles/' + article.slug,
+        },
+        {
+          name: 'citation_language',
+          content: article.language,
+        },
+        ...(article?.keywords?.length
+          ? [
+              {
+                name: 'citation_keywords',
+                content: article?.keywords,
+              },
+            ]
+          : []),
+        {
+          name: 'citation_abstract',
+          content: article.abstract,
+        },
+        {
+          name: 'citation_publisher',
+          content: 'Paris institute for Advanced Study',
+        },
+        {
+          name: 'citation_journal_abbrev',
+          content: this.$config.short_name,
+        },
+        {
+          name: 'citation_journal_title',
+          content: this.$config.full_name,
+        },
+        {
+          name: 'citation_journal_issn',
+          content: this.$config.identifier.ISSN,
+        },
+        {
+          name: 'citation_journal_volume',
+          content: article.issueIndex,
+        },
+        {
+          name: 'citation_journal_issue',
+          content: article.issue.name_of_the_issue,
+        },
+        {
+          name: 'citation_journal_language',
+          content: article.language,
+        },
+        ...(article?.keywords?.length
+          ? [
+              {
+                name: 'citation_journal_keywords',
+                content: article?.keywords,
+              },
+            ]
+          : []),
+        {
+          name: 'citation_journal_abstract',
+          content: article.abstract,
+        },
+        /*         ...(article.bibliography?.length
+          ? [
+              {
+                name: 'citation_reference',
+                name: 'citation_journal_reference',
+                content: article.bibliography
+                  .map((item) => item.title)
+                  .join(', '),
+              },
+            ]
+          : []), */
+        {
+          name: 'citation_journal_abbrev',
+          content: this.$config.short_name,
+        },
+        {
+          name: 'citation_journal_title',
+          content: this.$config.full_name,
         },
       ],
     }
+    console.log('head: ', head)
+    return head
   },
   computed: {},
   watch: {
