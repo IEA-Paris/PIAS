@@ -80,7 +80,7 @@ export default async (route, url, meta) => {
     const svgInline = await page.evaluate(
       () => document.querySelector('svg').outerHTML
     )
-    fs.writeFile(resolvedSVGPath, svgInline, (err) => {
+    fs.writeFileSync(resolvedSVGPath, svgInline, (err) => {
       if (err) {
         console.error(err)
         return
