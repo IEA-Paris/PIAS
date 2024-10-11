@@ -104,7 +104,7 @@ export default async (articles, options, queue) => {
       /*   console.log('sameIdOrDoi: ', sameIdOrDoi) */
       // check if the article already exists on Zenodo:
       if (sameIdOrDoi) {
-        console.log('sameIdOrDoi: ', sameIdOrDoi)
+        /* console.log('sameIdOrDoi: ', sameIdOrDoi) */
         console.log(
           'FOUND articles matching on Zenodo for ',
           document.article_title

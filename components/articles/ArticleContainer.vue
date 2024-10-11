@@ -109,7 +109,7 @@ export default {
       this.$router.go(-1)
     },
     formatAuthorsProxy() {
-      if (this.item.authors.length < 1) {
+      if (this.item.authors.length > 1) {
         return highlight(
           formatAuthors(
             this.item.authors,

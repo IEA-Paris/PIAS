@@ -17,6 +17,10 @@ export default (document, options) => {
           .replace('\n', '')
       )
     : []
+  console.log(
+    'new Date(document.date).toISOString().substring(0, 10): ',
+    new Date(document.date).toISOString().substring(0, 10)
+  )
 
   const metadata = {
     upload_type: 'publication',
@@ -71,7 +75,7 @@ export default (document, options) => {
     journal_title: cleanupString(options.config.full_name),
     ...(document.issueIndex && { journal_volume: document.issueIndex }),
     prereserve_doi: document.needDOI !== false,
-    publication_date: new Date(document.date).toISOString(),
+    publication_date: new Date(document.date).toISOString().substring(0, 10),
     // TODO
     // - same issue articles,
     // - cites relation (when a DOI is provided in the citation)
