@@ -44,7 +44,7 @@ import publishOnZenodo from './lib/article/disseminate/publishOnZenodo'
 
 // Others
 import tsvToArticles from './lib/tsvToArticles/tsvToArticles'
-
+require('events').EventEmitter.prototype._maxListeners = 100
 const chalk = require('chalk')
 const defaults = require('./module.defaults')
 

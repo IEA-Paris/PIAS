@@ -86,7 +86,9 @@
             <div class="overline mt-n1 ml-n1 text-grey">
               {{ $t('abstract') }}
             </div>
-            {{ item.abstract }}
+            <div style="white-space: pre; text-wrap: auto">
+              {{ item.abstract }}
+            </div>
           </div>
 
           <!--           <div v-if="item.images && item.images.length > 1" class="pb-8 pt-3">
