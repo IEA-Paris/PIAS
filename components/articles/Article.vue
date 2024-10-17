@@ -86,7 +86,7 @@
             <div class="overline mt-n1 ml-n1 text-grey">
               {{ $t('abstract') }}
             </div>
-            <div style="white-space: pre; text-wrap: auto">
+            <div>
               {{ item.abstract }}
             </div>
           </div>
