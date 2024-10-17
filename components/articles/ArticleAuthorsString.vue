@@ -108,7 +108,7 @@ export default {
 }
 .institutions-group {
   margin-top: 10px;
-  line-height: 0.6rem;
+  line-height: 0.8rem;
   .institutions.small {
     sup {
       font-style: normal;

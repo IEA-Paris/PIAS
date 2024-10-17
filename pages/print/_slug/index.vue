@@ -34,14 +34,14 @@
             ></DoiBadge>
 
             <div v-if="item.toCite && item.toCite.apa" class="to-cite-wrapper">
-              <div class="article-label my-4">
+              <div class="article-label mb-2">
                 {{ $t('to-cite') }}
               </div>
               <div class="to-cite" v-html="item.toCite.apa"></div>
             </div>
 
             <div class="mb-6 publication-date-content">
-              <div class="article-label mt-6 mb-3">
+              <div class="article-label mt-4 mb-2">
                 {{ $t('publication-date') }}
               </div>
               {{
@@ -54,11 +54,11 @@
               }}
             </div>
             <template v-if="item.disciplines && item.discipline.length">
-              <div class="article-label mt-6 mb-3">{{ $t('fields') }}</div>
+              <div class="article-label mt-4 mb-2">{{ $t('fields') }}</div>
 
               <div
                 v-if="item.disciplines && item.disciplines.length"
-                class="mb-6"
+                class="mb-2"
               >
                 <Tag
                   v-for="(discipline, index2) in item.disciplines"
@@ -70,7 +70,7 @@
               </div>
             </template>
             <template v-if="item.thematics && item.thematic.length">
-              <div class="article-label mt-6 mb-3">{{ $t('themes') }}</div>
+              <div class="article-label mt-4 mb-2">{{ $t('themes') }}</div>
 
               <div class="mb-6">
                 <Tag
@@ -83,7 +83,7 @@
               </div>
             </template>
             <template v-if="item.types && item.types.length">
-              <div class="article-label mt-6 mb-3">{{ $t('types') }}</div>
+              <div class="article-label mt-4 mb-2">{{ $t('types') }}</div>
 
               <div class="mb-6">
                 <Tag
@@ -96,9 +96,9 @@
               </div>
             </template>
             <template v-if="item.tag && item.tag.length">
-              <div class="article-label mt-6 mb-3">{{ $t('keywords') }}</div>
+              <div class="article-label mt-4 mb-2">{{ $t('keywords') }}</div>
 
-              <div class="mb-6">
+              <div class="mb-4">
                 <Tag
                   v-for="(tag, index2) in item.tag"
                   :key="index2"
@@ -111,9 +111,9 @@
 
             <div
               v-if="item.abstract && item.abstract.length"
-              class="article-abstract-frame mb-6"
+              class="article-abstract-frame mb-4"
             >
-              <div class="article-label mt-12 mb-4">
+              <div class="article-label mt-12">
                 {{ $t('abstract') }}
               </div>
               <div class="article-abstract">
@@ -279,10 +279,9 @@ export default {
     page-break-after: always;
   }
   @page {
-    margin: 0;
     format: A4;
     size: 210mm 297mm;
-    margin-bottom: 1.5rem; // for page numbers
+    margin: 0 0 1.5rem 0; // for page numbers
   }
   .language-text.line-numbers .v-application code {
     all: initial;
@@ -303,11 +302,6 @@ export default {
     border-left: 5px #5b5b66 solid;
     padding: 0 15px;
     font-size: 0.4em;
-  }
-  .article-abstract-frame {
-    border-left: 5px #000 solid;
-    padding: 0 15px;
-    margin-bottom: 1em;
   }
 
   .footer-content {
@@ -341,7 +335,7 @@ export default {
     font-size: 16px !important;
     margin-bottom: 15px;
     margin-top: 10px;
-    line-height: 28px !important;
+    line-height: 26px !important;
     text-align: justify;
     width: 100%;
     max-width: 18cm;
@@ -369,8 +363,8 @@ export default {
   #bibliography,
   #footnotes {
     font-size: 30px !important;
-    margin-bottom: 25px;
-    margin-top: 50px;
+    margin-bottom: 20px;
+    margin-top: 40px;
     word-spacing: 2px;
     line-height: 40px !important;
   }
@@ -382,7 +376,7 @@ export default {
     font-size: 28px !important;
     line-height: 34px !important;
     margin-bottom: 20px;
-    margin-top: 45px;
+    margin-top: 40px;
   }
 
   .nuxt-content.article-body h4 {
@@ -390,7 +384,7 @@ export default {
     font-weight: 500;
     line-height: 30px !important;
     margin-bottom: 20px;
-    margin-top: 45px;
+    margin-top: 40px;
   }
 
   .article-authors {
@@ -399,11 +393,15 @@ export default {
     max-width: 16cm;
     display: inline-block;
   }
-
+  .article-abstract-frame {
+    border-left: 5px #000 solid;
+    padding: 0 15px;
+  }
   .article-abstract {
     font-style: italic;
-    margin-top: 0.8em;
+    margin-top: -1rem;
     font-size: 14px;
+    white-space: pre-line;
   }
 
   .article-label {

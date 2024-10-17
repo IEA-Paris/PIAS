@@ -16,7 +16,7 @@
     "clean:cache:pwa": "rm -rf ./node_modules/.cache/pwa || :",
     "clean:cache:nuxt": "rm -rf ./node_modules/.cache/nuxt || :",
     "prepare": " APP_ID=${APP_ID:-PPIAS} &&  yarn clean ",
-    "copy": "rm -rf ./static/*&& cp -r ./submodules/$npm_package_config_name/config.js ./config.js&&cp -r ./submodules/$npm_package_config_name/generated .&&cp -r ./submodules/$npm_package_config_name/static . && cp -r ./admin ./static && cp -r ./submodules/$npm_package_config_name/bibliography ./static",
+    "copy": "rm -rf ./static/* && cp -r ./submodules/$npm_package_config_name/config.js ./config.js&&cp -r ./submodules/$npm_package_config_name/generated .&&cp -r ./submodules/$npm_package_config_name/static . && cp -r ./admin ./static && cp -r ./submodules/$npm_package_config_name/bibliography ./static",
     "configCMS": "node scripts/configCMS.mjs",
     "dev": "yarn copy && yarn prepare && yarn configCMS && nuxt",
     "build": "nuxt build",

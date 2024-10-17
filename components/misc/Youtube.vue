@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="page-break-inside: avoid">
     <a
       v-if="$route.name.startsWith('print')"
       class="my-6 d-block w-100"

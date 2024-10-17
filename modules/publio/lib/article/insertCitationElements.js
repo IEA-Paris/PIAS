@@ -12,7 +12,7 @@ export default (article, media, authors, issues, options) => {
     })
 
     // issue filters (pruned, sorted by date desc)
-    let issuesIndex = options.filters.issue.items.reverse()
+    let issuesIndex = options.filters.issue.items.slice().reverse()
     issuesIndex = issuesIndex.map((item, index) => ({
       index,
       value: item.value,

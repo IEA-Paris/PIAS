@@ -71,6 +71,8 @@ export default {
               if (indexInstitution === -1) {
                 institutions.push(highlightedInstitution)
                 indexInstitution = institutions.length
+              } else {
+                indexInstitution++
               }
               // add the index of the institution to the author
               authorsIndexInstutions.push(indexInstitution)
