@@ -131,7 +131,10 @@
             <div id="footnotes" class="text-h4 mt-3 d-flex ml-0">
               {{ $t('footnotes') }}
             </div>
-            <ArticleFootnotes :item="item"></ArticleFootnotes>
+            <ArticleFootnotes
+              :class="{ 'ml-n6': $vuetify.breakpoint.smAndUp }"
+              :item="item"
+            ></ArticleFootnotes>
           </template>
           {{
             new Date(item.date).toLocaleDateString('en-US', {

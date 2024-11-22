@@ -427,8 +427,8 @@ export default {
       'lastname',
       'authors.$.lastname',
       'article_title',
+      'abstract',
       'caption',
-      'institution',
     ],
   },
 

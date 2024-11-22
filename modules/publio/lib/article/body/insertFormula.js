@@ -15,7 +15,7 @@ export default (node, article, media, authors, issues, options) => {
     //
     //  Get the command-line arguments
     //
-    const argv = require('yargs')
+    /*  const argv = require('yargs')
       .demand(0)
       .strict()
       .usage('$0 [options] "math" > file.html')
@@ -55,33 +55,33 @@ export default (node, article, media, authors, issues, options) => {
           describe: 'whether to include assistive MathML output',
         },
       }).argv
-
+ */
     //
     //  Create DOM adaptor and register it for HTML documents
     //
-    const adaptor = liteAdaptor()
+    /*   const adaptor = liteAdaptor()
     const handler = RegisterHTMLHandler(adaptor)
     if (argv.assistiveMml) AssistiveMmlHandler(handler)
-
+ */
     //
     //  Create input and output jax and a document using them on the content from the HTML file
     //
-    const tex = new TeX({ packages: argv.packages.split(/\s*,\s*/) })
+    /*     const tex = new TeX({ packages: argv.packages.split(/\s*,\s) })
     const chtml = new CHTML({ fontURL: argv.fontURL })
     const html = mathjax.document(node.children[0].value, {
       InputJax: tex,
       OutputJax: chtml,
-    })
+    }) */
 
     //
     //  Typeset the math from the command line
     //
-    const rst = html.convert(node.children[0].value || '', {
+    /*     const rst = html.convert(node.children[0].value || '', {
       display: !argv.inline,
       em: argv.em,
       ex: argv.ex,
       containerWidth: argv.width,
-    })
+    }) */
 
     //
     //  If the --css option was specified, output the CSS,
@@ -93,9 +93,9 @@ export default (node, article, media, authors, issues, options) => {
       console.log(adaptor.outerHTML(node))
     } */
 
-    node.tag = 'span'
+    /* node.tag = 'span'
     node.html = adaptor.outerHTML(rst)
-    node.children = []
+    node.children = [] */
   }
   return [node, article, media, authors, issues, options]
 }
