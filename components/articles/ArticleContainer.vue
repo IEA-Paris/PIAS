@@ -57,7 +57,7 @@
             class="page-title"
             :class="$store.state.scrolled ? 'mb-9' : 'mb-6'"
           >
-            {{ item.article_title }}
+            {{ item && item.article_title ? item.article_title : '' }}
           </div>
           <client-only>
             <template
