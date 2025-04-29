@@ -46,7 +46,7 @@
                 small
                 v-on="on"
               >
-                <v-icon>mdi-open-in-new</v-icon>1
+                <v-icon>mdi-open-in-new</v-icon>
               </v-btn>
             </template>
             <span>Open in a new tab</span>
