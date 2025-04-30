@@ -6,6 +6,10 @@ export default async (articles, options, queue) => {
     const fs = require('fs')
     const path = require('path')
     const Zenodo = require('../../../utils/ZenodoConnector')
+    console.log(
+      'options.config.modules.zenodo.sandbox: ',
+      options.config.modules.zenodo.token
+    )
     const zenodo = await new Zenodo({
       host: options.config.modules.zenodo.sandbox
         ? 'sandbox.zenodo.org'
@@ -28,6 +32,7 @@ export default async (articles, options, queue) => {
     // TODO deal with the number of articles beyond 1k. I assume the md based system will show its limit before we reach it.
     const records = (
       await queue.add(async () => {
+        console.log('fetching Zenodo records')
         return await zenodo.depositions.list({
           size: 10000,
         })
@@ -58,6 +63,7 @@ export default async (articles, options, queue) => {
       const metadata = buildZenodoDocument(document, options)
 
       return await queue.add(async () => {
+        console.log('upsertArticleOnZenodo', metadata.title)
         const deposition = await (editMode
           ? zenodo.depositions.update({ metadata })
           : zenodo.depositions.create({ metadata }))

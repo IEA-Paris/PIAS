@@ -325,7 +325,7 @@ export default {
     font-weight: 500;
     font-size: 0.8rem !important;
     line-height: 0.8rem !important;
-    padding: 30px;
+    padding: 20px;
   }
   .nuxt-content.article-body p,
   .to-cite .csl-bib-body,

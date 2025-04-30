@@ -55,8 +55,12 @@ export default async (articles) => {
       delete article.countMap
       delete article.countRefs
     }
-    /*     if (article.slug === 'SynE2_2016_16_obedience-responsibility-punishment')
-      console.log('article: ', article) */
+    if (articleDiffed || !hasPDF) {
+      console.log('resolvedPDFPath: ', resolvedPDFPath)
+      console.log('articleDiffed: ', articleDiffed)
+      console.log('hasPDF: ', hasPDF)
+      console.log('article: missing pDF', article.article_title)
+    }
     article.todo = {
       gitDiffed: articleDiffed,
       generatePDF: articleDiffed || !hasPDF,

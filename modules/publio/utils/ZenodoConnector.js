@@ -4,8 +4,7 @@ const axios = require('axios')
 
 const defaultOptions = {
   protocol: 'https',
-  host: 'sandbox.zenodo.org', // TODO update for the actual zenodo once out of sandox
-  // TODO dynamic switch between sandbox and regular servers depending on the config file (e.G. a sandbox flag?)
+  host: 'sandbox.zenodo.org',
   pathPrefix: '/api/',
 }
 
@@ -36,7 +35,7 @@ class ZenodoApi {
     const baseURL = options.protocol + '://' + options.host + options.pathPrefix
     const baseHeaders = {
       Accept: 'application/json',
-      Authorization: 'Bearer:' + options.token,
+      Authorization: options.token,
     }
     this[kBaseUrl] = baseURL
     this[kBaseHeaders] = baseHeaders
@@ -74,6 +73,7 @@ class ZenodoApiDepositions {
   }
 
   list(options) {
+    console.log('options: ', options)
     return this[kRequest].get('', {
       params: options,
     })

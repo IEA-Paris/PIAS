@@ -100,9 +100,9 @@ export const formatAuthors = (
   }
 
   if (authors.length === 2) {
-    return `${format(authors[0])}${
-      !($t && $t('and')) ? ' and ' : $t('and')
-    }${format(authors[1])}`
+    return `${format(authors[0])}${!($t && $t('and')) ? ' and ' : $t('and')}${
+      ' ' + format(authors[1])
+    }`
   }
 
   if (authors.length === 3 || full) {
@@ -133,10 +133,11 @@ export const formatTitleAndInstitutions = (obj) => {
 }
 export const formatSearch = (str) => {
   if (!str) return []
-  else
+  else {
     return str
       .split(' ')
       .filter((item) => item.length > 1 && !stopWords.includes(item))
+  }
 }
 
 export const capitalize = (value) => {
