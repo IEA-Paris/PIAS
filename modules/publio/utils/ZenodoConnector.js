@@ -35,7 +35,7 @@ class ZenodoApi {
     const baseURL = options.protocol + '://' + options.host + options.pathPrefix
     const baseHeaders = {
       Accept: 'application/json',
-      Authorization: options.token,
+      Authorization: `Bearer ${options.token}`,
     }
     this[kBaseUrl] = baseURL
     this[kBaseHeaders] = baseHeaders
@@ -73,7 +73,14 @@ class ZenodoApiDepositions {
   }
 
   list(options) {
-    console.log('options: ', options)
+    console.log(
+      'options: ',
+      JSON.stringify(
+        this[kRequest].get('', {
+          params: options,
+        })
+      )
+    )
     return this[kRequest].get('', {
       params: options,
     })

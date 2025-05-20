@@ -15,9 +15,10 @@ export default async (authors = [], articles, content) => {
     const updatedAuthorsDocuments = [...(first || []), ...(second || [])].map(
       (item) => {
         const { createdAt, ...rest } = item // remove createdAt property
-        const authorArticles = item?.articles.filter((article) =>
-          articles.find((art) => !(art.slug === article && art.published))
-        )
+        const authorArticles =
+          item?.articles?.filter((article) =>
+            articles.find((art) => !(art.slug === article && art.published))
+          ) || []
 
         const fileContents = item.path
           ? fs.readFileSync(
