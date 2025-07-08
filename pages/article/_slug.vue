@@ -93,6 +93,7 @@ export default {
   },
   props: {},
   async asyncData({ $content, params, payload }) {
+    /*     console.log('payload: ', payload) */
     const item =
       (payload && payload.item) ||
       (await $content('articles', { deep: true })

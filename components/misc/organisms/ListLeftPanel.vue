@@ -316,6 +316,11 @@ export default {
       default: false,
     },
   },
+  asyncData({ $content, params, payload }) {
+    console.log('payload: ', payload)
+
+    return {}
+  },
   data() {
     return {
       letter: null,
@@ -412,14 +417,20 @@ export default {
     },
   },
   async mounted() {
+    // Load route query and params if not already loaded during SSR
     this.$store.commit('loadRouteQueryAndParams', this.type)
+
+    // Set filter state based on current filters and query
     this.filter =
       this.$store.state[this.type].filtersCount > 0 ||
       (this.$route.query.filters &&
         Object.keys(this.$route.query.filters).length > 0) ||
       this.$route.query?.search?.length > 0
 
-    await this.$store.dispatch('update', this.type)
+    // Only update store if items are not already loaded (e.g., during CSR navigation)
+    if (!this.$store.state[this.type].items.length) {
+      await this.$store.dispatch('update', this.type)
+    }
   },
   updated() {},
   methods: {},

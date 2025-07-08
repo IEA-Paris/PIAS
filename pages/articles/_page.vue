@@ -17,11 +17,17 @@
 </template>
 <script>
 export default {
-  props: {},
   data() {
     return {
       type: 'articles',
     }
+  },
+  async fetch({ store, route }) {
+    // Load route query and params into store
+    store.commit('loadRouteQueryAndParams', 'articles')
+
+    // Initialize the store with data during server-side rendering
+    await store.dispatch('update', 'articles')
   },
   computed: {},
   mounted() {
