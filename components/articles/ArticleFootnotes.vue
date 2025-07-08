@@ -1,10 +1,10 @@
 <template>
-  <v-list two-line max-width="650px" class="px-0 footnotes-panel">
+  <v-list two-line max-width="650px" class="pl-sm-6">
     <v-list-item
       v-for="(footnote, index) in item.footnotes"
       :key="index"
       nuxt
-      class="px-0"
+      class="pl-0"
     >
       <v-list-item-content>
         <nuxt-content :document="footnote" style="max-width: 650px" />
@@ -28,9 +28,4 @@ export default {
   methods: {},
 }
 </script>
-<style lang="scss">
-.footnotes-panel {
-  padding: 0;
-  white-space: break-spaces;
-}
-</style>
+<style lang="scss"></style>

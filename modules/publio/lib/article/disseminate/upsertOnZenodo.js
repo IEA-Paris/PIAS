@@ -6,10 +6,6 @@ export default async (articles, options, queue) => {
     const fs = require('fs')
     const path = require('path')
     const Zenodo = require('../../../utils/ZenodoConnector')
-    console.log(
-      'options.config.modules.zenodo.sandbox: ',
-      options.config.modules.zenodo.token
-    )
     const zenodo = await new Zenodo({
       host: options.config.modules.zenodo.sandbox
         ? 'sandbox.zenodo.org'
