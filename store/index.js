@@ -156,7 +156,7 @@ export const actions = {
     await dispatch('update', 'media')
     await dispatch('update', 'authors')
   },
-  async resetState({ dispatch, commit, state }, type) {
+  resetState({ dispatch, commit, state }, type) {
     if (
       !state[type].filtersCount &&
       (state[type].page === 1 || !state[type].page) &&
@@ -166,7 +166,8 @@ export const actions = {
     }
     commit('setBlankState', type)
     commit('setPage', { page: 1, type })
-    await dispatch('update', type)
+    // Never fetch database here - the reset is complete
+    // ListLeftPanel will handle loading data when user actually needs it (search/filter)
   },
   async updateSort({ dispatch, commit, state }, { value, type }) {
     commit('setSort', { value, type })

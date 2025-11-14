@@ -330,14 +330,10 @@ export default {
         this.$store.dispatch('updateSearch', { search: v, type: this.type })
         this.$vuetify.goTo(0)
       }, 200),
+      issues: rawFilters.articles.filters.issue.items,
     }
   },
   computed: {
-    issues() {
-      return rawFilters.articles.filters.issue.items.filter((issue) =>
-        this.items.find((item) => item.issue.slice(15, -3) === issue.value)
-      )
-    },
     filtersSpacing() {
       const scrolled = this.$store.state.scrolled
       switch (this.$vuetify.breakpoint.name) {
