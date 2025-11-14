@@ -22,7 +22,7 @@ export default async (authors = [], articles, content) => {
 
         const fileContents = item.path
           ? fs.readFileSync(
-              'submodules/' + config.name + item.path + '.md',
+              'submodules/' + config.name + '/content/' + item.path + '.md',
               'utf8'
             )
           : false

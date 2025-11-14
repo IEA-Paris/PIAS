@@ -46,7 +46,7 @@
         :lg="filter ? 9 : 11"
         :md="filter ? 9 : 12"
         :sm="filter ? 7 : 12"
-        class="transition-swing pt-0"
+        class="transition-swing pt-0 pr-4"
         :class="{
           'pl-0': filter || $vuetify.breakpoint.xs,
         }"
@@ -344,10 +344,10 @@ export default {
           return scrolled ? 'pt-14 pr-5' : 'pt-11 pr-0'
 
         case 'lg':
-          return scrolled ? 'pt-11 pr-2' : 'pt-8 pr-0'
+          return scrolled ? 'pt-11 pr-2' : 'pt-8 pr-3'
 
         case 'xl':
-          return scrolled ? 'pt-10 pr-3' : 'pt-8 pr-0'
+          return scrolled ? 'pt-10 pr-3' : 'pt-8 pr-3'
 
         default:
           return 'pt-10 pr-3'

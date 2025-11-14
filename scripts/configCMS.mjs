@@ -37,7 +37,7 @@ collections:
     nested:
       depth: 2
       summary: '{{lastname}} {{firstname}}'
-    folder: 'authors' # The path to the folder where the documents are stored
+    folder: 'content/authors' # The path to the folder where the documents are stored
     create: true
     slug: '{{lastname}}-{{firstname}}'
     summary: '{{lastname}} {{firstname}}'
@@ -175,7 +175,7 @@ collections:
       depth: 5
       summary: '{{title}}'
     label: 'Articles' # Used in the UI
-    folder: 'articles' # The path to the folder where the documents are stored
+    folder: 'content/articles' # The path to the folder where the documents are stored
     media_folder: '/static'
     create: true # Allow users to create new documents in this collection
     slug: '{{slug}}' # Filename template, e.g., YYYY-MM-DD-title.md
@@ -374,7 +374,7 @@ collections:
           name: 'issue',
           widget: 'file',
           required: true,
-          media_folder: '/issues',
+          media_folder: 'content/issues',
           public_folder: 'content/issues',
         }
       - {
@@ -412,7 +412,7 @@ collections:
           label: 'Bibliography',
           name: 'bibliography',
           media_library:
-            { allow_multiple: false, media_folder: '/bibliographies', public_folder: '/' },
+            { allow_multiple: false, media_folder: '/bibliography', public_folder: '/' },
           widget: 'file',
           required: false,
         }
@@ -442,7 +442,7 @@ collections:
   - name: 'issues' # Used in routes, e.g., /admin/collections/blog
     label: 'Issues' # Used in the UI
     identifier_field: title
-    folder: 'issues' # The path to the folder where the documents are stored
+    folder: 'content/issues' # The path to the folder where the documents are stored
     create: true # Allow users to create new documents in this collection
     slug: '{{name_of_the_issue}}' # Filename template, e.g., YYYY-MM-DD-title.md
     fields: # The fields for each document, usually in front matter
@@ -483,7 +483,7 @@ collections:
     nested:
       depth: 2
       summary: '{{slug}}'
-    folder: 'pages' # The path to the folder where the documents are stored
+    folder: 'content/pages' # The path to the folder where the documents are stored
     create: true # Allow users to create new documents in this collection
     fields: # The fields for each document, usually in front matter
       - {

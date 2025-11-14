@@ -7,15 +7,16 @@ export default async (articles) => {
   console.log('=== DIAGNOSE ARTICLES DEBUG ===')
   console.log('NODE_ENV:', process.env.NODE_ENV)
   console.log('LOCAL:', process.env.LOCAL)
-  console.log('thumbnails/ exists:', fs.existsSync('thumbnails'))
-  console.log('svg/ exists:', fs.existsSync('svg'))
   console.log('static/thumbnails/ exists:', fs.existsSync('static/thumbnails'))
   console.log('static/svg/ exists:', fs.existsSync('static/svg'))
-  if (fs.existsSync('thumbnails')) {
-    console.log('thumbnails/ file count:', fs.readdirSync('thumbnails').length)
+  if (fs.existsSync('static/thumbnails')) {
+    console.log(
+      'static/thumbnails/ file count:',
+      fs.readdirSync('static/thumbnails').length
+    )
   }
-  if (fs.existsSync('svg')) {
-    console.log('svg/ file count:', fs.readdirSync('svg').length)
+  if (fs.existsSync('static/svg')) {
+    console.log('static/svg/ file count:', fs.readdirSync('static/svg').length)
   }
   console.log('================================\n')
 
@@ -40,37 +41,28 @@ export default async (articles) => {
   let count = 0
   articles = articles?.map((article) => {
     const articleDiffed = diffed.includes(article.path)
-    // Check both possible locations for PDF
+    // Check for PDF in static/pdfs
     const resolvedPDFPath = path.resolve('static/pdfs', article.slug + '.pdf')
-    const resolvedPDFPathAlt = path.resolve('pdfs', article.slug + '.pdf')
 
-    // Check both possible locations for thumbnails (PNG)
+    // Check for thumbnails (PNG) in static/thumbnails
     const resolvedThumbnailPath = path.resolve(
       'static/thumbnails',
       article.slug + '.png'
     )
-    const resolvedThumbnailPathAlt = path.resolve(
-      'thumbnails',
-      article.slug + '.png'
-    )
 
-    // Check both possible locations for SVG
+    // Check for SVG in static/svg
     const resolvedSVGPath = path.resolve('static/svg', article.slug + '.svg')
-    const resolvedSVGPathAlt = path.resolve('svg', article.slug + '.svg')
 
     let hasPDF = false
-    if (fs.existsSync(resolvedPDFPath) || fs.existsSync(resolvedPDFPathAlt)) {
+    if (fs.existsSync(resolvedPDFPath)) {
       hasPDF = true
     } else {
       count++
     }
     let hasThumbnail = false
-    // Check for both PNG and SVG thumbnails in both possible locations
-    const hasPNG =
-      fs.existsSync(resolvedThumbnailPath) ||
-      fs.existsSync(resolvedThumbnailPathAlt)
-    const hasSVG =
-      fs.existsSync(resolvedSVGPath) || fs.existsSync(resolvedSVGPathAlt)
+    // Check for both PNG and SVG thumbnails in static directories
+    const hasPNG = fs.existsSync(resolvedThumbnailPath)
+    const hasSVG = fs.existsSync(resolvedSVGPath)
     if (hasPNG && hasSVG) {
       hasThumbnail = true
       console.log(

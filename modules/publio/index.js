@@ -36,6 +36,7 @@ import generateBibliographyFilesForExport from './lib/article/files/generateBibl
 import makePrintRoutes from './lib/makePrintRoutes'
 import extractAndGenerateMedia from './lib/article/body/extractAndGenerateMedia'
 import makeFiltersData from './lib/makeFiltersData'
+import pruneContentDatabase from './lib/pruneContentDatabase'
 
 // Dissemination
 import disseminate from './lib/article/disseminate'
@@ -84,7 +85,7 @@ export default function (moduleOptions) {
       })
     })
   })
-  nuxt.hook('generate:done', async ({ name }, errors) => {
+  nuxt.hook('generate:done', async (context, errors) => {
     // Avoid to retrigger after changing the contetn files (e.g. to add DOIs)
     if (!once) return
     once = false
@@ -114,6 +115,11 @@ export default function (moduleOptions) {
       // METADATA/FRONTMATTER
       [publishOnZenodo]
     )
+
+    // Prune the content database to reduce client-side download size
+    const distPath = nuxt.options.generate.dir || 'dist'
+    pruneContentDatabase(distPath)
+
     console.log('"GENERATE:DONE"')
     return true
   })

@@ -204,7 +204,7 @@ export const filterAndMerge = (first, second) => {
   })
 
   first = first.filter((author) => {
-    if (!author.social_channels)
+    if (!author.social_channels) {
       if (author?.social_channels?.orcid) {
         // does it have an orcid?
         // is it matching an existing doc?
@@ -224,6 +224,7 @@ export const filterAndMerge = (first, second) => {
           return false
         }
       }
+    }
     return true
   })
 
@@ -324,8 +325,13 @@ export const mergeDeep = (objects, id) => {
         } else if (isObject(pVal) && isObject(oVal)) {
           prev[key] = mergeDeep([pVal, oVal], id)
           // if string and the base is not set
-        } else if (typeof oVal === 'string' && !prev[key].length && oVal.length)
+        } else if (
+          typeof oVal === 'string' &&
+          !prev[key].length &&
+          oVal.length
+        ) {
           prev[key] = oVal.trim()
+        }
         // if string and both are set (conflict) // TODO decide on a conflict default strategy
         else if (
           typeof oVal === 'string' &&
@@ -414,7 +420,7 @@ export const deepEqual = (x, y) => {
 export const updateArticlesDoiAndZid = (documents) => {
   documents.forEach((document) => {
     const data = fs.readFileSync(
-      './submodules/' + config.name + document.path + '.md',
+      './submodules/' + config.name + '/content/' + document.path + '.md',
       'utf8'
     )
     const markdown = data.split('---')[2]
@@ -433,7 +439,7 @@ export const updateArticlesDoiAndZid = (documents) => {
       }
       // writeFlag is true only if the
       fs.writeFileSync(
-        './submodules/' + config.name + '/' + document.path + '.md',
+        './submodules/' + config.name + '/content/' + document.path + '.md',
         `---
 ${yaml.dump(frontmatter, { noRefs: true, sortKeys: true })}
 ---
@@ -502,7 +508,7 @@ export const insertDocuments = (data, cat, filenameFlag) => {
     ? data.map((item) => item.issue.slice(15, -3))
     : '0123456789abcdefghijklmnopqrstuvwxyz') {
     const folderPath = path.resolve(
-      'submodules/' + config.name + '/' + cat + '/' + folder
+      'submodules/' + config.name + '/content/' + cat + '/' + folder
     )
     if (!fs.existsSync(folderPath)) {
       fs.mkdirSync(folderPath, { recursive: true })
@@ -516,7 +522,7 @@ export const insertDocuments = (data, cat, filenameFlag) => {
       fs.existsSync(
         './submodules/' +
           config.name +
-          '/' +
+          '/content/' +
           cat +
           '/' +
           fileName[0] +
@@ -548,10 +554,16 @@ export const insertDocuments = (data, cat, filenameFlag) => {
     if (
       fs.existsSync(
         cat === 'articles'
-          ? './submodules/' + config.name + '/' + cat + '/' + fileName + '.md'
+          ? './submodules/' +
+              config.name +
+              '/content/' +
+              cat +
+              '/' +
+              fileName +
+              '.md'
           : './submodules/' +
               config.name +
-              '/' +
+              '/content/' +
               cat +
               '/' +
               fileName[0] +
@@ -566,10 +578,10 @@ export const insertDocuments = (data, cat, filenameFlag) => {
     }
     fs.writeFileSync(
       cat === 'articles'
-        ? './submodules/' + config.name + '/' + cat + '/' + fileName
+        ? './submodules/' + config.name + '/content/' + cat + '/' + fileName
         : './submodules/' +
             config.name +
-            '/' +
+            '/content/' +
             cat +
             '/' +
             fileName[0] +
