@@ -93,11 +93,6 @@ export default {
       this.$store.commit('setScrolled')
     },
     getItemsPerIssue(issue) {
-      console.log('issue: ', issue.value)
-      console.log(
-        'issues',
-        this.data.items.map((item) => item.issue.slice(15, -3))
-      )
       return this.data.items.filter(
         (item) => item.issue.slice(15, -3) === issue.value
       )

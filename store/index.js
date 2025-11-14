@@ -184,7 +184,6 @@ export const actions = {
     await dispatch('update', type)
   },
   async updateItemsPerPage({ dispatch, commit, state }, { value, type }) {
-    console.log('updateItemsPerPage')
     commit('setPage', { page: 1, type })
     commit('setItemsPerPage', { value, type })
     await dispatch('update', type)

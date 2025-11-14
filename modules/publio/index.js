@@ -54,8 +54,6 @@ export default function (moduleOptions) {
   // await tsvToArticles()
   const fs = require('fs')
   const path = require('path')
-  /*   console.log('ARG', process.env.LOCAL)
-  console.log('ARG', process.argv) */
   const { nuxt } = this
   let options = Object.assign({}, defaults, moduleOptions, this.options.publio)
   process.on('warning', (e) => console.warn(e.stack))
@@ -176,7 +174,7 @@ export default function (moduleOptions) {
       // transformers
       [generateBibliographyFilesForExport, insertCitationElements]
     )
-    const editedArticles = console.log(
+    console.log(
       'to process : ',
       articles.map((article) => article.article_title)
     )
@@ -191,7 +189,7 @@ export default function (moduleOptions) {
 
       // Upsert on Zenodo/OpenAire & get DOI is none is available
       articles = await upsertOnZenodo(articles, options, zenodoQueue)
-      console.log('articles: ', articles.length)
+      console.log('articles to upserted on zenodo: ', articles.length)
 
       updateArticlesDoiAndZid(articles)
     }

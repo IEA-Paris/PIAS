@@ -89,10 +89,8 @@ export default {
       const itemRawRules = this.tab
         ? forms[this.type][this.tab][input]?.rules
         : forms[this.type][input]?.rules
-      /*      console.log('itemRawRules: ', itemRawRules) */
       const rules = itemRawRules
         ? Object.keys(itemRawRules).flatMap((rule) => {
-            /*     console.log('rule: ', rule) */
             if (itemRawRules[rule]) {
               return itemRawRules[rule] === true
                 ? rulesSet[rule](this)
@@ -101,8 +99,7 @@ export default {
             return true
           })
         : []
-      /*  console.log('rules: ', rules)
-       */
+
       return rules
     },
   },

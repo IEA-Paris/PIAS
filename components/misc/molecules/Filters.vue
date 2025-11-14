@@ -92,9 +92,7 @@ export default {
       return this.$store.state[this.type].filtersCount
     },
   },
-  created() {
-    console.log('set', data[this.type])
-  },
+  created() {},
   mounted() {},
   methods: {},
 }
