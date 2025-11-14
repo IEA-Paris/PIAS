@@ -319,8 +319,6 @@ export default {
     },
   },
   asyncData({ $content, params, payload }) {
-    console.log('payload: ', payload)
-
     return {}
   },
   data() {
@@ -387,7 +385,6 @@ export default {
         return this.$store.state[this.type].display
       },
       async set(v) {
-        console.log('setDisplay')
         await this.$store.dispatch('update', { display: v, type: this.type })
         this.$vuetify.goTo(0)
       },
@@ -438,7 +435,6 @@ export default {
       hasActiveFiltersOrSearch &&
       !this.$store.state[this.type].items.length
     ) {
-      console.log('should load')
       await this.loadDatabase()
     }
   },
@@ -450,13 +446,11 @@ export default {
       await this.$store.dispatch('update', this.type)
     },
     async onSearchFocus() {
-      console.log('onSearchFocus')
       await this.loadDatabase()
     },
     async onFilterToggle() {
       this.filter = !this.filter
       if (this.filter) {
-        console.log('onFilterToggle')
         await this.loadDatabase()
       }
     },
