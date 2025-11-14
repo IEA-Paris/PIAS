@@ -62,6 +62,7 @@
               :type="type"
               class="mt-7 mr-6 ml-0"
               @close="open = false"
+              @filter-interaction="$emit('filter-interaction')"
             />
 
             <v-btn
@@ -116,7 +117,5 @@ $input-font-size: 48px;
 }
 .mobile-filter-btn {
   background-color: white;
-}
-.v-badge__badge {
 }
 </style>

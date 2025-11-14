@@ -6,6 +6,8 @@
     v-scroll="blur"
     menu-props="offset-y"
     :multiple="multiple"
+    @focus="$emit('filter-interaction')"
+    @click="$emit('filter-interaction')"
   >
     <template #selection="{ item, index }">
       <SelectionSlot

@@ -5,6 +5,8 @@
     multiple
     menu-props="offset-y"
     :loading="$nuxt.loading || $store.state.loading"
+    @focus="$emit('filter-interaction')"
+    @click="$emit('filter-interaction')"
   >
     <template #selection="{ item, index }">
       <SelectionSlot

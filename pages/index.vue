@@ -85,40 +85,13 @@ export default {
       latestIssue: {},
     }
   },
-  async fetch() {
-    this.page = await this.$content(
-      'pages/' + this.$i18n.locale + '/about'
-    ).fetch()
-    this.latestIssue = (
-      await this.$content('issues', { deep: true })
-        .sortBy('date', 'desc')
-        .limit(1)
-        .fetch()
-    )[0]
-    this.latestIssueArticles = await this.$content('articles', { deep: true })
-      .where({ issue: { $regex: this.latestIssue.path }, published: true })
-      .sortBy('date', 'asc')
-      .limit(3)
-      .fetch()
-    this.featuredArticles = await this.$content('articles', { deep: true })
-      .where({ highlight: true, published: true })
-      .sortBy('date', 'desc')
-      .limit(3)
-      .fetch()
-    this.$store.commit('setLoading', false)
-    /* commit('setItems', {
-      items: latestIssueArticles,
-      total: latestIssueArticles.length,
-      numberOfPages: 1,
-      type: 'articles', 
-    }) */
-  },
   computed: {},
   watch: {
     '$i18n.locale': '$fetch',
   },
   mounted() {
-    this.$fetch()
+    // Don't fetch on initial mount since asyncData already provided the data
+    // Only fetch when locale changes
   },
   methods: {
     onScroll() {

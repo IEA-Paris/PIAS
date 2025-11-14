@@ -21,6 +21,9 @@ export default {
     return {}
   },
   async fetch({ store, route }) {
+    // Skip fetch on client-side navigation - ListLeftPanel will load database when needed
+    if (process.client) return
+
     // Load route query and params into store
     store.commit('loadRouteQueryAndParams', 'media')
 

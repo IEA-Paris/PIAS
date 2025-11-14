@@ -157,6 +157,13 @@ export const actions = {
     await dispatch('update', 'authors')
   },
   async resetState({ dispatch, commit, state }, type) {
+    if (
+      !state[type].filtersCount &&
+      (state[type].page === 1 || !state[type].page) &&
+      (state[type].search === '' || !state[type].search)
+    ) {
+      return
+    }
     commit('setBlankState', type)
     commit('setPage', { page: 1, type })
     await dispatch('update', type)
@@ -176,6 +183,7 @@ export const actions = {
     await dispatch('update', type)
   },
   async updateItemsPerPage({ dispatch, commit, state }, { value, type }) {
+    console.log('updateItemsPerPage')
     commit('setPage', { page: 1, type })
     commit('setItemsPerPage', { value, type })
     await dispatch('update', type)

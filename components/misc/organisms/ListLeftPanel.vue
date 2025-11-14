@@ -5,6 +5,7 @@
       v-model="filter"
       :type="type"
       :filter-count="filtersCount"
+      @filter-interaction="loadDatabase"
     />
     <div v-if="$vuetify.breakpoint.smAndUp" class="d-inline-flex sidebtn">
       <v-tooltip bottom>
@@ -15,7 +16,7 @@
             text
             v-bind="attrs"
             class="pa-7 mb-0"
-            @click="filter = !filter"
+            @click="onFilterToggle"
             v-on="on"
           >
             <v-icon :left="!filter" :large="filter">
@@ -132,6 +133,7 @@
                   :dense="$vuetify.breakpoint.smAndDown"
                   clearable
                   style="min-width: 150px"
+                  @focus="onSearchFocus"
                 >
                   <template v-if="!search" #label>
                     <div class="searchLabel">
@@ -226,7 +228,7 @@
       >
         <v-row class="transition-swing pl-3 pr-0 fill-height">
           <v-col cols="12" :class="filtersSpacing" class="mt-12">
-            <Filters :type="type" /></v-col
+            <Filters :type="type" @filter-interaction="loadDatabase" /></v-col
         ></v-row>
       </v-col>
     </v-row>
@@ -325,14 +327,12 @@ export default {
     return {
       letter: null,
       filter: this.$store.state[this.type].filtersCount > 0,
+      databaseLoaded: false,
       debouncedSearch: debounce(function (v) {
         this.$store.dispatch('updateSearch', { search: v, type: this.type })
         this.$vuetify.goTo(0)
       }, 200),
     }
-  },
-  async fetch({ params, store: { dispatch, getters } }) {
-    await dispatch('update', this.type)
   },
   computed: {
     issues() {
@@ -387,6 +387,7 @@ export default {
         return this.$store.state[this.type].display
       },
       async set(v) {
+        console.log('setDisplay')
         await this.$store.dispatch('update', { display: v, type: this.type })
         this.$vuetify.goTo(0)
       },
@@ -427,13 +428,39 @@ export default {
         Object.keys(this.$route.query.filters).length > 0) ||
       this.$route.query?.search?.length > 0
 
-    // Only update store if items are not already loaded (e.g., during CSR navigation)
-    if (!this.$store.state[this.type].items.length) {
-      await this.$store.dispatch('update', this.type)
+    // Check if database needs to be loaded immediately (filters or search already active)
+    const hasActiveFiltersOrSearch =
+      this.$store.state[this.type].filtersCount > 0 ||
+      this.$route.query?.search?.length > 0
+
+    // Only load database if filters/search are active, otherwise defer until interaction
+    if (
+      hasActiveFiltersOrSearch &&
+      !this.$store.state[this.type].items.length
+    ) {
+      console.log('should load')
+      await this.loadDatabase()
     }
   },
   updated() {},
-  methods: {},
+  methods: {
+    async loadDatabase() {
+      if (this.databaseLoaded) return
+      this.databaseLoaded = true
+      await this.$store.dispatch('update', this.type)
+    },
+    async onSearchFocus() {
+      console.log('onSearchFocus')
+      await this.loadDatabase()
+    },
+    async onFilterToggle() {
+      this.filter = !this.filter
+      if (this.filter) {
+        console.log('onFilterToggle')
+        await this.loadDatabase()
+      }
+    },
+  },
 }
 </script>
 <style lang="scss">

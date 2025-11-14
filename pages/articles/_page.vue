@@ -23,6 +23,8 @@ export default {
     }
   },
   async fetch({ store, route }) {
+    // Skip fetch on client-side navigation - ListLeftPanel will load database when needed
+    if (process.client) return
     // Load route query and params into store
     store.commit('loadRouteQueryAndParams', 'articles')
 
@@ -30,9 +32,7 @@ export default {
     await store.dispatch('update', 'articles')
   },
   computed: {},
-  mounted() {
-    console.log(this.$route.name)
-  },
+  mounted() {},
   created() {},
   methods: {},
 }

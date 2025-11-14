@@ -53,6 +53,7 @@
           ? 'mt-1 mr-1'
           : 'mt-0 mr-1'
       "
+      @filter-interaction="$emit('filter-interaction')"
     />
     <v-btn
       v-if="Object.keys(filters).length > 2"
