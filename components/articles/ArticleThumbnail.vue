@@ -18,6 +18,7 @@
         provider="static"
         fit="inside"
         :src="'/thumbnails/' + item.slug + '.png'"
+        :alt="item.article_title || 'Article thumbnail'"
         style="max-height: 100%; max-width: 100%"
         @error="handleImageError"
       >

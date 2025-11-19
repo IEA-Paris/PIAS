@@ -5,6 +5,7 @@
     :src="$img(src, { height, quality: 70 })"
     :srcset="_srcset.srcset"
     :sizes="_srcset.size"
+    :alt="alt || 'Article image'"
     v-bind="$attrs"
   ></v-img>
 </template>
@@ -16,6 +17,10 @@ export default {
     src: {
       type: String,
       default: '/img/header-bg.jpg',
+    },
+    alt: {
+      type: String,
+      default: '',
     },
   },
   computed: {

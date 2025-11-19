@@ -498,5 +498,25 @@
   "articles-from-this-institution": "Articles de cette institution",
   "show-less": "Voir moins",
   "show-more": "Voir plus",
-  "to-cite": "To cite"
+  "to-cite": "To cite",
+  "aria": {
+    "open-navigation-menu": "Ouvrir le menu de navigation",
+    "close-navigation-menu": "Fermer le menu de navigation",
+    "scroll-back-to-top": "Retour en haut de page",
+    "close-footnote": "Fermer la note de bas de page",
+    "go-to-homepage": "Aller à la page d'accueil",
+    "change-language-current": "Changer de langue - Actuel: {0}",
+    "switch-to-english": "Basculer vers l'anglais",
+    "switch-to-french": "Basculer vers le français",
+    "main-navigation": "Navigation principale",
+    "main-menu-navigation": "Navigation du menu principal",
+    "filters": "Filtres",
+    "pagination-navigation": "Navigation de pagination",
+    "previous-page": "Page précédente",
+    "next-page": "Page suivante",
+    "page-number": "Page {0}",
+    "current-page": "Page actuelle, Page {0}",
+    "logo-alt": "Logo PIAS - Aller à la page d'accueil",
+    "logo-alt-simple": "Logo PIAS"
+  }
 }

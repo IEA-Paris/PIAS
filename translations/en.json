@@ -525,5 +525,25 @@
   "articles-from-this-institution": "Articles from this institution",
   "show-less": "Show less",
   "show-more": "Show more",
-  "to-cite": "To cite"
+  "to-cite": "To cite",
+  "aria": {
+    "open-navigation-menu": "Open navigation menu",
+    "close-navigation-menu": "Close navigation menu",
+    "scroll-back-to-top": "Scroll back to top",
+    "close-footnote": "Close footnote",
+    "go-to-homepage": "Go to homepage",
+    "change-language-current": "Change language - Current: {0}",
+    "switch-to-english": "Switch to English",
+    "switch-to-french": "Switch to French",
+    "main-navigation": "Main navigation",
+    "main-menu-navigation": "Main menu navigation",
+    "filters": "Filters",
+    "pagination-navigation": "Pagination Navigation",
+    "previous-page": "Previous Page",
+    "next-page": "Next Page",
+    "page-number": "Page {0}",
+    "current-page": "Current Page, Page {0}",
+    "logo-alt": "PIAS Logo - Go to homepage",
+    "logo-alt-simple": "PIAS Logo"
+  }
 }

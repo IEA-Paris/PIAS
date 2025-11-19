@@ -43,7 +43,13 @@
       <div class="d-flex" align="end">
         <b v-if="footnote" class="mb-2">Footnote {{ noteIndex }}</b>
 
-        <v-btn small icon class="ml-auto" @click="hideSnack">
+        <v-btn
+          small
+          icon
+          class="ml-auto"
+          :aria-label="$t('aria.close-footnote')"
+          @click="hideSnack"
+        >
           <v-icon>mdi-close</v-icon>
         </v-btn>
       </div>

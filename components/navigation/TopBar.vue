@@ -5,6 +5,7 @@
     clipped
     flat
     height="140"
+    role="banner"
     :class="{ loading: $nuxt.loading }"
   >
     <div class="d-flex flex-grow-1 justify-space-between">
@@ -16,10 +17,11 @@
           <MainMenu />
         </div>
 
-        <div
+        <nav
           v-if="$vuetify.breakpoint.smAndUp"
           class="d-flex menu"
           transition="v-expand-transition"
+          :aria-label="$t('aria.main-navigation')"
         >
           <v-btn
             text
@@ -43,7 +45,7 @@
           >
             {{ $t('authors') }}
           </v-btn>
-        </div>
+        </nav>
       </div>
     </div>
   </v-toolbar>

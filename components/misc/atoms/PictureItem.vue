@@ -13,7 +13,10 @@
       <slot name="date"></slot>
     </template>
     <template #content>
-      <OptimizedImage :src="item.picture"></OptimizedImage>
+      <OptimizedImage
+        :src="item.picture"
+        :alt="item.article_title || item.title || 'Article image'"
+      ></OptimizedImage>
     </template>
   </Item>
 </template>

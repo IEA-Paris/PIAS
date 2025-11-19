@@ -18,6 +18,7 @@
           contained
           fab
           style="background-color: white"
+          :aria-label="$t('aria.scroll-back-to-top')"
           :class="{
             'mb-16':
               $vuetify.breakpoint.xs &&

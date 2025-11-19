@@ -1,6 +1,9 @@
 <template>
   <div
     class="d-flex logo-container"
+    role="button"
+    tabindex="0"
+    :aria-label="$t('aria.go-to-homepage')"
     @click="
       $router.push(localePath('/')) &&
         $store.dispatch('resetState', 'articles') &&
@@ -18,7 +21,7 @@
       :src="$config.logo"
       contain
       preload
-      alt="Avatar"
+      :alt="$t('aria.logo-alt')"
       style="cursor: pointer"
     ></nuxt-img>
     <!--  <div>

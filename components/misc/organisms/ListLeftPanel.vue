@@ -122,6 +122,7 @@
                 <v-text-field
                   v-model.trim="search"
                   :placeholder="$t('search-type', [$t(type)])"
+                  :aria-label="$t('search-type', [$t(type)])"
                   prepend-inner-icon="mdi-magnify"
                   single-line
                   color="black"
@@ -225,6 +226,8 @@
         :md="filter ? 3 : 1"
         :sm="filter ? 5 : 1"
         class="transition-swing pr-0"
+        role="complementary"
+        :aria-label="$t('aria.filters')"
       >
         <v-row class="transition-swing pl-3 pr-0 fill-height">
           <v-col cols="12" :class="filtersSpacing" class="mt-12">
@@ -260,6 +263,7 @@
           flat
           dense
           :items="$store.state[type].itemsPerPageArray"
+          :aria-label="$t('items-per-page')"
           hide-details
         ></v-select>
       </div>

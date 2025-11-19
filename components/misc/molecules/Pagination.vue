@@ -2,7 +2,7 @@
   <v-btn-toggle
     value="currentPage"
     role="navigation"
-    aria-label="Pagination Navigation"
+    :aria-label="$t('aria.pagination-navigation')"
   >
     <v-btn
       v-if="!(hidePrevNext && firstPageSelected())"
@@ -10,7 +10,7 @@
       height="35"
       width="35"
       :tabindex="!hidePrevNext && firstPageSelected() ? -1 : 0"
-      aria-label="Previous Page"
+      :aria-label="$t('aria.previous-page')"
       nuxt
       :to="{
         path: `/${type}/${currentPage - 1}`,
@@ -67,8 +67,8 @@
           :aria-current="page.current ? 'true' : 'false'"
           :aria-label="
             page.current
-              ? `Current page, Page ${page.value}`
-              : `Goto Page ${page.value}`
+              ? $t('aria.current-page', [page.value])
+              : $t('aria.page-number', [page.value])
           "
           @keyup.enter="
             $router.push({
@@ -85,7 +85,7 @@
     <v-btn
       v-if="!(hidePrevNext && lastPageSelected())"
       :tabindex="!hidePrevNext && lastPageSelected() ? -1 : 0"
-      aria-label="Next Page"
+      :aria-label="$t('aria.next-page')"
       :to="{
         path: `/${type}/${currentPage + 1}`,
         query: $route.query,

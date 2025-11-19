@@ -1,5 +1,11 @@
 <template>
-  <v-footer app dark color="black" style="position: relative">
+  <v-footer
+    app
+    dark
+    color="black"
+    style="position: relative"
+    role="contentinfo"
+  >
     <v-container>
       <v-row justify="center" no-gutters>
         <v-col cols="12" lg="10" class="mt-6">

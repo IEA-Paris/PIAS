@@ -2,7 +2,15 @@
   <v-dialog v-model="open" fullscreen hide-overlay transition="none">
     <!-- ACTIVATOR BTN -->
     <template #activator="{ on, attrs }">
-      <v-btn v-bind="attrs" icon x-large class="ma-2" tile v-on="on">
+      <v-btn
+        v-bind="attrs"
+        icon
+        x-large
+        class="ma-2"
+        tile
+        :aria-label="$t('aria.open-navigation-menu')"
+        v-on="on"
+      >
         <v-icon color="black">mdi-menu</v-icon>
       </v-btn>
     </template>
@@ -17,6 +25,7 @@
               contain
               max-height="120"
               max-width="120"
+              :alt="$t('aria.logo-alt-simple')"
               style="cursor: pointer"
             ></v-img>
             <v-spacer></v-spacer>
@@ -25,6 +34,7 @@
               x-large
               class="ma-2 mr-2 mb-4"
               tile
+              :aria-label="$t('aria.close-navigation-menu')"
               @click="open = false"
             >
               <v-icon>mdi-close</v-icon>
@@ -65,27 +75,29 @@
         <v-col cols="12" md="4">
           <v-divider style="border-color: white"></v-divider>
           <!-- HOME/ARTICLES -->
-          <v-list dark color="black">
-            <v-list-item :to="localePath('/articles')" @click="open = false">
-              <v-list-item-title class="text-uppercase text-h5 mt-3 mb-6">
-                {{ $t('articles') }}
-              </v-list-item-title>
-            </v-list-item>
-            <v-divider></v-divider>
-            <!-- MEDIA -->
-            <v-list-item :to="localePath('/media')" @click="open = false">
-              <v-list-item-title class="text-uppercase text-h5 mt-3 mb-6">
-                {{ $t('media') }}
-              </v-list-item-title>
-            </v-list-item>
-            <v-divider></v-divider>
-            <!-- AUTHORS -->
-            <v-list-item :to="localePath('/authors')" @click="open = false">
-              <v-list-item-title class="text-uppercase text-h5 mt-3 mb-6">
-                {{ $t('authors') }}
-              </v-list-item-title>
-            </v-list-item>
-          </v-list>
+          <nav :aria-label="$t('aria.main-menu-navigation')">
+            <v-list dark color="black">
+              <v-list-item :to="localePath('/articles')" @click="open = false">
+                <v-list-item-title class="text-uppercase text-h5 mt-3 mb-6">
+                  {{ $t('articles') }}
+                </v-list-item-title>
+              </v-list-item>
+              <v-divider></v-divider>
+              <!-- MEDIA -->
+              <v-list-item :to="localePath('/media')" @click="open = false">
+                <v-list-item-title class="text-uppercase text-h5 mt-3 mb-6">
+                  {{ $t('media') }}
+                </v-list-item-title>
+              </v-list-item>
+              <v-divider></v-divider>
+              <!-- AUTHORS -->
+              <v-list-item :to="localePath('/authors')" @click="open = false">
+                <v-list-item-title class="text-uppercase text-h5 mt-3 mb-6">
+                  {{ $t('authors') }}
+                </v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </nav>
         </v-col>
         <!-- SOCIAL ICONS -->
         <v-col cols="12" md="4" order="last">
