@@ -15,9 +15,11 @@
     <template #content>
       <nuxt-img
         v-bind="$attrs"
+        provider="static"
         fit="inside"
         :src="'/thumbnails/' + item.slug + '.png'"
         style="max-height: 100%; max-width: 100%"
+        @error="handleImageError"
       >
       </nuxt-img>
     </template>
@@ -44,6 +46,16 @@ export default {
   methods: {
     hasContent(slot) {
       return !!this.$slots[slot]
+    },
+    handleImageError(event) {
+      // Log the error for debugging
+      console.warn(
+        'Failed to load thumbnail for:',
+        this.item.slug,
+        '/thumbnails/' + this.item.slug + '.png'
+      )
+      // Optionally set a fallback image
+      // event.target.src = '/path/to/fallback.png'
     },
   },
 }

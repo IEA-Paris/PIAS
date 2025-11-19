@@ -143,7 +143,7 @@ export default {
 </script>
 <style lang="scss">
 .articleBox {
-  background: linear-gradient(315deg, #2d3436 0%, #000000 74%);
+  background: #000000 !important;
   overflow: hidden;
 }
 .underline-color {

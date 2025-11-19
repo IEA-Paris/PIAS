@@ -18,6 +18,7 @@ export default {
       'issue',
       'issueIndex',
       'yt',
+      'countMap',
     ],
     styles: ['APA' /* 'vancouver' , */, 'harvard1'],
     perPage: {
