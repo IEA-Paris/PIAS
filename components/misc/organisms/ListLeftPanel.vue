@@ -411,28 +411,27 @@ export default {
     },
   },
   async mounted() {
-    // Load route query and params if not already loaded during SSR
+    // Load route query and params into store
     this.$store.commit('loadRouteQueryAndParams', this.type)
 
-    // Set filter state based on current filters and query
+    // Set filter panel state based on current filters and query
     this.filter =
       this.$store.state[this.type].filtersCount > 0 ||
       (this.$route.query.filters &&
         Object.keys(this.$route.query.filters).length > 0) ||
       this.$route.query?.search?.length > 0
 
-    // Check if database needs to be loaded immediately (filters or search already active)
+    // Check if query or store contains search or filters
     const hasActiveFiltersOrSearch =
       this.$store.state[this.type].filtersCount > 0 ||
-      this.$route.query?.search?.length > 0
+      (this.$route.query?.search && this.$route.query.search !== '') ||
+      (this.$store.state[this.type].search &&
+        this.$store.state[this.type].search !== '')
 
-    // On client-side navigation with active filters/search, or if items array is empty, load database
-    // This handles: pagination with filters, direct URLs with query params, and initial empty state
-    if (
-      hasActiveFiltersOrSearch ||
-      !this.$store.state[this.type].items.length
-    ) {
-      await this.loadDatabase()
+    // If filters/search present, use update (database will load automatically)
+    // Otherwise rely on SSR payload
+    if (hasActiveFiltersOrSearch) {
+      await this.$store.dispatch('update', this.type)
     }
   },
   updated() {},
