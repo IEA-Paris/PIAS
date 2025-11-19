@@ -270,6 +270,12 @@ export default {
           content: this.$config.full_name,
         },
       ],
+      link: [
+        {
+          rel: 'canonical',
+          href: this.$config.url + '/article/' + article.slug,
+        },
+      ],
     }
     return head
   },
@@ -315,8 +321,6 @@ export default {
 .article_cat {
   text-transform: uppercase;
   font-weight: bold;
-}
-.article-panel {
 }
 .article-panel .v-expansion-panel-content__wrap {
   padding-right: 0;

@@ -426,9 +426,10 @@ export default {
       this.$store.state[this.type].filtersCount > 0 ||
       this.$route.query?.search?.length > 0
 
-    // Only load database if filters/search are active, otherwise defer until interaction
+    // On client-side navigation with active filters/search, or if items array is empty, load database
+    // This handles: pagination with filters, direct URLs with query params, and initial empty state
     if (
-      hasActiveFiltersOrSearch &&
+      hasActiveFiltersOrSearch ||
       !this.$store.state[this.type].items.length
     ) {
       await this.loadDatabase()

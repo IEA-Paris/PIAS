@@ -12,7 +12,10 @@
       :tabindex="!hidePrevNext && firstPageSelected() ? -1 : 0"
       aria-label="Previous Page"
       nuxt
-      :to="`/${type}/${currentPage - 1}`"
+      :to="{
+        path: `/${type}/${currentPage - 1}`,
+        query: $route.query,
+      }"
       @keyup.enter="
         $router.push({
           path: `/${type}/${currentPage - 1}`,
@@ -32,12 +35,15 @@
         width="35"
         icon
         nuxt
-        :to="`/${type}/${Math.floor(
-          renderPages[index - 1].key +
-            ((renderPages[index + 1].key || totalPages) -
-              renderPages[index - 1].key) /
-              2
-        )}`"
+        :to="{
+          path: `/${type}/${Math.floor(
+            renderPages[index - 1].key +
+              ((renderPages[index + 1].key || totalPages) -
+                renderPages[index - 1].key) /
+                2
+          )}`,
+          query: $route.query,
+        }"
       >
         ...
       </v-btn>
@@ -45,7 +51,10 @@
         <v-btn
           :key="page.key"
           :class="{ 'active-page': page.current }"
-          :to="`/${type}/${page.value}`"
+          :to="{
+            path: `/${type}/${page.value}`,
+            query: $route.query,
+          }"
           tabindex="0"
           outlined
           min-width="35"
@@ -61,7 +70,12 @@
               ? `Current page, Page ${page.value}`
               : `Goto Page ${page.value}`
           "
-          @keyup.enter="$router.push(`/${type}/${page.value}`)"
+          @keyup.enter="
+            $router.push({
+              path: `/${type}/${page.value}`,
+              query: $route.query,
+            })
+          "
         >
           {{ page.value }}
         </v-btn>
@@ -72,7 +86,10 @@
       v-if="!(hidePrevNext && lastPageSelected())"
       :tabindex="!hidePrevNext && lastPageSelected() ? -1 : 0"
       aria-label="Next Page"
-      :to="`/${type}/${currentPage + 1}`"
+      :to="{
+        path: `/${type}/${currentPage + 1}`,
+        query: $route.query,
+      }"
       min-width="35"
       height="35"
       width="35"
