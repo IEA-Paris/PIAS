@@ -1,6 +1,7 @@
 <template>
   <ArticleContainer :item="item[0]">
     <div v-intersect="onIntersect"></div>
+    }" />
     <v-expansion-panels v-model="panels" flat tile accordion hover multiple>
       <v-expansion-panel>
         <v-divider></v-divider>
@@ -140,7 +141,74 @@ export default {
         }
       })
     const head = {
+      title: article.article_title,
       meta: [
+        {
+          hid: 'description',
+          name: 'description',
+          content: article.abstract || article.article_title,
+        },
+        {
+          hid: 'og:title',
+          property: 'og:title',
+          content: article.article_title,
+        },
+        {
+          hid: 'og:description',
+          property: 'og:description',
+          content: article.abstract || article.article_title,
+        },
+        {
+          hid: 'og:type',
+          property: 'og:type',
+          content: 'article',
+        },
+        {
+          hid: 'og:url',
+          property: 'og:url',
+          content: this.$config.url + '/article/' + article.slug,
+        },
+        {
+          hid: 'og:image',
+          property: 'og:image',
+          content: article.picture
+            ? this.$config.url + article.picture
+            : this.$config.url + '/thumbnails/' + article.slug + '.png',
+        },
+        {
+          hid: 'article:published_time',
+          property: 'article:published_time',
+          content: new Date(article.date).toISOString(),
+        },
+        {
+          hid: 'article:author',
+          property: 'article:author',
+          content: article.authors
+            ?.map((a) => `${a.firstname} ${a.lastname}`)
+            .join(', '),
+        },
+        {
+          hid: 'twitter:card',
+          name: 'twitter:card',
+          content: 'summary_large_image',
+        },
+        {
+          hid: 'twitter:title',
+          name: 'twitter:title',
+          content: article.article_title,
+        },
+        {
+          hid: 'twitter:description',
+          name: 'twitter:description',
+          content: article.abstract || article.article_title,
+        },
+        {
+          hid: 'twitter:image',
+          name: 'twitter:image',
+          content: article.picture
+            ? this.$config.url + article.picture
+            : this.$config.url + '/thumbnails/' + article.slug + '.png',
+        },
         {
           name: 'citation_title',
           content: article.article_title,
@@ -274,6 +342,47 @@ export default {
         {
           name: 'citation_journal_title',
           content: this.$config.full_name,
+        },
+      ],
+      script: [
+        {
+          type: 'application/ld+json',
+          json: {
+            '@context': 'https://schema.org',
+            '@type': 'ScholarlyArticle',
+            headline: article.article_title,
+            description: article.abstract,
+            author: article.authors?.map((author) => ({
+              '@type': 'Person',
+              name: `${author.firstname} ${author.lastname}`,
+              affiliation: author.institution,
+            })),
+            datePublished: article.date,
+            publisher: {
+              '@type': 'Organization',
+              name: 'Paris Institute for Advanced Study',
+              logo: {
+                '@type': 'ImageObject',
+                url: this.$config.url + '/icon.png',
+              },
+            },
+            image: article.picture
+              ? this.$config.url + article.picture
+              : this.$config.url + '/thumbnails/' + article.slug + '.png',
+            url: this.$config.url + '/article/' + article.slug,
+            mainEntityOfPage: {
+              '@type': 'WebPage',
+              '@id': this.$config.url + '/article/' + article.slug,
+            },
+            isPartOf: {
+              '@type': 'PublicationIssue',
+              issueNumber: article.issueIndex,
+              name: article.issue?.name_of_the_issue,
+            },
+            ...(article.DOI && { identifier: article.DOI }),
+            keywords: article.keywords?.join(', '),
+            inLanguage: article.language,
+          },
         },
       ],
       link: [

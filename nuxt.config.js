@@ -48,7 +48,6 @@ const routesMap = async function () {
 }
 EventEmitter.defaultMaxListeners = 20
 export default {
-  env: { config },
   server: {
     port: 3000, // par défaut: 3000
     host: '0.0.0.0', // par défaut: localhost
@@ -99,6 +98,9 @@ export default {
     titleTemplate: `%s - ${config.full_name}`,
     // Maps to the inner-text value of the <title> element.
     title: config.name,
+    htmlAttrs: {
+      lang: 'en',
+    },
     // Each item in the array maps to a newly-created <script> element,
     // where object properties map to attributes.
     // Example output: <script type="application/ld+json">{ "@context": "http://schema.org" }</script>
@@ -119,6 +121,11 @@ export default {
       { name: 'format-detection', content: 'telephone=no' },
       { charset: 'utf-8' },
       {
+        hid: 'description',
+        name: 'description',
+        content: config.description,
+      },
+      {
         name: 'keywords',
         content: config.keywords,
       },
@@ -127,10 +134,59 @@ export default {
         content: 'IE=edge, chrome=1',
       },
       {
+        hid: 'og:type',
+        property: 'og:type',
+        content: 'website',
+      },
+      {
+        hid: 'og:site_name',
+        property: 'og:site_name',
+        content: config.full_name,
+      },
+      {
+        hid: 'og:url',
+        property: 'og:url',
+        content: config.url,
+      },
+      {
         vmid: 'og:title',
         property: 'og:title',
+        content: `${config.name} - ${config.full_name}`,
+      },
+      {
+        hid: 'og:description',
+        property: 'og:description',
+        content: config.description,
+      },
+      {
+        hid: 'og:image',
+        property: 'og:image',
+        content: `${config.url}/banner.jpg`,
+      },
+      {
+        hid: 'twitter:card',
+        name: 'twitter:card',
+        content: 'summary_large_image',
+      },
+      {
+        hid: 'twitter:site',
+        name: 'twitter:site',
+        content: '@IEA_Paris',
+      },
+      {
+        hid: 'twitter:title',
+        name: 'twitter:title',
         content: config.name,
-        template: (chunk) => `Article - ${chunk}`, // or as string template: '%s - My page'
+      },
+      {
+        hid: 'twitter:description',
+        name: 'twitter:description',
+        content: config.description,
+      },
+      {
+        hid: 'twitter:image',
+        name: 'twitter:image',
+        content: `${config.url}/banner.jpg`,
       },
       {
         itemprop: 'name',
@@ -142,7 +198,15 @@ export default {
       },
       {
         itemprop: 'image',
-        content: `${process.config.BASE_URL}/banner.jpg`,
+        content: `${config.url}/banner.jpg`,
+      },
+      {
+        name: 'author',
+        content: 'Paris Institute for Advanced Study',
+      },
+      {
+        name: 'publisher',
+        content: 'Paris Institute for Advanced Study',
       },
       // Add to homescreen for Chrome on Android. Fallback for PWA (handled by nuxt)
       {
@@ -388,12 +452,20 @@ export default {
    ** https://github.com/nuxt-community/robots-module#options
    */
   // Robots module configuration (https://github.com/nuxt-community/robots-module)
-  robots: {
-    UserAgent: '*',
-    Disallow: '',
-    Allow: '/',
-    Sitemap: `${config.url}/sitemap.xml`,
-  },
+  // Configuration is loaded from submodule-specific config (e.g., submodules/PPIAS/config.js)
+  // PPIAS: Academic crawler support enabled
+  // PFIAS/Sandbox: Should use restrictive policies (disallow all crawlers)
+  robots: [
+    ...(config.modules.robots || [
+      {
+        UserAgent: '*',
+        Disallow: '/',
+      },
+    ]),
+    {
+      Sitemap: `${config.url}/sitemap.xml`,
+    },
+  ],
   // https://image.nuxtjs.org
   image: {
     screens: {
@@ -456,8 +528,13 @@ export default {
   sitemap: {
     hostname: config.url,
     gzip: true,
-    exclude: [],
-    icons: [],
+    exclude: ['/admin/**', '/print/**'],
+    defaults: {
+      changefreq: 'weekly',
+      priority: 0.8,
+      lastmod: new Date(),
+    },
+    i18n: true,
   },
   styleResources: {
     scss: [

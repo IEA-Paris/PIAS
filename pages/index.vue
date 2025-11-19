@@ -85,6 +85,102 @@ export default {
       latestIssue: {},
     }
   },
+  head() {
+    return {
+      title: 'Home',
+      script: [
+        {
+          type: 'application/ld+json',
+          json: {
+            '@context': 'https://schema.org',
+            '@type': 'Organization',
+            name: this.$config.full_name,
+            alternateName: this.$config.name,
+            url: this.$config.url,
+            logo: this.$config.url + '/icon.png',
+            description: this.$config.description,
+            address: {
+              '@type': 'PostalAddress',
+              streetAddress: this.$config.address,
+              addressLocality: 'Paris',
+              postalCode: '75004',
+              addressCountry: 'FR',
+            },
+            contactPoint: {
+              '@type': 'ContactPoint',
+              telephone: this.$config.phone,
+              email: this.$config.email,
+              contactType: 'customer service',
+            },
+            sameAs: [
+              'https://twitter.com/IEA_Paris',
+              'https://www.facebook.com/InstitutdEtudesAvanceesdeParis',
+              'https://www.linkedin.com/company/paris-institute-for-advanced-study',
+            ],
+          },
+        },
+        {
+          type: 'application/ld+json',
+          json: {
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            name: this.$config.full_name,
+            url: this.$config.url,
+            description: this.$config.description,
+            publisher: {
+              '@type': 'Organization',
+              name: 'Paris Institute for Advanced Study',
+            },
+            potentialAction: {
+              '@type': 'SearchAction',
+              target:
+                this.$config.url + '/articles?search={search_term_string}',
+              'query-input': 'required name=search_term_string',
+            },
+          },
+        },
+      ],
+      meta: [
+        {
+          hid: 'description',
+          name: 'description',
+          content: this.$config.description,
+        },
+        {
+          hid: 'og:title',
+          property: 'og:title',
+          content: `${this.$config.full_name} - Home`,
+        },
+        {
+          hid: 'og:description',
+          property: 'og:description',
+          content: this.$config.description,
+        },
+        {
+          hid: 'og:url',
+          property: 'og:url',
+          content: this.$config.url,
+        },
+        {
+          hid: 'twitter:title',
+          name: 'twitter:title',
+          content: `${this.$config.full_name} - Home`,
+        },
+        {
+          hid: 'twitter:description',
+          name: 'twitter:description',
+          content: this.$config.description,
+        },
+      ],
+      link: [
+        {
+          hid: 'canonical',
+          rel: 'canonical',
+          href: this.$config.url,
+        },
+      ],
+    }
+  },
   computed: {},
   watch: {
     '$i18n.locale': '$fetch',

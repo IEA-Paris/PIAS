@@ -1,3 +1,5 @@
+import config from '../config.js'
+
 export default (context, inject) => {
-  inject('config', context.env.config)
+  inject('config', config)
 }

@@ -19,6 +19,45 @@ export default {
   data() {
     return {}
   },
+  head() {
+    const page = this.$route.params.page || 1
+    const title = page > 1 ? `Authors - Page ${page}` : 'Authors'
+    const description = `Explore all authors and contributors to ${this.$config.full_name}. Browse researcher profiles, affiliations, and publications.`
+    const url = `${this.$config.url}/authors${page > 1 ? '/' + page : ''}`
+
+    return {
+      title,
+      meta: [
+        {
+          hid: 'description',
+          name: 'description',
+          content: description,
+        },
+        {
+          hid: 'og:title',
+          property: 'og:title',
+          content: `${title} - ${this.$config.full_name}`,
+        },
+        {
+          hid: 'og:description',
+          property: 'og:description',
+          content: description,
+        },
+        {
+          hid: 'og:url',
+          property: 'og:url',
+          content: url,
+        },
+      ],
+      link: [
+        {
+          hid: 'canonical',
+          rel: 'canonical',
+          href: url,
+        },
+      ],
+    }
+  },
   async fetch({ store, route }) {
     // Skip fetch on client-side navigation - ListLeftPanel will load database when needed
     if (process.client) return
