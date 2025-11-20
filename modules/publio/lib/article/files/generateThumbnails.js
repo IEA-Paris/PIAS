@@ -88,6 +88,17 @@ export default async (route, url, meta) => {
 
     console.log(`Compressed PNG saved for ${route.file}`)
 
+    // Generate WebP version for better performance (60-80% smaller than PNG)
+    const resolvedWebPPath = resolvedThumbnailPath.replace('.png', '.webp')
+    await sharp(imageBuffer)
+      .webp({
+        quality: 85,
+        effort: 6, // Higher effort = better compression (0-6 scale)
+      })
+      .toFile(resolvedWebPPath)
+
+    console.log(`WebP version saved for ${route.file.replace('.png', '.webp')}`)
+
     const svgInline = await page.evaluate(
       () => document.querySelector('svg').outerHTML
     )

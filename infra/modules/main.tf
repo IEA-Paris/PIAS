@@ -80,13 +80,135 @@ resource "aws_cloudfront_distribution" "this" {
       "HEAD",
     ]
     compress               = true
-    default_ttl            = 3600
-    max_ttl                = 86400
+    default_ttl            = 86400    # 1 day for HTML pages
+    max_ttl                = 31536000 # 1 year
     min_ttl                = 0
     smooth_streaming       = false
     target_origin_id       = "${local.bucket_name}.s3.${var.region}.amazonaws.com"
     trusted_key_groups     = []
     trusted_signers        = []
+    viewer_protocol_policy = "redirect-to-https"
+
+    forwarded_values {
+      headers                 = []
+      query_string            = false
+      query_string_cache_keys = []
+
+      cookies {
+        forward           = "none"
+        whitelisted_names = []
+      }
+    }
+  }
+
+  # Cache static assets (JS, CSS, fonts, images) for 1 year
+  ordered_cache_behavior {
+    path_pattern = "/_nuxt/*"
+    allowed_methods = [
+      "GET",
+      "HEAD",
+      "OPTIONS",
+    ]
+    cached_methods = [
+      "GET",
+      "HEAD",
+    ]
+    compress               = true
+    default_ttl            = 31536000 # 1 year - Nuxt hashes filenames
+    max_ttl                = 31536000 # 1 year
+    min_ttl                = 31536000 # 1 year
+    target_origin_id       = "${local.bucket_name}.s3.${var.region}.amazonaws.com"
+    viewer_protocol_policy = "redirect-to-https"
+
+    forwarded_values {
+      headers                 = []
+      query_string            = false
+      query_string_cache_keys = []
+
+      cookies {
+        forward           = "none"
+        whitelisted_names = []
+      }
+    }
+  }
+
+  # Cache static images, PDFs, thumbnails, SVGs for 1 year
+  ordered_cache_behavior {
+    path_pattern = "/static/*"
+    allowed_methods = [
+      "GET",
+      "HEAD",
+      "OPTIONS",
+    ]
+    cached_methods = [
+      "GET",
+      "HEAD",
+    ]
+    compress               = true
+    default_ttl            = 31536000 # 1 year - these rarely change
+    max_ttl                = 31536000 # 1 year
+    min_ttl                = 86400    # 1 day minimum
+    target_origin_id       = "${local.bucket_name}.s3.${var.region}.amazonaws.com"
+    viewer_protocol_policy = "redirect-to-https"
+
+    forwarded_values {
+      headers                 = []
+      query_string            = false
+      query_string_cache_keys = []
+
+      cookies {
+        forward           = "none"
+        whitelisted_names = []
+      }
+    }
+  }
+
+  # Cache PDFs, thumbnails, SVGs directly in root paths for 1 year
+  ordered_cache_behavior {
+    path_pattern = "*.pdf"
+    allowed_methods = [
+      "GET",
+      "HEAD",
+    ]
+    cached_methods = [
+      "GET",
+      "HEAD",
+    ]
+    compress               = false # PDFs already compressed
+    default_ttl            = 31536000 # 1 year
+    max_ttl                = 31536000
+    min_ttl                = 31536000
+    target_origin_id       = "${local.bucket_name}.s3.${var.region}.amazonaws.com"
+    viewer_protocol_policy = "redirect-to-https"
+
+    forwarded_values {
+      headers                 = []
+      query_string            = false
+      query_string_cache_keys = []
+
+      cookies {
+        forward           = "none"
+        whitelisted_names = []
+      }
+    }
+  }
+
+  # Cache images with long TTL
+  ordered_cache_behavior {
+    path_pattern = "*.{jpg,jpeg,png,gif,webp,svg,ico}"
+    allowed_methods = [
+      "GET",
+      "HEAD",
+    ]
+    cached_methods = [
+      "GET",
+      "HEAD",
+    ]
+    compress               = true
+    default_ttl            = 31536000 # 1 year
+    max_ttl                = 31536000
+    min_ttl                = 2592000  # 30 days minimum
+    target_origin_id       = "${local.bucket_name}.s3.${var.region}.amazonaws.com"
     viewer_protocol_policy = "redirect-to-https"
 
     forwarded_values {

@@ -55,6 +55,9 @@ export default {
   // Target: https://go.nuxtjs.dev/config-target
   target: 'static',
   ssr: true,
+  router: {
+    trailingSlash: true, // Enforce trailing slashes to avoid redirects
+  },
   generate: {
     dir: 'dist',
     fallback: true,
@@ -78,6 +81,13 @@ export default {
         ]
       }
       return routesMapRst.routes
+    },
+  },
+  render: {
+    static: {
+      // Set Cache-Control headers for static assets
+      // These are S3 metadata that CloudFront will respect
+      maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year for immutable assets
     },
   },
   /* Global page headers: https://go.nuxtjs.dev/c onfig-head
@@ -471,6 +481,8 @@ export default {
       blogImage: 864,
     },
     domains: config.modules.image.providers,
+    formats: ['webp', 'png', 'jpeg'], // Prefer WebP when available
+    quality: 85,
   },
   // ESLint module configuration (https://github.com/nuxt-community/eslint-module)
   eslint: {
