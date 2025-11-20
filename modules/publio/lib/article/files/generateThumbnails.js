@@ -2,6 +2,7 @@ import { Blob } from 'node:buffer'
 const fs = require('fs')
 const path = require('path')
 const puppeteer = require('puppeteer')
+const sharp = require('sharp')
 let browser, response
 export default async (route, url, meta) => {
   try {
@@ -13,10 +14,9 @@ export default async (route, url, meta) => {
       headless: 'new',
     })
     const page = await browser.newPage()
-    await page.setViewport(
-      // Pixel equivalent of an A4 page with 300dpi
-      { width: 2480, height: 3508, deviceScaleFactor: 1 }
-    )
+    // Reduced viewport size: A4 proportions at 150dpi instead of 300dpi
+    // This gives us 1240x1754px which is still high quality but 4x smaller
+    await page.setViewport({ width: 1240, height: 1754, deviceScaleFactor: 1 })
     console.log(
       'generating graph thumbnail at route: ',
       `${url.replace(/\/$/, '')}${route.route}`
@@ -75,7 +75,18 @@ export default async (route, url, meta) => {
       route.file.slice(0, -4) + '.svg'
     )
 
-    fs.writeFileSync(resolvedThumbnailPath, imageBuffer)
+    // Post-process PNG with Sharp for better compression
+    // Quality 85 provides excellent quality with ~40-60% file size reduction
+    await sharp(imageBuffer)
+      .png({
+        quality: 85,
+        compressionLevel: 9,
+        adaptiveFiltering: true,
+        palette: true,
+      })
+      .toFile(resolvedThumbnailPath)
+
+    console.log(`Compressed PNG saved for ${route.file}`)
 
     const svgInline = await page.evaluate(
       () => document.querySelector('svg').outerHTML

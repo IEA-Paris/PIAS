@@ -106,26 +106,6 @@ export default {
     // Example output: <script type="application/ld+json">{ "@context": "http://schema.org" }</script>
     script: [],
 
-    // Preload critical fonts and optimize font loading
-    link: [
-      {
-        rel: 'preload',
-        as: 'font',
-        href: '/_nuxt/fonts/materialdesignicons-webfont.d5cba82.woff2',
-        type: 'font/woff2',
-        crossorigin: 'anonymous',
-      },
-      {
-        rel: 'preconnect',
-        href: 'https://fonts.gstatic.com',
-        crossorigin: true,
-      },
-      {
-        rel: 'dns-prefetch',
-        href: 'https://fonts.gstatic.com',
-      },
-    ],
-
     // Nuxt.js lets you define all default <meta> tags for your application inside nuxt.config.js. Define them using the same head property:
     // Each item in the array maps to a newly-created <meta> element, where object properties map to attributes.
     // Example output:
@@ -291,10 +271,7 @@ export default {
     }, */
   },
   // Global CSS: https://go.nuxtjs.dev/config-css
-  css: [
-    '@mdi/font/css/materialdesignicons.min.css',
-    '~/assets/font-display.css',
-  ],
+  css: ['@mdi/font/css/materialdesignicons.min.css'],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
@@ -304,7 +281,6 @@ export default {
     /*  { src: '~/plugin/apollo-config', mode: 'client' }, */
     { src: '~/plugin/vue-youtube', mode: 'client' },
     '~/plugin/jsonld',
-    { src: '~/plugin/polyfills.client.js', mode: 'client' },
     /*    { src: '~/plugin/vuex-persist', ssr: false }, */
   ],
 
@@ -487,40 +463,14 @@ export default {
   ],
   // https://image.nuxtjs.org
   image: {
-    provider: 'static',
-    quality: 80,
-    format: ['webp', 'jpg', 'png'],
     screens: {
       avatarSm: 24,
       avatarLg: 48,
       logo: 32,
       migration: 536,
       blogImage: 864,
-      xs: 320,
-      sm: 640,
-      md: 768,
-      lg: 1024,
-      xl: 1280,
-      xxl: 1536,
     },
     domains: config.modules.image.providers,
-    presets: {
-      thumbnail: {
-        modifiers: {
-          format: 'webp',
-          quality: 70,
-          width: 300,
-          height: 200,
-        },
-      },
-      article: {
-        modifiers: {
-          format: 'webp',
-          quality: 80,
-          width: 864,
-        },
-      },
-    },
   },
   // ESLint module configuration (https://github.com/nuxt-community/eslint-module)
   eslint: {
@@ -702,44 +652,6 @@ export default {
         ['@babel/plugin-proposal-private-property-in-object', { loose: true }],
       ],
     },
-    // Enable code splitting and optimization
-    splitChunks: {
-      layouts: true,
-      pages: true,
-      commons: true,
-    },
-    optimization: {
-      runtimeChunk: 'single',
-      splitChunks: {
-        chunks: 'all',
-        automaticNameDelimiter: '.',
-        maxSize: 244000, // Split chunks larger than 244KB
-        cacheGroups: {
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name(module) {
-              const packageName = module.context.match(
-                /[\\/]node_modules[\\/](.*?)([\\/]|$)/
-              )[1]
-              return `npm.${packageName.replace('@', '')}`
-            },
-          },
-        },
-      },
-    },
-    // Enable tree-shaking and minimize bundle size
-    analyze: false,
-    extractCSS: {
-      ignoreOrder: true,
-    },
-    // Terser options for better compression
-    terser: {
-      terserOptions: {
-        compress: {
-          drop_console: process.env.NODE_ENV === 'production',
-        },
-      },
-    },
     watchOptions: {
       ignored: '/generated/filters.js',
     },
@@ -749,23 +661,6 @@ export default {
       if (ctx.isDev) {
         config.devtool = ctx.isClient ? 'source-map' : 'inline-source-map'
       }
-    },
-  },
-
-  // Enable modern build for better performance on modern browsers
-  modern: process.env.NODE_ENV === 'production' ? 'client' : false,
-
-  // Render optimization
-  render: {
-    http2: {
-      push: true,
-      pushAssets: (req, res, publicPath, preloadFiles) =>
-        preloadFiles
-          .filter((f) => f.asType === 'script' && f.file === 'runtime.js')
-          .map((f) => `<${publicPath}${f.file}>; rel=preload; as=${f.asType}`),
-    },
-    static: {
-      maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year for static assets
     },
   },
 }

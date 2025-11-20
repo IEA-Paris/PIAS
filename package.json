@@ -101,7 +101,7 @@
     "prettier": "^2.2.1",
     "remark-bibliography": "^1.0.0",
     "serve": "^14.1.0",
-    "sharp": "^0.31.1",
+    "sharp": "^0.34.5",
     "vue-eslint-parser": "^7.0.0",
     "vue-jest": "^3.0.4"
   },

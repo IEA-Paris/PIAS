@@ -67,7 +67,10 @@
         >
           <v-row
             class="transition-swing"
-            :no-gutters="!$store.state.scrolled || $vuetify.breakpoint.xs"
+            :no-gutters="$vuetify.breakpoint.xs"
+            :class="{
+              'ml-0 my-0': $store.state.scrolled,
+            }"
           >
             <v-col cols="12 transition-swing">
               <div class="text-right">
