@@ -50,8 +50,8 @@
     <v-tooltip bottom>
       <template #activator="{ on, attrs }">
         <v-btn
+          tile
           text
-          outlined
           class="justify-self-center my-6"
           v-bind="attrs"
           :href="
@@ -59,6 +59,7 @@
               ? customPdf
               : '/pdfs/' + $route.params.slug + '.pdf'
           "
+          :aria-label="$t('aria.download-pdf')"
           nuxt
           target="_blank"
           :title="title"

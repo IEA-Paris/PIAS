@@ -39,6 +39,7 @@
             v-if="!print"
             class="pa-7 ml-3 mt-4 closebtn"
             v-bind="attrs"
+            :aria-label="$t('aria.exit-zen-mode')"
             tile
             icon
             large
@@ -72,7 +73,12 @@
           </v-card-text>
           <v-card-actions class="mb-12">
             <v-spacer></v-spacer>
-            <v-btn tile outlined @click="toogleZen()">
+            <v-btn
+              tile
+              outlined
+              :aria-label="$t('aria.exit-zen-mode')"
+              @click="toogleZen()"
+            >
               <v-icon left color="black">mdi-exit-to-app</v-icon>
               {{ $t('exit-zen-mode') }}</v-btn
             >

@@ -16,6 +16,11 @@
             text
             v-bind="attrs"
             class="pa-7 mb-0"
+            :aria-label="
+              filter
+                ? $t('aria.hide-filters-panel')
+                : $t('aria.show-filters-panel')
+            "
             @click="onFilterToggle"
             v-on="on"
           >

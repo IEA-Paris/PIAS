@@ -35,6 +35,16 @@
         width="35"
         icon
         nuxt
+        :aria-label="
+          $t('aria.pagination-gap', [
+            Math.floor(
+              renderPages[index - 1].key +
+                ((renderPages[index + 1].key || totalPages) -
+                  renderPages[index - 1].key) /
+                  2
+            ),
+          ])
+        "
         :to="{
           path: `/${type}/${Math.floor(
             renderPages[index - 1].key +

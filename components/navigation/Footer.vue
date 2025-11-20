@@ -135,6 +135,7 @@
                     target="_blank"
                     rel="noopener noreferrer"
                     :href="item.url"
+                    :aria-label="$t('aria.social-media-link', [item.text])"
                     fab
                     dark
                     outlined
@@ -150,12 +151,25 @@
               </v-tooltip>
             </v-col>
             <v-col cols="12" align="center" class="mt-3">
-              <v-btn text x-small nuxt dark>{{
-                $config.identifier.ISSN
-                  ? 'Online ISSN ' + $config.identifier.ISSN
-                  : ''
-              }}</v-btn>
-              <v-btn text x-small nuxt dark>
+              <v-btn
+                text
+                x-small
+                nuxt
+                dark
+                :aria-label="$t('aria.issn-info')"
+                >{{
+                  $config.identifier.ISSN
+                    ? 'Online ISSN ' + $config.identifier.ISSN
+                    : ''
+                }}</v-btn
+              >
+              <v-btn
+                text
+                x-small
+                nuxt
+                dark
+                :aria-label="$t('aria.copyright-info')"
+              >
                 <!-- TODO add raw licence file url on github -->
                 &copy; {{ new Date().getFullYear() }}
                 {{ $t('paris-ias') }}</v-btn

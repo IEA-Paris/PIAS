@@ -9,6 +9,7 @@
               class="py-7"
               tile
               v-bind="attrs"
+              :aria-label="$t('aria.cite-export-article')"
               nuxt
               target="_blank"
               v-on="{ ...tooltip, ...dialogStart }"
@@ -50,7 +51,14 @@
             <div>
               <v-tooltip bottom>
                 <template #activator="{ on, attrs }">
-                  <v-btn icon tile v-bind="attrs" small v-on="on">
+                  <v-btn
+                    icon
+                    tile
+                    v-bind="attrs"
+                    small
+                    :aria-label="$t('aria.copy-citation', [format.type])"
+                    v-on="on"
+                  >
                     <v-icon>mdi-content-copy</v-icon>
                   </v-btn>
                 </template>
@@ -71,7 +79,11 @@
           <v-btn color="primary" text @click="dialog = false">Close</v-btn>
         </v-card-actions>
         <v-overlay absolute>
-          <v-btn dark tile @click="dialog = false"
+          <v-btn
+            dark
+            tile
+            :aria-label="$t('aria.close-dialog')"
+            @click="dialog = false"
             ><v-icon>mdi-close</v-icon></v-btn
           >
           <v-sheet dark class="pa-12 text-h6 d-flex justify-center flex-column">

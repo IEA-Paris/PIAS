@@ -1,7 +1,15 @@
 <template>
   <v-dialog v-model="open" fullscreen hide-overlay overflowed>
     <template #activator="{ on, attrs }">
-      <v-btn v-bind="attrs" icon x-large class="ma-2" tile v-on="on">
+      <v-btn
+        v-bind="attrs"
+        icon
+        x-large
+        class="ma-2"
+        tile
+        :aria-label="$t('aria.open-search')"
+        v-on="on"
+      >
         <v-icon color="black">mdi-magnify</v-icon>
       </v-btn>
     </template>
@@ -23,6 +31,7 @@
               x-large
               class="ma-2 mr-2 mb-4"
               tile
+              :aria-label="$t('aria.close-search')"
               @click="open = false"
             >
               <v-icon>mdi-close</v-icon>

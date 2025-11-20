@@ -8,6 +8,7 @@
           color="black"
           v-bind="attrs"
           :href="social.link"
+          :aria-label="$t('aria.social-media-link', [social.tooltip])"
           target="_blank"
           tile
           @click.stop

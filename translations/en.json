@@ -544,6 +544,23 @@
     "page-number": "Page {0}",
     "current-page": "Current Page, Page {0}",
     "logo-alt": "PIAS Logo - Go to homepage",
-    "logo-alt-simple": "PIAS Logo"
+    "logo-alt-simple": "PIAS Logo",
+    "toggle-filters": "Toggle filters panel",
+    "hide-filters-panel": "Hide filters panel",
+    "show-filters-panel": "Show filters panel",
+    "cite-export-article": "Cite or export this article",
+    "social-media-link": "Visit {0}",
+    "download-pdf": "Download this article as PDF",
+    "pagination-gap": "Jump to page {0}",
+    "author-social-link": "{0} profile for {1}",
+    "copyright-info": "Copyright information",
+    "terms-of-service": "Terms of service",
+    "issn-info": "Online ISSN information",
+    "filter-by-letter": "Filter authors by letter {0}",
+    "exit-zen-mode": "Exit zen reading mode",
+    "copy-citation": "Copy {0} citation",
+    "close-dialog": "Close dialog",
+    "open-search": "Open search",
+    "close-search": "Close search"
   }
 }

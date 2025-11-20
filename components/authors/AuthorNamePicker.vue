@@ -31,6 +31,7 @@
       ]"
       :key="index"
       class="px-0"
+      :aria-label="$t('aria.filter-by-letter', [letter])"
       text
       @click="$emit('letter', letter)"
     >
