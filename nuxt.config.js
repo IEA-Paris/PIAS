@@ -55,9 +55,6 @@ export default {
   // Target: https://go.nuxtjs.dev/config-target
   target: 'static',
   ssr: true,
-  router: {
-    trailingSlash: true, // Enforce trailing slashes to avoid redirects
-  },
   generate: {
     dir: 'dist',
     fallback: true,
