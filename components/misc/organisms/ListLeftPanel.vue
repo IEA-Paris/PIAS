@@ -72,7 +72,12 @@
               'ml-0 my-0': $store.state.scrolled,
             }"
           >
-            <v-col cols="12 transition-swing">
+            <v-col
+              cols="12 transition-swing"
+              :class="{
+                'pl-0 pb-0': $store.state.scrolled,
+              }"
+            >
               <div class="text-right">
                 <ViewMenu :type="type"></ViewMenu>
                 <SortMenu :type="type"></SortMenu>

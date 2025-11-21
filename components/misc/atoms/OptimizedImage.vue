@@ -2,7 +2,7 @@
   <v-img
     :aspect-ratio="ratio"
     :lazy-src="$img(src, { width: 10, quality: 70 })"
-    :src="$img(src, { height, quality: 70 })"
+    :src="$img(src, { height, width, quality: 70 })"
     :srcset="_srcset.srcset"
     :sizes="_srcset.size"
     :alt="alt || 'Article image'"
@@ -12,8 +12,9 @@
 <script>
 export default {
   props: {
-    ratio: { type: Number, default: 16 / 9 },
+    ratio: { type: Number, default: 1 / 1 },
     height: { type: [Number, String], default: 500 },
+    width: { type: [Number, String], default: 500 },
     src: {
       type: String,
       default: '/img/header-bg.jpg',
@@ -31,6 +32,7 @@ export default {
           format: 'webp',
           quality: 70,
           height: 500,
+          width: 500,
         },
       })
     },
