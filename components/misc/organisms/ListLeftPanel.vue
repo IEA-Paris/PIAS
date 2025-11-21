@@ -187,11 +187,7 @@
           :filter="filter"
           :type="type"
         ></RegularList>
-        <template v-if="items.length === 0 && $store.state.loading">
-          <div width="100%" class="my-6 ml-6">
-            <Loader></Loader>
-          </div>
-        </template>
+        <Loader :active="$store.state.loading" />
         <!-- TODO update for equivalent after removing datatable -->
         <v-container
           class="transition-swing mb-12"

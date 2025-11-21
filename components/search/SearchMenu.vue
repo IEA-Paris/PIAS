@@ -230,6 +230,11 @@ export default {
   methods: {
     seeAll(name) {
       this.open = false
+      this.$store.dispatch('updateSearch', {
+        search: this.searchStringRaw,
+        type: name,
+      })
+
       this.$router.push(
         this.localePath({
           name,
