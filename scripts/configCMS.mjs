@@ -17,7 +17,7 @@ backend:
 publish_mode: editorial_workflow
 media_folder: 'static'
 public_folder: '/'
-locale: fr
+locale: en
 site_url: ${config.url}
 logo_url: ${config.url}/icon.png
 show_preview_links: false
@@ -176,7 +176,8 @@ collections:
       summary: '{{title}}'
     label: 'Articles' # Used in the UI
     folder: 'content/articles' # The path to the folder where the documents are stored
-    media_folder: '/static'
+    media_folder: '/static/{{slug}}'
+    public_folder: '/{{slug}}'
     create: true # Allow users to create new documents in this collection
     slug: '{{slug}}' # Filename template, e.g., YYYY-MM-DD-title.md
     sortable_fields: ['date', 'article_title', 'issue'] # The fields on which it should be sortable
@@ -354,7 +355,7 @@ collections:
           widget: 'file',
           required: false,
           allow_multiple: false,
-          media_library: { allow_multiple: false, media_folder: 'pdfs' },
+          media_library: { allow_multiple: false, media_folder: '/pdfs/{{slug}}' },
           hint: 'If used, the usual PDF will not be generated (and the
             file provided will be used instead)',
         }
@@ -372,10 +373,12 @@ collections:
       - {
           label: 'Issue',
           name: 'issue',
-          widget: 'file',
+          widget: 'relation',
           required: true,
-          media_folder: 'content/issues',
-          public_folder: 'content/issues',
+          collection: 'issues',
+          search_fields: ['name_of_the_issue', 'title'],
+          value_field: 'content/issues/{{slug}}.md',
+          display_fields: ['name_of_the_issue'],
         }
       - {
           label: 'Picture',
@@ -412,7 +415,7 @@ collections:
           label: 'Bibliography',
           name: 'bibliography',
           media_library:
-            { allow_multiple: false, media_folder: '/bibliography', public_folder: '/' },
+            { allow_multiple: false, media_folder: '/bibliography/{{slug}}', public_folder: '/{{slug}}' },
           widget: 'file',
           required: false,
         }
@@ -438,7 +441,7 @@ collections:
               Other,
             ],
         }
-      - { label: 'Article', name: 'body', widget: 'markdown', allow_multiple: false, media_folder: '/static', public_folder: '/'  }
+      - { label: 'Article', name: 'body', widget: 'markdown', allow_multiple: false, media_folder: '/static/{{slug}}', public_folder: '/{{slug}}'  }
   - name: 'issues' # Used in routes, e.g., /admin/collections/blog
     label: 'Issues' # Used in the UI
     identifier_field: title

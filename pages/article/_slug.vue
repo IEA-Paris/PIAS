@@ -1,7 +1,6 @@
 <template>
   <ArticleContainer :item="item[0]">
     <div v-intersect="onIntersect"></div>
-    }" />
     <v-expansion-panels v-model="panels" flat tile accordion hover multiple>
       <v-expansion-panel>
         <v-divider></v-divider>
