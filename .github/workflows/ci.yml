@@ -122,14 +122,196 @@ jobs:
         # TODO replace hard coded references to the repo with variables
         shell: bash
         run: |
-          cd submodules/${{ github.event.inputs.name }} 
+          cd submodules/${{ github.event.inputs.name }}
+          PRE_SHA=$(git rev-parse HEAD)
+          echo "PRE_SHA=$PRE_SHA" >> "$GITHUB_ENV"
           rsync -av   -a --include='*/' --exclude 'admin' --exclude='*' --exclude 'sw.js' ../../static/ ./static/
           git config --global user.name "CI"
           git config --global user.email "username@users.noreply.github.com"
           git add .
-          echo `git commit -m "[skip ci] auto-generated content"`
-          echo `git status`
-          echo `git push -f origin HEAD:main`
+          if git diff --cached --quiet; then
+            echo "no generated changes to commit"
+            echo "POST_SHA=$PRE_SHA" >> "$GITHUB_ENV"
+          else
+            git commit -m "[skip ci] auto-generated content"
+            git status
+            git push -f origin HEAD:main
+            echo "POST_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          fi
+
+      - name: 📝 Summarise generated artefacts
+        if: always()
+        shell: bash
+        env:
+          PROCEEDINGS: ${{ github.event.inputs.name }}
+        run: |
+          set -euo pipefail
+          cd "submodules/${PROCEEDINGS}"
+
+          summary="${GITHUB_STEP_SUMMARY:-/dev/stdout}"
+
+          {
+            echo "## ${PROCEEDINGS} — generated artefacts"
+            echo ""
+          } >> "$summary"
+
+          if [ -z "${POST_SHA:-}" ] || [ "${POST_SHA}" = "${PRE_SHA:-}" ]; then
+            echo "_No new content was retro-pushed in this run._" >> "$summary"
+            exit 0
+          fi
+
+          # All paths added/modified in the auto-commit, NUL-separated for safety.
+          CHANGED=()
+          mapfile -d '' CHANGED < <(git diff --name-only -z --diff-filter=AM "${PRE_SHA}" "${POST_SHA}")
+
+          filter_ext() {
+            local prefix="$1"; shift
+            local exts_re="$1"; shift
+            for f in "${CHANGED[@]}"; do
+              [[ -z "$f" ]] && continue
+              if [[ "$f" == "$prefix"* ]] && [[ "$f" =~ \.($exts_re)$ ]]; then
+                printf '%s\n' "$f"
+              fi
+            done | sort -u
+          }
+
+          # `git diff --diff-filter` doesn't expose Added-only directly across two SHAs reliably
+          # when the file existed in PRE_SHA tree but not as the same blob — use a name-status pass
+          # to separate Added vs Modified.
+          declare -A STATUS
+          while IFS=$'\t' read -r st path; do
+            [[ -z "$path" ]] && continue
+            STATUS["$path"]="$st"
+          done < <(git diff --name-status "${PRE_SHA}" "${POST_SHA}")
+
+          list_section() {
+            local title="$1"; shift
+            local files
+            files=$(filter_ext "$@")
+            local count
+            count=$(printf '%s\n' "$files" | sed '/^$/d' | wc -l | tr -d ' ')
+            echo "" >> "$summary"
+            echo "### ${title} (${count})" >> "$summary"
+            if [ "$count" = "0" ]; then
+              echo "_none_" >> "$summary"
+              return
+            fi
+            echo "" >> "$summary"
+            echo "| Status | File |" >> "$summary"
+            echo "| --- | --- |" >> "$summary"
+            while IFS= read -r f; do
+              [[ -z "$f" ]] && continue
+              local s="${STATUS[$f]:-?}"
+              local label="modified"
+              [[ "$s" == "A" ]] && label="new"
+              echo "| ${label} | \`${f}\` |" >> "$summary"
+            done <<< "$files"
+          }
+
+          list_section "PDFs"       "static/pdfs/"       "pdf"
+          list_section "Thumbnails" "static/thumbnails/" "png|jpg|jpeg|webp|gif"
+          list_section "SVGs"       "static/svg/"        "svg"
+
+          # Images: anything image-ish under static/ that isn't already covered above.
+          {
+            echo ""
+            echo "### Images (static/) — excluding pdfs/thumbnails/svg"
+          } >> "$summary"
+          IMG_LIST=$(
+            for f in "${CHANGED[@]}"; do
+              [[ -z "$f" ]] && continue
+              [[ "$f" == static/pdfs/* ]] && continue
+              [[ "$f" == static/thumbnails/* ]] && continue
+              [[ "$f" == static/svg/* ]] && continue
+              if [[ "$f" == static/* ]] && [[ "$f" =~ \.(png|jpe?g|webp|gif)$ ]]; then
+                printf '%s\n' "$f"
+              fi
+            done | sort -u
+          )
+          IMG_COUNT=$(printf '%s\n' "$IMG_LIST" | sed '/^$/d' | wc -l | tr -d ' ')
+          if [ "$IMG_COUNT" = "0" ]; then
+            echo "_none_" >> "$summary"
+          else
+            echo "" >> "$summary"
+            echo "| Status | File |" >> "$summary"
+            echo "| --- | --- |" >> "$summary"
+            while IFS= read -r f; do
+              [[ -z "$f" ]] && continue
+              s="${STATUS[$f]:-?}"
+              label="modified"
+              [[ "$s" == "A" ]] && label="new"
+              echo "| ${label} | \`${f}\` |" >> "$summary"
+            done <<< "$IMG_LIST"
+          fi
+
+          # Zenodo records: scan changed content/*.md files for newly written Zid / DOI.
+          # A "new" record = Zid present in POST_SHA frontmatter and absent in PRE_SHA frontmatter.
+          {
+            echo ""
+            echo "### Zenodo records"
+          } >> "$summary"
+
+          extract_field() {
+            # extract_field <sha> <path> <field>  -> prints value or empty
+            local sha="$1" p="$2" field="$3"
+            { git show "${sha}:${p}" 2>/dev/null || true; } \
+              | awk -v f="$field" '
+                  /^---[[:space:]]*$/ { fm = !fm; if (!fm) exit; next }
+                  fm && $0 ~ "^"f":[[:space:]]" {
+                    sub("^"f":[[:space:]]*", "")
+                    gsub(/^["\x27]|["\x27]$/, "")
+                    print; exit
+                  }'
+          }
+
+          MD_CHANGED=()
+          for f in "${CHANGED[@]}"; do
+            [[ "$f" == content/*.md ]] && MD_CHANGED+=("$f")
+          done
+
+          if [ "${#MD_CHANGED[@]}" -eq 0 ]; then
+            echo "_no content frontmatter changes_" >> "$summary"
+          else
+            ZENODO_ROWS=""
+            for f in "${MD_CHANGED[@]}"; do
+              new_zid=$(extract_field "$POST_SHA" "$f" "Zid")
+              new_doi=$(extract_field "$POST_SHA" "$f" "DOI")
+              old_zid=$(extract_field "$PRE_SHA"  "$f" "Zid" || true)
+              old_doi=$(extract_field "$PRE_SHA"  "$f" "DOI" || true)
+
+              # Skip if nothing new
+              if [ -z "$new_zid" ] && [ -z "$new_doi" ]; then continue; fi
+              if [ "$new_zid" = "$old_zid" ] && [ "$new_doi" = "$old_doi" ]; then continue; fi
+
+              # Determine sandbox vs prod from the config baked into the submodule, if possible.
+              host="zenodo.org"
+              if grep -q "sandbox:[[:space:]]*true" config.js 2>/dev/null; then
+                host="sandbox.zenodo.org"
+              fi
+
+              zid_cell="—"
+              [ -n "$new_zid" ] && zid_cell="[${new_zid}](https://${host}/record/${new_zid})"
+              doi_cell="—"
+              [ -n "$new_doi" ] && doi_cell="[${new_doi}](https://doi.org/${new_doi})"
+
+              kind="updated"
+              { [ -z "$old_zid" ] && [ -n "$new_zid" ]; } && kind="new"
+
+              ZENODO_ROWS+="| ${kind} | \`${f}\` | ${zid_cell} | ${doi_cell} |"$'\n'
+            done
+
+            if [ -z "$ZENODO_ROWS" ]; then
+              echo "_no new or updated Zenodo records_" >> "$summary"
+            else
+              echo "" >> "$summary"
+              echo "| Status | Article | Zenodo ID | DOI |" >> "$summary"
+              echo "| --- | --- | --- | --- |" >> "$summary"
+              printf '%s' "$ZENODO_ROWS" >> "$summary"
+            fi
+          fi
+
+          echo "" >> "$summary"
+          echo "_Diff range: \`${PRE_SHA:0:7}..${POST_SHA:0:7}\` in submodule \`${PROCEEDINGS}\`._" >> "$summary"
 
       - name: 🤫 Setting up AWS credentials
         uses: 'aws-actions/configure-aws-credentials@v1'
