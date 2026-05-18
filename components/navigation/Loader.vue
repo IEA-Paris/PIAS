@@ -13,12 +13,13 @@
       @enter="enter"
       @leave="leave"
     >
-      <div v-if="active" class="logo-container">
+      <div v-if="active" class="loader-logo-container">
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="280"
-          height="280"
+          width="100%"
+          height="100%"
           viewBox="0 0 442.31067 372.62268"
+          preserveAspectRatio="xMidYMid meet"
           class="loader-logo"
           :class="{ 'loader-logo--active': active }"
         >
@@ -172,17 +173,26 @@ $animation-easing: ease;
   opacity: 0;
   transform: scale(0.95);
 
-  .logo-container {
+  .loader-logo-container {
     transform: scale(0.9);
     opacity: 0;
     transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
+.loader-logo-container {
+  width: 280px;
+  height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .loader-logo {
   filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1));
-  max-width: 350px;
-  height: auto;
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 /* Base state for all SVG elements */
