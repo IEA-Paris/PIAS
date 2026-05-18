@@ -393,6 +393,7 @@ collections:
           search_fields: ['name_of_the_issue', 'title'],
           value_field: 'content/issues/{{slug}}.md',
           display_fields: ['name_of_the_issue'],
+          options_length: 200,
         }
       - {
           label: 'Picture',
