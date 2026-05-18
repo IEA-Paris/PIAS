@@ -55,7 +55,8 @@
   },
   "peerDependencies": {},
   "resolutions": {
-    "sharp": "^0.34.5"
+    "sharp": "^0.34.5",
+    "js-cookie": "3.0.5"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.14.7",
