@@ -111,6 +111,8 @@ jobs:
           DEEPL_KEY: ${{ secrets.DEEPL_KEY }}
           orcid: ${{secrets.ORCID_SANDBOX_ID}}
           ORCID_SANDBOX_SECRET_KEY_ID: ${{secrets.ORCID_SANDBOX_SECRET_KEY_ID}}
+          ZENODO_TOKEN: ${{ secrets.ZENODO_TOKEN }}
+          ZENODO_SANDBOX_TOKEN: ${{ secrets.ZENODO_SANDBOX_TOKEN }}
 
       #   - name: Cache dist
       #    uses: actions/cache@v3
