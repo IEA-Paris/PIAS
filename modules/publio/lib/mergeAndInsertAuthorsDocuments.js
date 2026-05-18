@@ -65,7 +65,10 @@ export default async (authors = [], articles, content) => {
           firstname: (rest.firstname && rest.firstname.trim()) || '',
           lastname: (rest.lastname && rest.lastname.trim()) || '',
           exerpt: rest.text?.length ? rest.text.slice(0, 350) : '',
-          active: !!authorArticles,
+          active:
+            (authorArticles && authorArticles.length > 0) ||
+            !!rest.editorial_fellow ||
+            !!rest.editorial_committee,
           positions_and_institutions: positionsAndInstitutions,
           articles: authorArticles || [],
         }

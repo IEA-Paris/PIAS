@@ -22,6 +22,15 @@ export default {
       type: 'articles',
     }
   },
+  async fetch({ store, route }) {
+    // Skip fetch on client-side navigation - ListLeftPanel will load database when needed
+    if (process.client) return
+    // Load route query and params into store
+    store.commit('loadRouteQueryAndParams', 'articles')
+
+    // Initialize the store with data during server-side rendering
+    await store.dispatch('update', 'articles')
+  },
   head() {
     const page = this.$route.params.page || 1
     const title = page > 1 ? `Articles - Page ${page}` : 'Articles'
@@ -75,15 +84,6 @@ export default {
         },
       ],
     }
-  },
-  async fetch({ store, route }) {
-    // Skip fetch on client-side navigation - ListLeftPanel will load database when needed
-    if (process.client) return
-    // Load route query and params into store
-    store.commit('loadRouteQueryAndParams', 'articles')
-
-    // Initialize the store with data during server-side rendering
-    await store.dispatch('update', 'articles')
   },
   computed: {},
   mounted() {},

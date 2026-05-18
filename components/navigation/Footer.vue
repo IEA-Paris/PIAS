@@ -61,6 +61,18 @@
                   </v-list-item-content>
                 </v-list-item>
                 <v-list-item
+                  :to="localePath('/editorial_policy')"
+                  nuxt
+                  @click="open = false"
+                >
+                  <v-list-item-content>
+                    <v-list-item-title
+                      class="text-uppercase text-button"
+                      v-text="$t('editorial-policy')"
+                    ></v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+                <v-list-item
                   :to="localePath('/contact')"
                   nuxt
                   @click="open = false"
