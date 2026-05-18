@@ -20,19 +20,17 @@ export default async (articles) => {
   }
   console.log('================================\n')
 
-  let gitDiffed = false
+  let gitDiffed = ''
 
   try {
-    // TODO the following command raises an error if no file has changed. Look into an argument to avoid that, thus removing the try catch block
-    const { stdout, stderr } = await exec(
-      "{ git ls-files --others --exclude-standard ; git diff-index --name-only --diff-filter=d HEAD ; } | grep --regexp='[.]md$'"
+    // grep exits non-zero when there are no matches (no changed markdown files),
+    // so swallow that and treat it as "no diff".
+    const { stdout } = await exec(
+      "{ git ls-files --others --exclude-standard ; git diff-index --name-only --diff-filter=d HEAD ; } | grep --regexp='[.]md$' || true"
     )
-    gitDiffed = stdout
+    gitDiffed = stdout || ''
   } catch (error) {
-    /*     console.log('error: ', error) */
-    console.log('No file seems to have changed')
-  } finally {
-    gitDiffed = ''
+    console.log('No file seems to have changed:', error.message)
   }
   const diffed = gitDiffed
     .split('\n')
@@ -82,7 +80,11 @@ export default async (articles) => {
       gitDiffed: articleDiffed,
       generatePDF: articleDiffed || !hasPDF,
       generateGraph: articleDiffed || !hasThumbnail,
-      upsertOnZenodo: articleDiffed || !hasPDF,
+      // Always attempt Zenodo sync for articles that want a DOI — the upsert
+      // routine itself short-circuits when a matching record already exists
+      // on Zenodo, so this is safe and ensures new/changed articles aren't
+      // silently skipped just because their PDF is already present locally.
+      upsertOnZenodo: article.needDOI === true,
       obtainDOI: article.needDOI && !article.DOI?.length,
       publishOnZenodo: false,
     }

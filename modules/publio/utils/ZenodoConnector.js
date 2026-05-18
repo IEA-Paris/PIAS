@@ -15,7 +15,7 @@ const kRequest = Symbol('request')
 const kSublevel = Symbol('sublevel')
 
 function getAxios(options) {
-  return axios.create(
+  const instance = axios.create(
     Object.assign(
       {
         maxContentLength: Infinity,
@@ -24,6 +24,45 @@ function getAxios(options) {
       options
     )
   )
+  // Surface Zenodo's validation payload — by default axios only exposes
+  // "Request failed with status code 400", which hides the actual reason
+  // (Zenodo returns { status, message, errors: [{ field, messages }] }).
+  instance.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      if (error?.response) {
+        const { status, statusText, data, config } = error.response
+        const method = (config?.method || 'GET').toUpperCase()
+        const url = (config?.baseURL || '') + (config?.url || '')
+        const fieldErrors = Array.isArray(data?.errors)
+          ? data.errors
+              .map(
+                (e) =>
+                  `${e.field}: ${
+                    Array.isArray(e.messages) ? e.messages.join('; ') : e.message
+                  }`
+              )
+              .join(' | ')
+          : ''
+        const summary = [
+          `Zenodo ${method} ${url} -> ${status} ${statusText || ''}`.trim(),
+          data?.message ? `message: ${data.message}` : '',
+          fieldErrors ? `errors: ${fieldErrors}` : '',
+        ]
+          .filter(Boolean)
+          .join(' — ')
+        error.message = summary || error.message
+        error.zenodo = {
+          status,
+          statusText,
+          message: data?.message,
+          errors: data?.errors,
+        }
+      }
+      return Promise.reject(error)
+    }
+  )
+  return instance
 }
 
 class ZenodoApi {
@@ -73,14 +112,6 @@ class ZenodoApiDepositions {
   }
 
   list(options) {
-    console.log(
-      'options: ',
-      JSON.stringify(
-        this[kRequest].get('', {
-          params: options,
-        })
-      )
-    )
     return this[kRequest].get('', {
       params: options,
     })

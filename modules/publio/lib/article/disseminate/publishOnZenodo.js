@@ -14,9 +14,22 @@ export default async (articles, options, queue) => {
     })
     console.log('STARTING UPLOAD & PUBLISH ON ZENODO')
     const publishArticleOnZenodo = async (document) => {
-      await zenodo.depositions.publish({
-        id: document.Zid,
-      })
+      try {
+        await zenodo.depositions.publish({
+          id: document.Zid,
+        })
+      } catch (error) {
+        console.error(
+          `Zenodo publish failed for slug=${document.slug} Zid=${document.Zid}: ${error.message}`
+        )
+        if (error.zenodo?.errors) {
+          console.error(
+            'Zenodo field errors:',
+            JSON.stringify(error.zenodo.errors, null, 2)
+          )
+        }
+        throw error
+      }
       console.log(`${document.slug} successfully published on Zenodo `)
       return document
     }
@@ -59,7 +72,15 @@ export default async (articles, options, queue) => {
           )
         }
       } catch (error) {
-        console.log(`Error while uploading file to Zenodo: ${error}`)
+        console.error(
+          `Error while uploading file to Zenodo for slug=${document.slug}: ${error.message}`
+        )
+        if (error.zenodo?.errors) {
+          console.error(
+            'Zenodo field errors:',
+            JSON.stringify(error.zenodo.errors, null, 2)
+          )
+        }
       }
       return document
     }
@@ -79,7 +100,15 @@ export default async (articles, options, queue) => {
               document = await publishArticleOnZenodo(document)
               return document
             } catch (error) {
-              console.log(`Error while upload and publish on Zenodo: ${error}`)
+              console.error(
+                `Error while upload and publish on Zenodo for slug=${document.slug}: ${error.message}`
+              )
+              if (error.zenodo?.errors) {
+                console.error(
+                  'Zenodo field errors:',
+                  JSON.stringify(error.zenodo.errors, null, 2)
+                )
+              }
             }
             return document
           })
@@ -89,6 +118,12 @@ export default async (articles, options, queue) => {
 
     return result
   } catch (error) {
-    console.log(`Error while publishing on Zenodo: ${error}`)
+    console.error(`Error while publishing on Zenodo: ${error.message}`)
+    if (error.zenodo?.errors) {
+      console.error(
+        'Zenodo field errors:',
+        JSON.stringify(error.zenodo.errors, null, 2)
+      )
+    }
   }
 }

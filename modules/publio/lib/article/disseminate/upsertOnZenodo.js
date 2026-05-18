@@ -25,15 +25,23 @@ export default async (articles, options, queue) => {
         .filter((doi) => doi)
         .join(' OR doi:')
     console.log('Q', JSON.stringify(q)) */
-    // TODO deal with the number of articles beyond 1k. I assume the md based system will show its limit before we reach it.
-    const records = (
-      await queue.add(async () => {
-        console.log('fetching Zenodo records')
-        return await zenodo.depositions.list({
-          size: 10000,
+    // Zenodo caps `size` at 100 on the deposit listing endpoint, so paginate.
+    const records = await queue.add(async () => {
+      console.log('fetching Zenodo records')
+      const pageSize = 100
+      const all = []
+      for (let page = 1; ; page++) {
+        const { data } = await zenodo.depositions.list({
+          size: pageSize,
+          page,
         })
-      })
-    ).data
+        if (!data?.length) break
+        all.push(...data)
+        if (data.length < pageSize) break
+      }
+      console.log(`fetched ${all.length} Zenodo records`)
+      return all
+    })
 
     // or pull each record independantly (would be better, but the elastic search query is not working)
 
@@ -46,13 +54,14 @@ export default async (articles, options, queue) => {
       false
 
     const hasSameIdOrDoi = (data, document) => {
-      return data?.length && document?.Zid && document?.DOI
-        ? data.find(
-            (article) =>
-              (article.id && article.id === document.Zid) ||
-              article.metadata?.doi === document.DOI
-          )
-        : false
+      if (!data?.length || (!document?.Zid && !document?.DOI)) return false
+      return (
+        data.find(
+          (article) =>
+            (document.Zid && article.id && article.id === document.Zid) ||
+            (document.DOI && article.metadata?.doi === document.DOI)
+        ) || false
+      )
     }
 
     const upsertArticleOnZenodo = async (document, editMode = false) => {
@@ -60,10 +69,27 @@ export default async (articles, options, queue) => {
 
       return await queue.add(async () => {
         console.log('upsertArticleOnZenodo', metadata.title)
-        const deposition = await (editMode
-          ? zenodo.depositions.update({ metadata })
-          : zenodo.depositions.create({ metadata }))
-        return deposition
+        try {
+          const deposition = await (editMode
+            ? zenodo.depositions.update({ metadata })
+            : zenodo.depositions.create({ metadata }))
+          return deposition
+        } catch (error) {
+          console.error(
+            `Zenodo upsert failed for "${metadata.title}" (slug=${document.slug}): ${error.message}`
+          )
+          if (error.zenodo?.errors) {
+            console.error(
+              'Zenodo field errors:',
+              JSON.stringify(error.zenodo.errors, null, 2)
+            )
+          }
+          console.error(
+            'Submitted metadata:',
+            JSON.stringify(metadata, null, 2)
+          )
+          throw error
+        }
       })
     }
 
@@ -155,30 +181,41 @@ export default async (articles, options, queue) => {
             document.links = { bucket: sameIdOrDoi.links.bucket }
           }
         }
-      } else {
-        // this article doesn't exist on Zenodo. Let's create it then.
-        if (!document.DOI) {
-          console.log("article doesn't exist on Zenodo", document.article_title)
-          const rst = (await upsertArticleOnZenodo(document)) || false
-          if (rst) {
-            if (!document.Zid) document.Zid = rst.data.id
-            if (!document.DOI) {
-              document.DOI = rst.data.metadata.prereserve_doi.doi
-            }
-            if (!document?.links?.bucket) {
-              document.links = { bucket: rst.data.links.bucket }
-            }
-            document.todo.publishOnZenodo = true
+      } else if (!document.DOI) {
+        // No matching Zenodo record and no existing DOI — safe to mint a new
+        // record (Zenodo will assign a fresh DOI via prereserve_doi).
+        console.log("article doesn't exist on Zenodo", document.article_title)
+        const rst = (await upsertArticleOnZenodo(document)) || false
+        if (rst) {
+          document.Zid = rst.data.id
+          if (rst.data.metadata?.prereserve_doi?.doi) {
+            document.DOI = rst.data.metadata.prereserve_doi.doi
           }
+          if (rst.data.links?.bucket) {
+            document.links = { bucket: rst.data.links.bucket }
+          }
+          document.todo.publishOnZenodo = true
         }
         document.todo.generatePDF = true
 
         console.log('document created', document.DOI)
+      } else {
+        // Article already has a DOI but no matching Zenodo record on this
+        // host — do nothing (per project policy: don't re-mint existing DOIs).
+        // This usually means the record lives on a different Zenodo host
+        // (e.g. prod vs sandbox) or was deleted upstream; either way we leave
+        // it alone and surface it for manual investigation.
+        console.log(
+          'Article has a DOI but no matching Zenodo record on this host — skipping create:',
+          document.article_title,
+          'DOI=',
+          document.DOI
+        )
       }
       return document
     }
     articles = await Promise.all(
-      await articles.map(async (document) => {
+      articles.map(async (document) => {
         if (
           document.published &&
           document.needDOI === true &&
@@ -195,7 +232,13 @@ export default async (articles, options, queue) => {
 
     return articles
   } catch (error) {
-    console.log('error while inserting on Zenodo: ', error)
+    console.error('error while inserting on Zenodo:', error.message)
+    if (error.zenodo?.errors) {
+      console.error(
+        'Zenodo field errors:',
+        JSON.stringify(error.zenodo.errors, null, 2)
+      )
+    }
   }
   return articles
 }

@@ -38,7 +38,12 @@ export default (document, options) => {
     // conference_title:
     // conference_acronym
     // location: [{"lat": 34.02577, "lon": -118.7804, "place": "Los Angeles"}, {"place": "Mt.Fuji, Japan", "description": "Sample found 100ft from the foot of the mountain."}]
-    ...(document.DOI && { doi: document.DOI }),
+    ...(document.DOI ? { doi: document.DOI } : {}),
+    // Zenodo rejects (400) when both `doi` and `prereserve_doi` are sent.
+    // Only ask Zenodo to mint a DOI when the article doesn't already carry one.
+    ...(document.DOI
+      ? {}
+      : { prereserve_doi: document.needDOI !== false }),
     ...(document.issue && {
       journal_issue:
         options.filters.issue.items.find(
@@ -74,7 +79,6 @@ export default (document, options) => {
     ],
     journal_title: cleanupString(options.config.full_name),
     ...(document.issueIndex && { journal_volume: document.issueIndex }),
-    prereserve_doi: document.needDOI !== false,
     publication_date: new Date(document.date).toISOString().substring(0, 10),
     // TODO
     // - same issue articles,
