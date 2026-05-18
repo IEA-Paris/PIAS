@@ -50,6 +50,20 @@ collections:
           default: false,
         },
         {
+          label: 'Editorial Fellow',
+          name: 'editorial_fellow',
+          widget: 'boolean',
+          default: false,
+          required: false,
+        },
+        {
+          label: 'Editorial Committee',
+          name: 'editorial_committee',
+          widget: 'boolean',
+          default: false,
+          required: false,
+        },
+        {
           label: Firstname,
           name: firstname,
           widget: string,
