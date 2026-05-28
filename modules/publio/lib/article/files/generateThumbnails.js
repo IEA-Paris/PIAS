@@ -3,15 +3,21 @@ const fs = require('fs')
 const path = require('path')
 const puppeteer = require('puppeteer')
 const sharp = require('sharp')
-let browser, response
 export default async (route, url, meta) => {
+  let browser = null
+  let response
   try {
     console.log(
       'starting to generate Thumbnails at ',
       url.replace(/\/$/, '') + route.route
     )
+    // --no-sandbox / --disable-setuid-sandbox: required on Ubuntu 24.04 GitHub
+    // runners where unprivileged user namespaces are restricted and Chromium's
+    // sandbox can't initialize. Safe in this CI context — we only render our
+    // own trusted print pages.
     browser = await puppeteer.launch({
       headless: 'new',
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
     })
     const page = await browser.newPage()
     // Reduced viewport size: A4 proportions at 150dpi instead of 300dpi
@@ -111,7 +117,16 @@ export default async (route, url, meta) => {
     })
     return [route, url, meta]
   } catch (error) {
-    console.log('error: ', error)
+    console.error(
+      '[publio-diag] generateThumbnails FAILED',
+      'route=' + route.route,
+      'file=' + route.file,
+      'error=' + (error && error.message)
+    )
     return [route, url, meta]
+  } finally {
+    if (browser !== null) {
+      await browser.close()
+    }
   }
 }

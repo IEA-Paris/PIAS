@@ -3,23 +3,24 @@ const path = require('path')
 const puppeteer = require('puppeteer')
 
 const { PDFDocument: Document } = require('pdf-lib')
-let browser, response
 const chalk = require('chalk')
 export default async (route, url, meta) => {
+  let browser = null
+  let response
   try {
     console.error(
       '[publio-diag] generatePDF starting',
       url.replace(/\/$/, '') + route.route,
       'file=' + route.file
     )
-    browser = await puppeteer.launch(
-      /*  Object.assign( */
-      {
-        headless: 'new',
-      }
-      /*    options.puppeteer 
-      ) */
-    )
+    // --no-sandbox / --disable-setuid-sandbox: required on Ubuntu 24.04 GitHub
+    // runners where unprivileged user namespaces are restricted and Chromium's
+    // sandbox can't initialize. Safe in this CI context — we only render our
+    // own trusted print pages.
+    browser = await puppeteer.launch({
+      headless: 'new',
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    })
     const page = await browser.newPage()
     await page.setViewport(
       // Pixel equivalent of an A4 page with 300dpi
