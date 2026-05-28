@@ -1,20 +1,35 @@
 import { formatAuthors } from '../utils/transforms'
 
 export default (articles, options) => {
-  console.log('make print routes for array of articles', articles.length)
+  console.error(
+    '[publio-diag] makePrintRoutes input count=' + (articles?.length || 0)
+  )
+  console.error(
+    '[publio-diag] makePrintRoutes input articles:',
+    (articles || []).map((a) => ({
+      slug: a.slug,
+      published: a.published,
+      custom_pdf: a.custom_pdf,
+      picture: !!a.picture,
+      yt: !!a.yt,
+      todo: a.todo,
+    }))
+  )
   const pdfArticles = articles.filter((article) => {
-    /*    */
     return !article.custom_pdf && article?.todo?.generatePDF
   })
-  console.log('pdfArticles: ', pdfArticles.length)
+  console.error(
+    '[publio-diag] makePrintRoutes pdfArticles count=' + pdfArticles.length,
+    'slugs=' + JSON.stringify(pdfArticles.map((a) => a.slug))
+  )
   const thumbnailArticles = articles.filter((article) => {
-    /*    if (!article?.todo?.generateGraph) {
-      delete article.countMap
-      delete article.countRef
-    } */
     return !article.picture && !article.yt && article?.todo?.generateGraph
   })
-  console.log('thumbnailArticles: ', thumbnailArticles.length)
+  console.error(
+    '[publio-diag] makePrintRoutes thumbnailArticles count=' +
+      thumbnailArticles.length,
+    'slugs=' + JSON.stringify(thumbnailArticles.map((a) => a.slug))
+  )
   return {
     pdfs: pdfArticles.map((article) => {
       // if the file has been changed

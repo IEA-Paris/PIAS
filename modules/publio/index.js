@@ -95,6 +95,29 @@ export default function (moduleOptions) {
 
     routesToPrint = makePrintRoutes(articles, options)
 
+    console.error('[publio-diag] generate:done entered')
+    console.error(
+      '[publio-diag] articles in memory:',
+      (articles || []).map((a) => ({
+        slug: a.slug,
+        published: a.published,
+        needDOI: a.needDOI,
+        DOI: a.DOI,
+        Zid: a.Zid,
+        custom_pdf: a.custom_pdf,
+        todo: a.todo,
+      }))
+    )
+    console.error(
+      '[publio-diag] routesToPrint counts:',
+      'pdfs=' + (routesToPrint?.pdfs?.length || 0),
+      'thumbnails=' + (routesToPrint?.thumbnails?.length || 0)
+    )
+    console.error(
+      '[publio-diag] routesToPrint.pdfs slugs:',
+      (routesToPrint?.pdfs || []).map((r) => r.file)
+    )
+
     url = 'http://127.0.0.1:3000'
     if (routesToPrint?.pdfs?.length || routesToPrint?.thumbnails?.length) {
       console.log('generating files')
@@ -105,6 +128,10 @@ export default function (moduleOptions) {
           thumbnails: generateThumbnails,
         },
         url
+      )
+    } else {
+      console.error(
+        '[publio-diag] SKIPPING generateFiles — no pdfs or thumbnails routes'
       )
     }
     console.log('STARTING DISSEMINATION', articles.length)

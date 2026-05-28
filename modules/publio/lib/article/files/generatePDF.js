@@ -7,9 +7,10 @@ let browser, response
 const chalk = require('chalk')
 export default async (route, url, meta) => {
   try {
-    console.log(
-      'starting to generate PDF at ',
-      url.replace(/\/$/, '') + route.route
+    console.error(
+      '[publio-diag] generatePDF starting',
+      url.replace(/\/$/, '') + route.route,
+      'file=' + route.file
     )
     browser = await puppeteer.launch(
       /*  Object.assign( */
@@ -27,6 +28,11 @@ export default async (route, url, meta) => {
     response = await page.goto(`${url.replace(/\/$/, '')}${route.route}`, {
       waitUntil: ['networkidle0'],
     })
+    console.error(
+      '[publio-diag] generatePDF page.goto status=' + (response && response.status()),
+      'ok=' + (response && response.ok()),
+      'url=' + (response && response.url())
+    )
 
     /*     // workaround to allow SVGs to render before the page is saved as PDF
     const loaded = page.waitForNavigation({
@@ -107,9 +113,11 @@ export default async (route, url, meta) => {
     const ws2 = fs.createWriteStream(file2, { flags: 'w' })
     await ws2.write(await document.save())
     await ws2.end()
-    console.log(
-      `${chalk.green('✔')}  Generated PDF 
-      } at file '${file2} (${document.getTitle()})`
+    console.error(
+      '[publio-diag] generatePDF wrote',
+      file2,
+      'exists=' + fs.existsSync(file2),
+      'size=' + (fs.existsSync(file2) ? fs.statSync(file2).size : 'N/A')
     )
     if (!route.keep && process.env.NODE_ENV === 'production') {
       fs.unlinkSync(`./dist${route.route}/index.html`)
@@ -127,9 +135,12 @@ export default async (route, url, meta) => {
     }
     await page.close()
   } catch (e) {
-    console.log(
-      `${chalk.red('𐄂')} Failed to generated PDF 
-       at route ${route.route} error: ${e.message}`
+    console.error(
+      '[publio-diag] generatePDF FAILED',
+      'route=' + route.route,
+      'file=' + route.file,
+      'error=' + (e && e.message),
+      'stack=' + (e && e.stack)
     )
   } finally {
     if (browser !== null) {
