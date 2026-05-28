@@ -8,11 +8,6 @@ export default async (route, url, meta) => {
   let browser = null
   let response
   try {
-    console.error(
-      '[publio-diag] generatePDF starting',
-      url.replace(/\/$/, '') + route.route,
-      'file=' + route.file
-    )
     // --no-sandbox / --disable-setuid-sandbox: required on Ubuntu 24.04 GitHub
     // runners where unprivileged user namespaces are restricted and Chromium's
     // sandbox can't initialize. Safe in this CI context — we only render our
@@ -29,11 +24,6 @@ export default async (route, url, meta) => {
     response = await page.goto(`${url.replace(/\/$/, '')}${route.route}`, {
       waitUntil: ['networkidle0'],
     })
-    console.error(
-      '[publio-diag] generatePDF page.goto status=' + (response && response.status()),
-      'ok=' + (response && response.ok()),
-      'url=' + (response && response.url())
-    )
 
     /*     // workaround to allow SVGs to render before the page is saved as PDF
     const loaded = page.waitForNavigation({
@@ -114,13 +104,6 @@ export default async (route, url, meta) => {
       recursive: true,
     })
     fs.writeFileSync(staticFile, pdfBytes)
-    console.error(
-      '[publio-diag] generatePDF wrote',
-      'dist=' + distFile,
-      'static=' + staticFile,
-      'exists=' + fs.existsSync(staticFile),
-      'size=' + (fs.existsSync(staticFile) ? fs.statSync(staticFile).size : 'N/A')
-    )
     if (!route.keep && process.env.NODE_ENV === 'production') {
       fs.unlinkSync(`./dist${route.route}/index.html`)
       console.log(
@@ -138,12 +121,11 @@ export default async (route, url, meta) => {
     await page.close()
   } catch (e) {
     console.error(
-      '[publio-diag] generatePDF FAILED',
-      'route=' + route.route,
-      'file=' + route.file,
-      'error=' + (e && e.message),
-      'stack=' + (e && e.stack)
+      'generatePDF failed for route=' + route.route + ' file=' + route.file,
+      '-',
+      (e && e.message) || e
     )
+    if (e && e.stack) console.error(e.stack)
   } finally {
     if (browser !== null) {
       await browser.close()

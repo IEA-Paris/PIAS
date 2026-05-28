@@ -58,30 +58,15 @@ export default async (routesToPrint, fn, url = 'http://localhost:3000') => {
 
     // generate the PDFs, thumbnails, & whatever we need <3
     for (const category of Object.keys(routesToPrint).reverse()) {
-      console.error(
-        '[publio-diag] generateFiles category=' + category,
-        'count=' + routesToPrint[category].length
-      )
       for (const route of routesToPrint[category]) {
-        console.error(
-          '[publio-diag] generateFiles start',
-          category,
-          route.route,
-          '->',
-          route.file
-        )
         try {
           await fn[category](route, url, meta)
-          console.error(
-            '[publio-diag] generateFiles done',
-            category,
-            route.file
-          )
         } catch (e) {
           console.error(
-            '[publio-diag] generateFiles THREW',
+            'generateFiles threw for',
             category,
             route.file,
+            '-',
             e && e.message
           )
         }
@@ -89,6 +74,6 @@ export default async (routesToPrint, fn, url = 'http://localhost:3000') => {
     }
     return true
   } catch (error) {
-    console.error('[publio-diag] generateFiles outer error: ', error && error.message)
+    console.error('generateFiles outer error:', error && error.message)
   }
 }

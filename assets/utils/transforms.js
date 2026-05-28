@@ -95,7 +95,14 @@ export const formatAuthors = (
           }`
         })
         .join('')
-      return `<a href="${url}/author/${slug}" style="text-decoration: none; color: inherit;">${name}<span style="margin-left: 3px">${instutionElmt}</span></a>`
+      const instutionSpan = instutionElmt
+        ? `<span style="margin-left: 3px">${instutionElmt}</span>`
+        : ''
+      // The trailing &nbsp; after initials (line above) exists to gap the
+      // institution superscript; without one it just creates lopsided spacing
+      // before whatever follows the link (e.g. " and ").
+      const trimmedName = instutionElmt ? name : name.replace(/&nbsp;$/, '')
+      return `<a href="${url}/author/${slug}" style="text-decoration: none; color: inherit;">${trimmedName}${instutionSpan}</a>`
     }
     return name
   }
@@ -108,7 +115,7 @@ export const formatAuthors = (
       format(authors[0]) +
       // fallback on english for pdfs (only case where $t is called as undefined)
       // TODO: double check it works once we go for multilingual
-      (typeof $t === 'undefined' ? ' and ' : $t('and')) +
+      (typeof $t === 'undefined' ? ' and ' : ' ' + $t('and') + ' ') +
       format(authors[1])
     )
   }
@@ -242,7 +249,11 @@ export const formatBiblioAPA7th = (item, name, self = true) => {
 export const highlight = (word, query = '', light = false) => {
   const stopwords = ['this']
 
-  const tokens = query.split(/\W+/).filter((token) => {
+  // Split on runs of characters that are NOT letters/digits. Unicode-aware so
+  // accented characters (ê, é, à, ñ, …) stay part of their word — otherwise
+  // "tempête" would shatter into ["temp", "te"] and the short "te" would
+  // highlight noise all over the page.
+  const tokens = query.split(/[^\p{L}\p{N}]+/u).filter((token) => {
     token = token.toLowerCase()
     return token.length >= 2 && !stopwords.includes(token)
   })

@@ -70,8 +70,6 @@
                 text
                 class="mb-3 px-3 font-italic authorsBtn"
                 style=""
-                nuxt
-                :to="'/article/' + item.slug + '#authors'"
                 v-html="formatAuthorsProxy()"
               >
               </v-btn>
@@ -128,8 +126,12 @@ export default {
 <style lang="scss">
 .authorsBtn {
   text-transform: none !important;
-}
-.authorsBtn .v-btn__content {
+  // Vuetify makes .v-btn `display: inline-flex`, which turns each <a> and the
+  // bare " and " text node into separate flex items and drops the surrounding
+  // whitespace. Inline-block keeps the author links + " and " as normal inline
+  // flow so the spaces render. (Note: this v-btn renders without the usual
+  // .v-btn__content wrapper, so the rule must target .authorsBtn directly.)
+  display: inline-block !important;
   width: 500px;
   max-width: 100vw;
   line-height: 1.8rem;

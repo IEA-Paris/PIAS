@@ -7,21 +7,6 @@ export default (articles, options) => {
   const thumbnailArticles = articles.filter((article) => {
     return !article.picture && !article.yt && article?.todo?.generateGraph
   })
-  console.error(
-    '[publio-diag] makePrintRoutes input=' + (articles?.length || 0),
-    'pdfArticles=' + pdfArticles.length,
-    'thumbnailArticles=' + thumbnailArticles.length
-  )
-  for (const a of pdfArticles) {
-    console.error(
-      '[publio-diag] makePrintRoutes -> PDF slug=' + JSON.stringify(a.slug)
-    )
-  }
-  for (const a of thumbnailArticles) {
-    console.error(
-      '[publio-diag] makePrintRoutes -> THUMB slug=' + JSON.stringify(a.slug)
-    )
-  }
   return {
     pdfs: pdfArticles.map((article) => {
       // if the file has been changed

@@ -93,21 +93,15 @@ export default async (route, url, meta) => {
     fs.copyFileSync(resolvedWebPPath, distWebPPath)
     fs.copyFileSync(resolvedSVGPath, distSVGPath)
 
-    console.error(
-      '[publio-diag] generateThumbnails wrote',
-      'png=' + resolvedThumbnailPath,
-      'webp=' + resolvedWebPPath,
-      'svg=' + resolvedSVGPath,
-      'pngSize=' + fs.statSync(resolvedThumbnailPath).size,
-      'svgSize=' + fs.statSync(resolvedSVGPath).size
-    )
     return [route, url, meta]
   } catch (error) {
     console.error(
-      '[publio-diag] generateThumbnails FAILED',
-      'route=' + route.route,
-      'file=' + route.file,
-      'error=' + (error && error.message)
+      'generateThumbnails failed for route=' +
+        route.route +
+        ' file=' +
+        route.file,
+      '-',
+      (error && error.message) || error
     )
     return [route, url, meta]
   } finally {

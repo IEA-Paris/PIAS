@@ -95,27 +95,6 @@ export default function (moduleOptions) {
 
     routesToPrint = makePrintRoutes(articles, options)
 
-    console.error(
-      '[publio-diag] generate:done entered',
-      'articles=' + (articles?.length || 0),
-      'pdfs=' + (routesToPrint?.pdfs?.length || 0),
-      'thumbnails=' + (routesToPrint?.thumbnails?.length || 0)
-    )
-    const actionable = (articles || []).filter(
-      (a) =>
-        (!a.custom_pdf && a?.todo?.generatePDF) ||
-        (!a.picture && !a.yt && a?.todo?.generateGraph) ||
-        a?.todo?.publishOnZenodo
-    )
-    for (const a of actionable) {
-      console.error(
-        '[publio-diag] generate:done actionable slug=' + JSON.stringify(a.slug),
-        'todo=' + JSON.stringify(a.todo),
-        'Zid=' + a.Zid,
-        'DOI=' + a.DOI
-      )
-    }
-
     url = 'http://127.0.0.1:3000'
     if (routesToPrint?.pdfs?.length || routesToPrint?.thumbnails?.length) {
       console.log('generating files')
@@ -126,10 +105,6 @@ export default function (moduleOptions) {
           thumbnails: generateThumbnails,
         },
         url
-      )
-    } else {
-      console.error(
-        '[publio-diag] SKIPPING generateFiles — no pdfs or thumbnails routes'
       )
     }
     console.log('STARTING DISSEMINATION', articles.length)
