@@ -127,7 +127,20 @@ jobs:
           cd submodules/${{ github.event.inputs.name }}
           PRE_SHA=$(git rev-parse HEAD)
           echo "PRE_SHA=$PRE_SHA" >> "$GITHUB_ENV"
-          rsync -av   -a --include='*/' --exclude 'admin' --exclude='*' --exclude 'sw.js' ../../static/ ./static/
+          # Generated assets live at the submodule root (pdfs/, thumbnails/, svg/),
+          # not under static/. They get copied into static/ at the start of the run
+          # via `cp -r ./submodules/<name>/{pdfs,thumbnails,svg} ./static`, so the
+          # PIAS-root `static/<dir>/` is the canonical generated location during
+          # the run. Push each back to its submodule-root home.
+          rsync -av --delete ../../static/pdfs/       ./pdfs/
+          rsync -av --delete ../../static/thumbnails/ ./thumbnails/
+          rsync -av --delete ../../static/svg/        ./svg/
+          # For the rest of static/, mirror back to the submodule's static/,
+          # excluding the three asset dirs handled above plus admin and sw.js.
+          rsync -av \
+            --exclude 'pdfs/' --exclude 'thumbnails/' --exclude 'svg/' \
+            --exclude 'admin' --exclude 'sw.js' \
+            ../../static/ ./static/
           git config --global user.name "CI"
           git config --global user.email "username@users.noreply.github.com"
           git add .
