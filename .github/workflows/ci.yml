@@ -39,9 +39,16 @@ jobs:
 
     steps:
       - name: 🛎 Checkout ${{ github.event.inputs.name }}
+        # `submodules: false` here because actions/checkout fails the whole
+        # workflow when PIAS's gitlink references a submodule SHA that's
+        # missing from origin (e.g. a local-only commit that never got
+        # pushed). The next step (`Update submodules`) does its own init
+        # with `--remote`, which always tracks each submodule's origin/main
+        # regardless of the (possibly stale) gitlink, so we don't need
+        # actions/checkout to fetch the submodules at all.
         uses: actions/checkout@v3
         with:
-          submodules: true
+          submodules: false
           token: ${{ secrets.SUBMODULE_GIT_TOKEN }}
 
       # Cancel previous runs to avoid wasting resources
@@ -69,8 +76,28 @@ jobs:
 
       - name: 🔄 Update submodules
         shell: bash
+        env:
+          # Use the same token actions/checkout would have used so private
+          # submodules (PPIAS, PFIAS, SANDBOX) can be fetched.
+          SUBMODULE_GIT_TOKEN: ${{ secrets.SUBMODULE_GIT_TOKEN }}
         run: |
-          git submodule update --init --remote && git submodule foreach git config pull.rebase true && git checkout main && git pull origin main --allow-unrelated-histories
+          # Rewrite the GitHub URL once so all subsequent submodule fetches
+          # carry the token. (actions/checkout did this for us when it
+          # handled submodules; now we handle them ourselves.)
+          git config --global url."https://x-access-token:${SUBMODULE_GIT_TOKEN}@github.com/".insteadOf "git@github.com:"
+          # `--remote` makes git fetch each submodule's tracking branch
+          # (origin/main) instead of trying to resolve the SHA recorded in
+          # PIAS's gitlink. That SHA can be a local-only commit that was
+          # never pushed (e.g. when a developer's PIAS commit accidentally
+          # bumps the submodule pointer to an unpushed SHA). Using --remote
+          # makes the CI self-healing for that case.
+          git submodule update --init --remote --recursive
+          git submodule foreach git config pull.rebase true
+          # Make sure each submodule is on its main branch (the --remote
+          # fetch can leave it on a detached HEAD at origin/main).
+          git submodule foreach 'git checkout main && git pull origin main --allow-unrelated-histories'
+          git checkout main
+          git pull origin main --allow-unrelated-histories
           rm -rf ./static/*
           echo `ls submodules/${{ github.event.inputs.name }}`
           cp -r ./submodules/${{ github.event.inputs.name }}/config.js ./config.js 

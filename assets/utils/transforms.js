@@ -247,16 +247,26 @@ export const highlight = (word, query = '', light = false) => {
     return token.length >= 2 && !stopwords.includes(token)
   })
 
-  tokens.forEach((token) => {
-    const regex = new RegExp(token, 'gi')
-    const bgColor = light ? 'white' : 'black'
-    const fontColor = light ? 'black' : 'white'
-    const style = `style="color: ${fontColor}; background-color: ${bgColor}"`
+  if (!tokens.length) return word
 
-    word = word.replace(regex, `<strong ${style}>$&</strong>`)
-  })
+  const bgColor = light ? 'white' : 'black'
+  const fontColor = light ? 'black' : 'white'
+  const style = `style="color: ${fontColor}; background-color: ${bgColor}"`
 
+  // Split into HTML tags and text nodes, then only apply replacements to text
+  // nodes so we never corrupt attribute values (e.g. style="text-decoration…").
   return word
+    .split(/(<[^>]+>)/g)
+    .map((segment) => {
+      if (segment.startsWith('<')) return segment
+      let out = segment
+      tokens.forEach((token) => {
+        const regex = new RegExp(token, 'gi')
+        out = out.replace(regex, `<strong ${style}>$&</strong>`)
+      })
+      return out
+    })
+    .join('')
 }
 /**
  * Get the Youtube Video id.
