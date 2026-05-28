@@ -90,30 +90,23 @@ export default async (route, url, meta) => {
     document.setKeywords(route.meta.tag || [])
     document.setLanguage(route.meta.language || '')
 
+    // Serialize the PDF once — `document.save()` returns a Uint8Array.
+    const pdfBytes = await document.save()
+
     const file = path.resolve('dist', route.file)
-
-    // Create folder where file will be stored.
-    fs.mkdirSync(file.substring(0, file.lastIndexOf('/')), {
-      recursive: true,
-    })
-
-    // Write document to file.
+    fs.mkdirSync(file.substring(0, file.lastIndexOf('/')), { recursive: true })
     if (process.env.NODE_ENV === 'production') {
-      const ws = fs.createWriteStream(file, { flags: 'w' })
-      await ws.write(await document.save())
-      await ws.end()
+      // Synchronous write so the file is fully flushed before downstream
+      // steps (Zenodo upload, retro-push rsync) read it. The previous
+      // createWriteStream+await ws.write+await ws.end pattern resolved before
+      // the bytes actually hit disk because Node's writable streams don't
+      // return Promises from .write/.end — leaving a 0-byte file.
+      fs.writeFileSync(file, pdfBytes)
     }
     // also write it in static to commit to source code (used to generate DOI)
     const file2 = path.resolve('static/pdfs', route.file)
-    // Create folder where file will be stored.
-    /*     console.log('makin PDF folder') */
-    fs.mkdirSync(file2.substring(0, file2.lastIndexOf('/')), {
-      recursive: true,
-    })
-    /*    console.log('writing PDF file') */
-    const ws2 = fs.createWriteStream(file2, { flags: 'w' })
-    await ws2.write(await document.save())
-    await ws2.end()
+    fs.mkdirSync(file2.substring(0, file2.lastIndexOf('/')), { recursive: true })
+    fs.writeFileSync(file2, pdfBytes)
     console.error(
       '[publio-diag] generatePDF wrote',
       file2,
