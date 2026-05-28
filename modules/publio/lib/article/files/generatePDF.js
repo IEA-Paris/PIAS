@@ -93,25 +93,33 @@ export default async (route, url, meta) => {
     // Serialize the PDF once — `document.save()` returns a Uint8Array.
     const pdfBytes = await document.save()
 
-    const file = path.resolve('dist', route.file)
-    fs.mkdirSync(file.substring(0, file.lastIndexOf('/')), { recursive: true })
-    if (process.env.NODE_ENV === 'production') {
-      // Synchronous write so the file is fully flushed before downstream
-      // steps (Zenodo upload, retro-push rsync) read it. The previous
-      // createWriteStream+await ws.write+await ws.end pattern resolved before
-      // the bytes actually hit disk because Node's writable streams don't
-      // return Promises from .write/.end — leaving a 0-byte file.
-      fs.writeFileSync(file, pdfBytes)
-    }
-    // also write it in static to commit to source code (used to generate DOI)
-    const file2 = path.resolve('static/pdfs', route.file)
-    fs.mkdirSync(file2.substring(0, file2.lastIndexOf('/')), { recursive: true })
-    fs.writeFileSync(file2, pdfBytes)
+    // 1) Write into the build output so this run's S3 deploy includes the
+    //    PDF (S3 sync source is `dist/`). Nuxt's static-copy step runs
+    //    before publio's generate:done hook, so writing here directly is
+    //    the only way to get same-run shipping. Path must be `dist/pdfs/`
+    //    so it matches the public URL convention (/pdfs/<slug>.pdf).
+    const distFile = path.resolve('dist/pdfs', route.file)
+    fs.mkdirSync(distFile.substring(0, distFile.lastIndexOf('/')), {
+      recursive: true,
+    })
+    fs.writeFileSync(distFile, pdfBytes)
+
+    // 2) Write into static/pdfs so the retro-push step copies it back to
+    //    the submodule's `pdfs/` directory (where the canonical archive
+    //    lives) and so the Zenodo upload step (publishOnZenodo) finds it.
+    //    Synchronous write so the file is fully flushed before either of
+    //    those downstream steps reads it.
+    const staticFile = path.resolve('static/pdfs', route.file)
+    fs.mkdirSync(staticFile.substring(0, staticFile.lastIndexOf('/')), {
+      recursive: true,
+    })
+    fs.writeFileSync(staticFile, pdfBytes)
     console.error(
       '[publio-diag] generatePDF wrote',
-      file2,
-      'exists=' + fs.existsSync(file2),
-      'size=' + (fs.existsSync(file2) ? fs.statSync(file2).size : 'N/A')
+      'dist=' + distFile,
+      'static=' + staticFile,
+      'exists=' + fs.existsSync(staticFile),
+      'size=' + (fs.existsSync(staticFile) ? fs.statSync(staticFile).size : 'N/A')
     )
     if (!route.keep && process.env.NODE_ENV === 'production') {
       fs.unlinkSync(`./dist${route.route}/index.html`)

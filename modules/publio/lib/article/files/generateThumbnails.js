@@ -35,49 +35,20 @@ export default async (route, url, meta) => {
 
     const imageBuffer = await content.screenshot({ omitBackground: true })
 
-    // in case the target folder does not exist, create it
+    // Always write under static/ for two reasons:
+    //   (a) the retro-push rsync mirrors PIAS-root static/{thumbnails,svg}/
+    //       back to the submodule's root thumbnails/ and svg/
+    //   (b) diagnoseArticles checks `static/thumbnails/<slug>.png` and
+    //       `static/svg/<slug>.svg` to decide whether to regenerate
+    // Previously this used an env-dependent path that wrote to root-level
+    // thumbnails/ in CI, which neither the rsync nor diagnoseArticles
+    // looked at — so generated thumbnails were silently abandoned.
+    fs.mkdirSync('static/thumbnails', { recursive: true })
+    fs.mkdirSync('static/svg', { recursive: true })
 
-    // create thumbnails
-    if (
-      !fs.existsSync(
-        process.env.NODE_ENV === 'production' && process.env.LOCAL === 'true'
-          ? 'static/thumbnails'
-          : 'thumbnails'
-      )
-    ) {
-      fs.mkdirSync(
-        process.env.NODE_ENV === 'production' && process.env.LOCAL === 'true'
-          ? 'static/thumbnails'
-          : 'thumbnails'
-      )
-    }
-    const resolvedThumbnailPath = path.resolve(
-      process.env.NODE_ENV !== 'production' ||
-        (process.env.NODE_ENV === 'production' && process.env.LOCAL === 'true')
-        ? 'static/thumbnails'
-        : 'thumbnails',
-      route.file
-    )
-
-    if (
-      !fs.existsSync(
-        process.env.NODE_ENV === 'production' && process.env.LOCAL === 'true'
-          ? 'static/svg'
-          : 'svg'
-      )
-    ) {
-      fs.mkdirSync(
-        process.env.NODE_ENV === 'production' && process.env.LOCAL === 'true'
-          ? 'static/svg'
-          : 'svg'
-      )
-    }
-
+    const resolvedThumbnailPath = path.resolve('static/thumbnails', route.file)
     const resolvedSVGPath = path.resolve(
-      process.env.NODE_ENV !== 'production' ||
-        (process.env.NODE_ENV === 'production' && process.env.LOCAL === 'true')
-        ? 'static/svg'
-        : 'svg',
+      'static/svg',
       route.file.slice(0, -4) + '.svg'
     )
 
@@ -92,8 +63,6 @@ export default async (route, url, meta) => {
       })
       .toFile(resolvedThumbnailPath)
 
-    console.log(`Compressed PNG saved for ${route.file}`)
-
     // Generate WebP version for better performance (60-80% smaller than PNG)
     const resolvedWebPPath = resolvedThumbnailPath.replace('.png', '.webp')
     await sharp(imageBuffer)
@@ -103,18 +72,35 @@ export default async (route, url, meta) => {
       })
       .toFile(resolvedWebPPath)
 
-    console.log(`WebP version saved for ${route.file.replace('.png', '.webp')}`)
-
     const svgInline = await page.evaluate(
       () => document.querySelector('svg').outerHTML
     )
-    fs.writeFileSync(resolvedSVGPath, svgInline, (err) => {
-      if (err) {
-        console.error(err)
-        return
-      }
-      console.log(`Write SVG finised for ${route.file}`)
-    })
+    fs.writeFileSync(resolvedSVGPath, svgInline)
+
+    // Mirror into dist/ so the assets ship in the same run's S3 deploy.
+    // Nuxt's static-copy step (static/ -> dist/) runs before this hook,
+    // so anything written to static/ alone misses the current deploy and
+    // only appears in the next run. Mirroring to dist/ closes that gap.
+    const distThumbnailPath = path.resolve('dist/thumbnails', route.file)
+    const distWebPPath = distThumbnailPath.replace('.png', '.webp')
+    const distSVGPath = path.resolve(
+      'dist/svg',
+      route.file.slice(0, -4) + '.svg'
+    )
+    fs.mkdirSync(path.dirname(distThumbnailPath), { recursive: true })
+    fs.mkdirSync(path.dirname(distSVGPath), { recursive: true })
+    fs.copyFileSync(resolvedThumbnailPath, distThumbnailPath)
+    fs.copyFileSync(resolvedWebPPath, distWebPPath)
+    fs.copyFileSync(resolvedSVGPath, distSVGPath)
+
+    console.error(
+      '[publio-diag] generateThumbnails wrote',
+      'png=' + resolvedThumbnailPath,
+      'webp=' + resolvedWebPPath,
+      'svg=' + resolvedSVGPath,
+      'pngSize=' + fs.statSync(resolvedThumbnailPath).size,
+      'svgSize=' + fs.statSync(resolvedSVGPath).size
+    )
     return [route, url, meta]
   } catch (error) {
     console.error(
