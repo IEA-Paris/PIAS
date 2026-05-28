@@ -96,29 +96,25 @@ export default function (moduleOptions) {
     routesToPrint = makePrintRoutes(articles, options)
 
     console.error(
-      '[publio-diag] generate:done entered articles=' +
-        (articles?.length || 0)
+      '[publio-diag] generate:done entered',
+      'articles=' + (articles?.length || 0),
+      'pdfs=' + (routesToPrint?.pdfs?.length || 0),
+      'thumbnails=' + (routesToPrint?.thumbnails?.length || 0)
     )
-    const interesting = (articles || []).filter(
-      (a) => a?.todo?.generatePDF || a?.todo?.generateGraph || a?.todo?.publishOnZenodo
+    const actionable = (articles || []).filter(
+      (a) =>
+        (!a.custom_pdf && a?.todo?.generatePDF) ||
+        (!a.picture && !a.yt && a?.todo?.generateGraph) ||
+        a?.todo?.publishOnZenodo
     )
-    for (const a of interesting) {
+    for (const a of actionable) {
       console.error(
-        '[publio-diag] generate:done interesting slug=' + JSON.stringify(a.slug),
+        '[publio-diag] generate:done actionable slug=' + JSON.stringify(a.slug),
         'todo=' + JSON.stringify(a.todo),
         'Zid=' + a.Zid,
         'DOI=' + a.DOI
       )
     }
-    console.error(
-      '[publio-diag] routesToPrint counts:',
-      'pdfs=' + (routesToPrint?.pdfs?.length || 0),
-      'thumbnails=' + (routesToPrint?.thumbnails?.length || 0)
-    )
-    console.error(
-      '[publio-diag] routesToPrint.pdfs files=' +
-        JSON.stringify((routesToPrint?.pdfs || []).map((r) => r.file))
-    )
 
     url = 'http://127.0.0.1:3000'
     if (routesToPrint?.pdfs?.length || routesToPrint?.thumbnails?.length) {

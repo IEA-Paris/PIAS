@@ -76,10 +76,17 @@ export default async (articles) => {
       console.log('hasPDF: ', hasPDF)
       console.log('article: missing pDF', article.article_title)
     }
+    // Align `todo` with what `makePrintRoutes` will actually generate:
+    // - PDF route is skipped when the article supplies a `custom_pdf`
+    // - Thumbnail route is skipped when the article has its own `picture`
+    //   or a `yt` (YouTube) poster
+    // Flagging the `todo` against those same conditions keeps the diagnostic
+    // log honest and avoids pretending we'll touch articles we won't.
     article.todo = {
       gitDiffed: articleDiffed,
-      generatePDF: articleDiffed || !hasPDF,
-      generateGraph: articleDiffed || !hasThumbnail,
+      generatePDF: (articleDiffed || !hasPDF) && !article.custom_pdf,
+      generateGraph:
+        (articleDiffed || !hasThumbnail) && !article.picture && !article.yt,
       // Always attempt Zenodo sync for articles that want a DOI — the upsert
       // routine itself short-circuits when a matching record already exists
       // on Zenodo, so this is safe and ensures new/changed articles aren't

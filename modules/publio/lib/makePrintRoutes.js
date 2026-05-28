@@ -1,40 +1,27 @@
 import { formatAuthors } from '../utils/transforms'
 
 export default (articles, options) => {
-  const interesting = (articles || []).filter(
-    (a) => a?.todo?.generatePDF || a?.todo?.generateGraph
-  )
-  console.error(
-    '[publio-diag] makePrintRoutes input count=' +
-      (articles?.length || 0) +
-      ' interesting=' +
-      interesting.length
-  )
-  for (const a of interesting) {
-    console.error(
-      '[publio-diag] makePrintRoutes interesting slug=' + JSON.stringify(a.slug),
-      'generatePDF=' + !!a?.todo?.generatePDF,
-      'generateGraph=' + !!a?.todo?.generateGraph,
-      'custom_pdf=' + JSON.stringify(a.custom_pdf),
-      'picture=' + !!a.picture,
-      'yt=' + !!a.yt
-    )
-  }
   const pdfArticles = articles.filter((article) => {
     return !article.custom_pdf && article?.todo?.generatePDF
   })
-  console.error(
-    '[publio-diag] makePrintRoutes pdfArticles count=' + pdfArticles.length,
-    'slugs=' + JSON.stringify(pdfArticles.map((a) => a.slug))
-  )
   const thumbnailArticles = articles.filter((article) => {
     return !article.picture && !article.yt && article?.todo?.generateGraph
   })
   console.error(
-    '[publio-diag] makePrintRoutes thumbnailArticles count=' +
-      thumbnailArticles.length,
-    'slugs=' + JSON.stringify(thumbnailArticles.map((a) => a.slug))
+    '[publio-diag] makePrintRoutes input=' + (articles?.length || 0),
+    'pdfArticles=' + pdfArticles.length,
+    'thumbnailArticles=' + thumbnailArticles.length
   )
+  for (const a of pdfArticles) {
+    console.error(
+      '[publio-diag] makePrintRoutes -> PDF slug=' + JSON.stringify(a.slug)
+    )
+  }
+  for (const a of thumbnailArticles) {
+    console.error(
+      '[publio-diag] makePrintRoutes -> THUMB slug=' + JSON.stringify(a.slug)
+    )
+  }
   return {
     pdfs: pdfArticles.map((article) => {
       // if the file has been changed

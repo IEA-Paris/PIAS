@@ -125,7 +125,9 @@ export default async (articles, options, queue) => {
           `The PDF related to ${document.slug} does not exist.`
         )
         document.fileBuffer = false
-        document.todo.generatePDF = true
+        if (!document.custom_pdf) {
+          document.todo.generatePDF = true
+        }
       }
       // Compare DOI and Zenodo document id
       const sameIdOrDoi = hasSameIdOrDoi(records, document)
@@ -196,7 +198,9 @@ export default async (articles, options, queue) => {
           }
           document.todo.publishOnZenodo = true
         }
-        document.todo.generatePDF = true
+        if (!document.custom_pdf) {
+          document.todo.generatePDF = true
+        }
 
         console.log('document created', document.DOI)
       } else {
