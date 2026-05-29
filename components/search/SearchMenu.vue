@@ -95,8 +95,20 @@
               </span>
             </div>
 
+            <!-- Preparing the search index (first interaction, cold cache) -->
+            <div v-if="preparing" class="search-preparing mt-8">
+              <v-progress-circular
+                :size="32"
+                width="3"
+                color="primary"
+                indeterminate
+                class="mr-3"
+              ></v-progress-circular>
+              <span class="text-body-1">{{ $t('preparing-search') }}</span>
+            </div>
+
             <!-- Empty state: what is searchable -->
-            <div v-if="isEmpty && !loading" class="search-empty mt-8">
+            <div v-else-if="isEmpty && !loading" class="search-empty mt-8">
               <h2 class="text-h5 mb-2">{{ $t('search-empty-title') }}</h2>
               <p class="text-body-1 grey--text text--lighten-1 mb-6">
                 {{ $t('search-empty-subtitle') }}
@@ -238,7 +250,7 @@
             </v-list>
 
             <v-progress-circular
-              v-if="loading"
+              v-if="loading && !preparing"
               :size="50"
               color="primary"
               indeterminate
@@ -319,6 +331,18 @@ export default {
     },
     shortcutModifier() {
       return this.isApple ? 'Meta' : 'Control'
+    },
+    preparing() {
+      return this.$store.state.preparingSearchIndex
+    },
+  },
+  watch: {
+    // Warm the search index cache the first time the dialog is opened,
+    // whether via the activator button or the Cmd/Ctrl+K shortcut.
+    open(isOpen) {
+      if (isOpen) {
+        this.$store.dispatch('prepareSearchIndex')
+      }
     },
   },
   mounted() {
@@ -496,6 +520,12 @@ $input-font-size: 48px;
     font-size: 1rem;
     color: rgba(255, 255, 255, 0.75);
   }
+}
+
+.search-preparing {
+  display: flex;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 ::v-deep .search-item--active .v-list-item {

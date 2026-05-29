@@ -441,6 +441,7 @@
   "with-activefilters-filters": "sans filtre actif | avec {count} filtre | avec {count} filtres",
   "searching-for-string": "Recherche de \"{0}\"",
   "searching": "Recherche en cours",
+  "preparing-search": "Préparation de la recherche…",
   "show-filters": "Voir les filtres",
   "hide-filters": "Cacher les filtres",
   "by-date-oldest-first": "Plus vieux d'abord",

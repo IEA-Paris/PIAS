@@ -192,7 +192,12 @@
           :filter="filter"
           :type="type"
         ></RegularList>
-        <Loader :active="$store.state.loading" />
+        <Loader
+          :active="$store.state.loading || $store.state.preparingSearchIndex"
+          :message="
+            $store.state.preparingSearchIndex ? $t('preparing-search') : ''
+          "
+        />
         <!-- TODO update for equivalent after removing datatable -->
         <v-container
           class="transition-swing mb-12"
@@ -455,6 +460,9 @@ export default {
       await this.$store.dispatch('update', this.type)
     },
     async onSearchFocus() {
+      // Warm the search index cache (shows "Preparing for the search")
+      // the first time the user reaches for the search field.
+      await this.$store.dispatch('prepareSearchIndex')
       await this.loadDatabase()
     },
     async onFilterToggle() {

@@ -8,6 +8,11 @@ export const state = () => ({
   logo: 0,
   loading: true,
   resetFilters: false,
+  // Whether the full-text search index has been downloaded into the
+  // client-side cache. Used to show a "Preparing for the search" message
+  // the first time a user reaches for search before the index is ready.
+  searchIndexReady: false,
+  preparingSearchIndex: false,
 })
 
 export const mutations = {
@@ -17,6 +22,12 @@ export const mutations = {
   },
   setLoading(state, value) {
     set(state, 'loading', value)
+  },
+  setSearchIndexReady(state, value) {
+    set(state, 'searchIndexReady', value)
+  },
+  setPreparingSearchIndex(state, value) {
+    set(state, 'preparingSearchIndex', value)
   },
   setScrolled(state) {
     if (process.browser) {
@@ -205,6 +216,24 @@ export const actions = {
     commit('setPage', { page: 1, type })
     commit('setSearch', { search, type })
     await dispatch('update', type)
+  },
+  // Warm the client-side search index cache the first time a user reaches
+  // for search (focusing a list search field, or opening the search menu).
+  // Fetching once with an empty projection forces @nuxt/content to download
+  // and cache the database so later queries resolve instantly.
+  async prepareSearchIndex({ commit, state }) {
+    if (state.searchIndexReady || state.preparingSearchIndex) return
+    commit('setPreparingSearchIndex', true)
+    try {
+      await Promise.all([
+        this.$content('articles', { deep: true }).only('[]').fetch(),
+        this.$content('media', { deep: true }).only('[]').fetch(),
+        this.$content('authors', { deep: true }).only('[]').fetch(),
+      ])
+      commit('setSearchIndexReady', true)
+    } finally {
+      commit('setPreparingSearchIndex', false)
+    }
   },
   async update({ dispatch, commit, state, getters, rootState }, type) {
     commit('setLoading', true)

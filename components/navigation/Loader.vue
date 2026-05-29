@@ -125,6 +125,9 @@
             </g>
           </g>
         </svg>
+        <div v-if="message" class="loader-message" role="status">
+          {{ message }}
+        </div>
       </div>
     </transition>
   </v-overlay>
@@ -135,6 +138,10 @@ export default {
     active: {
       type: Boolean,
       default: false,
+    },
+    message: {
+      type: String,
+      default: '',
     },
   },
   methods: {
@@ -184,8 +191,27 @@ $animation-easing: ease;
   width: 280px;
   height: 280px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+}
+
+.loader-message {
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  color: rgba(0, 0, 0, 0.7);
+  text-align: center;
+  animation: loader-message-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes loader-message-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 .loader-logo {

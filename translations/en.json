@@ -468,6 +468,7 @@
   "with-activefilters-filters": "with no filters | with {count} filter | with {count} filters",
   "searching-for-string": "Searching for \"{0}\"",
   "searching": "Searching",
+  "preparing-search": "Preparing for the search…",
   "show-filters": "Show filters",
   "hide-filters": "Hide filters",
   "by-date-oldest-first": "Oldest",
