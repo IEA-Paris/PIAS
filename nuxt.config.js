@@ -59,9 +59,18 @@ export default {
     dir: 'dist',
     fallback: true,
     crawler: false,
-    // default concurrency is 500 afaik. Considering the RAM cost of each, it would require way too much memory.
-    // TODO check and time different values to come up with the best compromise between required memory (in free tier) and execution time
-    concurrency: 50,
+    // Render batch size for `nuxt generate` (routes rendered per Promise.all
+    // wave in the generator). Nuxt's default is 500; that's far too much for
+    // the small CI runner (2 vCPU / ~7GB) — page render is CPU-bound, so a
+    // batch much larger than the core count doesn't render faster, it just
+    // holds that many component trees + payloads in heap at once.
+    //
+    // Measured (CPU pinned to 2 cores, OFFLINE, 903 routes): render wall-time
+    // was identical at 8/16/50 (~484s) while peak RSS fell from 5261MB@50 to
+    // 4941MB@8 — i.e. lowering the batch reclaims headroom on the ~7GB runner
+    // for free. Default to 8; override via GENERATE_CONCURRENCY to tune
+    // without editing config.
+    concurrency: Number(process.env.GENERATE_CONCURRENCY) || 8,
     // interval: 6000,
     // Explicit declaration of the routes is necessary since
     // Nuxt crawler can't follow all the print routes (besides it doesn't follow vuetify pagination component links).
