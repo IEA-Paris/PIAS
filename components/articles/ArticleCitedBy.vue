@@ -23,9 +23,15 @@
               <v-icon small>mdi-arrow-bottom-left-thick</v-icon>
             </v-list-item-icon>
             <v-list-item-content>
-              <v-list-item-title class="text-body-2">
-                {{ entry.doi }}
+              <v-list-item-title class="text-body-2 text-wrap">
+                {{ entry.title || entry.doi }}
+                <span v-if="entry.year" class="text--secondary">
+                  ({{ entry.year }})
+                </span>
               </v-list-item-title>
+              <v-list-item-subtitle v-if="entry.title" class="text-caption">
+                {{ entry.doi }}
+              </v-list-item-subtitle>
             </v-list-item-content>
             <v-list-item-action>
               <v-icon small>mdi-open-in-new</v-icon>
@@ -52,9 +58,15 @@
               <v-icon small>mdi-arrow-top-right-thick</v-icon>
             </v-list-item-icon>
             <v-list-item-content>
-              <v-list-item-title class="text-body-2">
-                {{ entry.doi }}
+              <v-list-item-title class="text-body-2 text-wrap">
+                {{ entry.title || entry.doi }}
+                <span v-if="entry.year" class="text--secondary">
+                  ({{ entry.year }})
+                </span>
               </v-list-item-title>
+              <v-list-item-subtitle v-if="entry.title" class="text-caption">
+                {{ entry.doi }}
+              </v-list-item-subtitle>
             </v-list-item-content>
             <v-list-item-action>
               <v-icon small>mdi-open-in-new</v-icon>

@@ -42,7 +42,7 @@ import pruneContentDatabase from './lib/pruneContentDatabase'
 import disseminate from './lib/article/disseminate'
 import upsertOnZenodo from './lib/article/disseminate/upsertOnZenodo'
 import publishOnZenodo from './lib/article/disseminate/publishOnZenodo'
-import fetchOpenCitations from './lib/article/disseminate/fetchOpenCitations'
+import fetchCitationLinks from './lib/article/disseminate/fetchCitationLinks'
 
 // Others
 import isOffline from './utils/isOffline'
@@ -215,9 +215,10 @@ export default function (moduleOptions) {
 
         updateArticlesDoiAndZid(articles)
 
-        // DOIs are now final — query OpenCitations to populate `article.citedBy`
+        // DOIs are now final — resolve the citation graph (OpenAIRE
+        // ScholExplorer + OpenCitations) to populate `article.citedBy`
         // (works citing / cited by each article) for the "Cited by" panel.
-        articles = await fetchOpenCitations(articles, options)
+        articles = await fetchCitationLinks(articles, options)
       }
     }
     return true
