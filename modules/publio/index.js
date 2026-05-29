@@ -163,6 +163,34 @@ export default function (moduleOptions) {
 
     if (!once) return
 
+    // `nuxt generate` (static target) runs content:ready TWICE — once in the
+    // build Nuxt instance (`ensureBuild`: options.server === false /
+    // options._build === true) and again in the render instance
+    // (`generate$1`: options.server === true). Each is a separate Nuxt
+    // instance with its own copy of this module, so they don't share state.
+    //
+    // The full pipeline below (diagnose, author merge, relational data,
+    // citations, Zenodo/DOI, print routes) only feeds page RENDER and the
+    // generate:done hook — neither of which exists in the build instance.
+    // Running it there is wasted CPU, and in production it duplicates every
+    // Zenodo upsert / DOI mint (real network side effects).
+    //
+    // The ONE thing the build instance genuinely needs is generated/
+    // filters.js: nuxt.config.js and several components import it, so it
+    // must be present and current when webpack compiles (which happens
+    // right after this hook, in the same build instance). makeFiltersData()
+    // both computes the filter data and writes that file. So in the build
+    // instance we produce filters.js and stop; the render instance runs the
+    // complete pipeline.
+    if (nuxt.options._build === true || nuxt.options.server === false) {
+      const issuesForFilters = await content('issues', { deep: true }).fetch()
+      options.filters = makeFiltersData(articles || [], issuesForFilters)
+      console.log(
+        'BUILD instance: generated/filters.js written; skipping render-only content pipeline'
+      )
+      return true
+    }
+
     articles = await diagnoseArticles(articles, url)
     console.log('articles content ready: ', articles?.length || 0)
 
