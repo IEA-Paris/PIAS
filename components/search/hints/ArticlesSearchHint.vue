@@ -5,11 +5,13 @@
         {{ outline ? 'mdi-help-circle-outline' : 'mdi-help-circle' }}</v-icon
       >
     </template>
-    <span>{{
-      $t(
-        'the-article-search-is-based-on-their-text-title-and-authors-and-nbsp-lastname-or-institutions'
-      )
-    }}</span>
+    <span
+      v-html="
+        $t(
+          'the-article-search-is-based-on-their-text-title-and-authors-and-nbsp-lastname-or-institutions'
+        )
+      "
+    ></span>
   </v-tooltip>
 </template>
 <script>

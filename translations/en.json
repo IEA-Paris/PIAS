@@ -565,5 +565,14 @@
     "close-dialog": "Close dialog",
     "open-search": "Open search",
     "close-search": "Close search"
-  }
+  },
+  "search-placeholder": "Search articles, media and authors…",
+  "search-empty-title": "What are you looking for?",
+  "search-empty-subtitle": "Start typing to search across the whole publication.",
+  "search-no-results": "No results for “{0}”",
+  "search-no-results-hint": "Try a different keyword, an author name or a title.",
+  "search-hint-navigate": "to navigate",
+  "search-hint-open": "to open",
+  "search-hint-close": "to close",
+  "search-shortcut-hint": "to search"
 }

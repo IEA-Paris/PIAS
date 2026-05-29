@@ -23,6 +23,9 @@
       <template #caption>
         <span v-html="highlightWord(item.caption)"></span
       ></template>
+      <template #author>
+        <ArticleAuthorsString v-if="item.authors" :authors="item.authors" />
+      </template>
       <template #date>
         <div class="d-flex mx-1">
           {{

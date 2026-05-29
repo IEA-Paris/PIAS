@@ -323,6 +323,28 @@ export const actions = {
       .only(lists[type].listKeys)
       .fetch()
 
+    // Media documents don't carry an authors field; pull it from the
+    // parent article (matched by article_slug) so cards can display it.
+    if (type === 'media') {
+      const slugs = [
+        ...new Set(items.map((item) => item.article_slug).filter(Boolean)),
+      ]
+      if (slugs.length) {
+        const parents = await this.$content('articles', { deep: true })
+          .where({ slug: { $in: slugs } })
+          .only(['slug', 'authors'])
+          .fetch()
+        const authorsBySlug = Object.fromEntries(
+          parents.map((article) => [article.slug, article.authors])
+        )
+        items.forEach((item) => {
+          if (!item.authors && authorsBySlug[item.article_slug]) {
+            item.authors = authorsBySlug[item.article_slug]
+          }
+        })
+      }
+    }
+
     const defaultView =
       lists[type].views[
         Object.keys(lists[type].views).find(

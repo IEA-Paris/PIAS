@@ -113,7 +113,7 @@
           <ArticleAuthorsString
             v-if="item.authors"
             :authors="item.authors"
-            class="article-authors"
+            class="article-authors text-subtitle-1"
           />
         </div>
         <template v-if="excerpt">
@@ -185,7 +185,8 @@ export default {
   margin-bottom: 0.4rem;
 }
 .article-authors {
-  font-size: 0.8rem !important;
+  font-weight: 600;
+  line-height: 1.25;
   display: -webkit-box;
   width: 220px;
   -webkit-line-clamp: 3;

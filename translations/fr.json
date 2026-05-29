@@ -538,5 +538,14 @@
     "close-dialog": "Fermer la boîte de dialogue",
     "open-search": "Ouvrir la recherche",
     "close-search": "Fermer la recherche"
-  }
+  },
+  "search-placeholder": "Rechercher des articles, médias et auteurs…",
+  "search-empty-title": "Que recherchez-vous ?",
+  "search-empty-subtitle": "Commencez à taper pour chercher dans toute la publication.",
+  "search-no-results": "Aucun résultat pour « {0} »",
+  "search-no-results-hint": "Essayez un autre mot-clé, un nom d’auteur ou un titre.",
+  "search-hint-navigate": "pour naviguer",
+  "search-hint-open": "pour ouvrir",
+  "search-hint-close": "pour fermer",
+  "search-shortcut-hint": "pour rechercher"
 }
