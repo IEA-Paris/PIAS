@@ -65,10 +65,10 @@ const insertBibliographicalReferences = (node, biblio) => {
       // do we have references to replace?
       if (matches !== null) {
         const element = matches[0]
-        // find the related reference
-        const ref = biblio.find(
-          (item) => item.id === element.toLowerCase().substring(1)
-        )
+        // find the related reference (case-insensitive: citation-js preserves the
+        // original key case in item.id, but cited keys may differ in case)
+        const citedKey = element.substring(1).toLowerCase()
+        const ref = biblio.find((item) => item.id.toLowerCase() === citedKey)
         if (!ref) {
           // TODO write it in a file somewhere to use it in CMS
           console.log('REFERENCE NOT FOUND IN BIB FILE: ', element)

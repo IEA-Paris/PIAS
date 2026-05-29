@@ -24,7 +24,7 @@
         v-if="svgMarkup"
         ref="fingerprint"
         class="fingerprint-animated"
-        :class="{ 'is-hovered': hovered }"
+        :class="{ 'is-hovered': hovered, 'is-entered': entered }"
         v-html="svgMarkup"
       ></div>
       <!-- eslint-enable vue/no-v-html -->
@@ -51,20 +51,27 @@ export default {
       type: [String, Number],
       default: '200px',
     },
+    index: {
+      type: Number,
+      default: 0,
+    },
   },
   data() {
     return {
       svgMarkup: '',
       hovered: false,
       hoverTarget: null,
+      entered: false,
+      enterTimer: null,
     }
   },
-  computed: {},
   mounted() {
     this.loadSvg()
     this.bindHover()
+    this.scheduleEntry()
   },
   beforeDestroy() {
+    if (this.enterTimer) clearTimeout(this.enterTimer)
     if (this.hoverTarget) {
       this.hoverTarget.removeEventListener('mouseenter', this.onEnter)
       this.hoverTarget.removeEventListener('mouseleave', this.onLeave)
@@ -79,6 +86,17 @@ export default {
       this.hoverTarget = target
       target.addEventListener('mouseenter', this.onEnter)
       target.addEventListener('mouseleave', this.onLeave)
+    },
+    // Stagger the load animation down the list: each item reveals 200ms after
+    // the one above it. We gate the animation on a JS-added `is-entered` class
+    // rather than a CSS `animation-delay`, because each SVG is injected
+    // whenever its own fetch resolves — a per-element CSS delay would count
+    // from that scattered injection moment and the cascade wouldn't be
+    // perceptible. The timer counts from a shared mount instead.
+    scheduleEntry() {
+      this.enterTimer = setTimeout(() => {
+        this.entered = true
+      }, this.index * 200)
     },
     onEnter() {
       this.hovered = true
@@ -194,33 +212,53 @@ export default {
    Each spoke draws itself in once, then its outer node pops into place. The
    nth-of-type stagger sweeps the assembly around the dial. After that the
    fingerprint rests — no perpetual pulsing in the idle grid. */
+/* The list-index stagger (200ms × index) is driven from JS: the wrapper gains
+   `.is-entered` after a per-item timeout, and only then do the load animations
+   run. Before that the elements sit in their pre-animation state (spokes
+   undrawn, nodes/ring hidden) so nothing flashes into its final form early. */
 .fingerprint-animated ::v-deep .type-element line {
   stroke-dasharray: 90;
   stroke-dashoffset: 90;
-  animation: fp-draw 1.4s ease-out forwards;
 }
 
 .fingerprint-animated ::v-deep .type-element circle:last-of-type {
   transform-box: fill-box;
   transform-origin: center;
   opacity: 0;
+}
+
+.fingerprint-animated ::v-deep > svg > g > circle:first-child {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+}
+
+.fingerprint-animated.is-entered ::v-deep .type-element line {
+  animation: fp-draw 1.4s ease-out forwards;
+}
+
+.fingerprint-animated.is-entered ::v-deep .type-element circle:last-of-type {
   animation: fp-pop 0.6s ease-out forwards;
 }
 
 /* The central base ring fades up underneath everything as the dial assembles. */
-.fingerprint-animated ::v-deep > svg > g > circle:first-child {
-  transform-box: fill-box;
-  transform-origin: center;
+.fingerprint-animated.is-entered ::v-deep > svg > g > circle:first-child {
+  opacity: 1;
   animation: fp-ring-in 1.2s ease-out;
 }
 
 /* Stagger the reveal across the first chunk of spokes for an assembling sweep.
-   Beyond ~24 spokes everything is already in motion, so a flat delay is fine. */
+   Beyond ~24 spokes everything is already in motion, so a flat delay is fine.
+   The list-index offset is handled in JS (the `.is-entered` gate), so these
+   are just the within-fingerprint spoke staggers. */
 @for $i from 1 through 24 {
-  .fingerprint-animated ::v-deep .type-element:nth-of-type(#{$i}) line {
+  .fingerprint-animated.is-entered
+    ::v-deep
+    .type-element:nth-of-type(#{$i})
+    line {
     animation-delay: #{$i * 0.04}s;
   }
-  .fingerprint-animated
+  .fingerprint-animated.is-entered
     ::v-deep
     .type-element:nth-of-type(#{$i})
     circle:last-of-type {
@@ -339,6 +377,9 @@ export default {
     stroke-dashoffset: 0;
   }
   .fingerprint-animated ::v-deep .type-element circle:last-of-type {
+    opacity: 1;
+  }
+  .fingerprint-animated ::v-deep > svg > g > circle:first-child {
     opacity: 1;
   }
   .fingerprint-animated.is-hovered ::v-deep svg {

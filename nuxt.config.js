@@ -288,6 +288,7 @@ export default {
     /*  { src: '~/plugin/apollo-config', mode: 'client' }, */
     { src: '~/plugin/vue-youtube', mode: 'client' },
     '~/plugin/jsonld',
+    { src: '~/plugin/citation-style.client', mode: 'client' },
     /*    { src: '~/plugin/vuex-persist', ssr: false }, */
   ],
 

@@ -1,6 +1,13 @@
 <template>
   <ArticleContainer :item="item[0]">
     <div v-intersect="onIntersect"></div>
+    <!-- COinS / Z3988 OpenURL ContextObject: invisible, machine-readable
+         citation that Zotero/Mendeley browser connectors auto-detect. -->
+    <span
+      v-if="item[0] && item[0].coins"
+      class="Z3988"
+      :title="item[0].coins"
+    ></span>
     <v-expansion-panels v-model="panels" flat tile accordion hover multiple>
       <v-expansion-panel>
         <v-divider></v-divider>
@@ -29,6 +36,19 @@
             :item="item[0]"
             :title="show"
           ></Article>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+      <!-- "Cited by" / references — only when OpenCitations returned matches. -->
+      <v-expansion-panel v-if="hasCitedBy">
+        <v-divider></v-divider>
+        <v-expansion-panel-header color="rgb(249, 249, 249)">
+          <div class="article_cat">
+            {{ $t('cited-by') }}
+          </div>
+        </v-expansion-panel-header>
+        <v-divider></v-divider>
+        <v-expansion-panel-content>
+          <ArticleCitedBy :item="item[0]"></ArticleCitedBy>
         </v-expansion-panel-content>
       </v-expansion-panel>
     </v-expansion-panels>
@@ -275,7 +295,9 @@ export default {
           ? [
               {
                 name: 'citation_keywords',
-                content: article?.keywords,
+                content: Array.isArray(article.keywords)
+                  ? article.keywords.join('; ')
+                  : article.keywords,
               },
             ]
           : []),
@@ -289,7 +311,7 @@ export default {
         },
         {
           name: 'citation_journal_abbrev',
-          content: this.$config.short_name,
+          content: this.$config.name,
         },
         {
           name: 'citation_journal_title',
@@ -315,7 +337,9 @@ export default {
           ? [
               {
                 name: 'citation_journal_keywords',
-                content: article?.keywords,
+                content: Array.isArray(article.keywords)
+                  ? article.keywords.join('; ')
+                  : article.keywords,
               },
             ]
           : []),
@@ -334,14 +358,6 @@ export default {
               },
             ]
           : []), */
-        {
-          name: 'citation_journal_abbrev',
-          content: this.$config.short_name,
-        },
-        {
-          name: 'citation_journal_title',
-          content: this.$config.full_name,
-        },
       ],
       script: [
         {
@@ -393,7 +409,12 @@ export default {
     }
     return head
   },
-  computed: {},
+  computed: {
+    hasCitedBy() {
+      const citedBy = this.item[0]?.citedBy
+      return !!(citedBy && (citedBy.citing?.length || citedBy.cited?.length))
+    },
+  },
   watch: {
     showNote(newVal) {
       if (newVal) {

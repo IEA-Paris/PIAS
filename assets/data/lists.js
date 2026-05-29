@@ -20,7 +20,7 @@ export default {
       'yt',
       'countMap',
     ],
-    styles: ['APA' /* 'vancouver' , */, 'harvard1'],
+    styles: ['APA', 'vancouver', 'harvard1'],
     perPage: {
       options: [9, 12, 16],
       default: 9,

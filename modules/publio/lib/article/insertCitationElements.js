@@ -4,10 +4,29 @@ const fs = require('fs')
 export default (article, media, authors, issues, options) => {
   try {
     // TODO add more output plugins
-    const styles = ['apa', 'vanvouver', 'harvard1'] // TODO import from config
+    // citation-js built-in CSL templates. Note: the name must match exactly —
+    // a misspelled template silently falls back to the default (APA-like)
+    // output, which is why "vanvouver" used to render identically to APA.
+    const styles = ['apa', 'vancouver', 'harvard1'] // TODO import from config
+
+    // Locales to pre-render citations for. citation-js's `lang` controls date
+    // formatting and connector words ("and" → "et"). We render every site
+    // locale at build time so the client can pick the active one with no
+    // runtime citation engine. The default locale is also stored under the
+    // flat `toCite` map for backward compatibility with existing consumers.
+    const defaultLang =
+      options.config.lang.locales.find(
+        (l) => l.code === options.config.lang.default
+      )?.iso || 'en-US'
+    const langs = [
+      ...new Set([
+        defaultLang,
+        ...options.config.lang.locales.map((l) => l.iso),
+      ]),
+    ]
 
     // TODO fix the issue with numbered lists in hardvard1 & co
-    const date = new Date(article.date).toLocaleDateString('EN', {
+    const date = new Date(article.date).toLocaleDateString(defaultLang, {
       timezone: 'UTC',
     })
 
@@ -122,16 +141,31 @@ export default (article, media, authors, issues, options) => {
       ],
     }
 
-    article.toCite = styles
-      .map((style) => {
-        const obj = new Citation(docData).format('bibliography', {
-          format: 'html',
-          template: style,
-          lang: 'en-US',
+    const renderStyles = (lang) =>
+      styles
+        .map((style) => {
+          const obj = new Citation(docData).format('bibliography', {
+            format: 'html',
+            template: style,
+            lang,
+          })
+          return { [style]: obj }
         })
-        return { [style]: obj }
-      })
+        .reduce((rst, tick) => Object.assign(rst, tick), {})
+
+    // Per-locale rendered citations, e.g. toCiteIntl['fr-FR']['apa'].
+    article.toCiteIntl = langs
+      .map((lang) => ({ [lang]: renderStyles(lang) }))
       .reduce((rst, tick) => Object.assign(rst, tick), {})
+
+    // Flat default-locale map kept for backward compatibility (CiteModal,
+    // ArticleCiteWidget, the bibliography hash lookup in _slug.vue).
+    article.toCite = article.toCiteIntl[defaultLang]
+
+    // Expose the normalised CSL-like metadata so downstream transformers
+    // (e.g. generateBibliographyFilesForExport) can build export formats
+    // without re-deriving it.
+    article.docData = docData
 
     return [article, media, authors, issues, options]
   } catch (error) {

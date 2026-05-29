@@ -116,6 +116,10 @@
             style="max-width: 650px; width: 100%"
             class="page a4"
           />
+          <QuoteSelection
+            v-if="!title && !$route.name.startsWith('print')"
+            :item="item"
+          />
           <div
             v-if="item.bibliography && item.bibliography.length"
             class="bibliography-panel"
@@ -137,11 +141,11 @@
             ></ArticleFootnotes>
           </template>
           {{
-            new Date(item.date).toLocaleDateString('en-US', {
+            new Date(item.date).toLocaleDateString('en-GB', {
               // you can use undefined as first argument
               year: 'numeric',
-              month: 'numeric',
-              day: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
             })
           }}
         </v-card-text>

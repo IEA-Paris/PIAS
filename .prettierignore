@@ -1,0 +1,17 @@
+# Content markdown is Pandoc/remark-bibliography flavoured: it contains
+# citation keys like `@unescoLiteracy_ref_0000`. Prettier's markdown parser
+# treats those underscores as emphasis delimiters and rewrites them (turning
+# `_ref_` into `*ref` / `\_ref`), which silently breaks citation resolution.
+# Never let Prettier reformat authored/imported content.
+content/**/*.md
+submodules/*/content/**/*.md
+
+# Generated/exported bibliography & metadata files are not ours to reformat.
+**/*.bib
+static/**
+submodules/*/static/**
+generated/**
+submodules/*/generated/**
+
+# Editor history snapshots
+.history/**

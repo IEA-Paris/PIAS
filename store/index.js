@@ -157,6 +157,15 @@ export const mutations = {
   },
   setStyle(state, style) {
     set(state.articles, 'style', style)
+    // Persist the reader's preferred citation style so it sticks across
+    // articles and sessions (hydrated on load by plugin/citation-style.client.js).
+    if (process.client) {
+      try {
+        localStorage.setItem('articles.style', style)
+      } catch (e) {
+        // localStorage may be unavailable (private mode / blocked); ignore.
+      }
+    }
   },
 }
 

@@ -64,7 +64,13 @@
             </div>
           </template>
         </PictureItem>
-        <ArticleThumbnail v-else :item="item" :size="300" :margin="20">
+        <ArticleThumbnail
+          v-else
+          :item="item"
+          :index="index"
+          :size="300"
+          :margin="20"
+        >
           <!--         <template #categories>
             <ArticleCategories :item="item" />
           </template> -->

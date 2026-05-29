@@ -42,6 +42,7 @@ import pruneContentDatabase from './lib/pruneContentDatabase'
 import disseminate from './lib/article/disseminate'
 import upsertOnZenodo from './lib/article/disseminate/upsertOnZenodo'
 import publishOnZenodo from './lib/article/disseminate/publishOnZenodo'
+import fetchOpenCitations from './lib/article/disseminate/fetchOpenCitations'
 
 // Others
 import isOffline from './utils/isOffline'
@@ -186,7 +187,10 @@ export default function (moduleOptions) {
       issues,
       options,
       // transformers
-      [generateBibliographyFilesForExport, insertCitationElements]
+      // insertCitationElements must run first: it attaches `article.docData`,
+      // which generateBibliographyFilesForExport consumes to build the
+      // downloadable export payloads (BibTeX, TEI, DataCite, …).
+      [insertCitationElements, generateBibliographyFilesForExport]
     )
     console.log(
       'to process : ',
@@ -210,6 +214,10 @@ export default function (moduleOptions) {
         console.log('articles to upserted on zenodo: ', articles.length)
 
         updateArticlesDoiAndZid(articles)
+
+        // DOIs are now final — query OpenCitations to populate `article.citedBy`
+        // (works citing / cited by each article) for the "Cited by" panel.
+        articles = await fetchOpenCitations(articles, options)
       }
     }
     return true

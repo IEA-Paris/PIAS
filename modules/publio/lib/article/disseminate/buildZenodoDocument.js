@@ -1,5 +1,44 @@
 import Citation from 'citation-js'
 import { cleanupString } from '../../../utils/contentUtilities'
+
+// Map a config contributor (which describes its role in free text) onto
+// Zenodo's controlled contributor-type vocabulary.
+// cf https://developers.zenodo.org/#representation
+const CONTRIBUTOR_TYPES = [
+  'ContactPerson',
+  'DataCollector',
+  'DataCurator',
+  'DataManager',
+  'Distributor',
+  'Editor',
+  'HostingInstitution',
+  'Producer',
+  'ProjectLeader',
+  'ProjectManager',
+  'ProjectMember',
+  'RegistrationAgency',
+  'RegistrationAuthority',
+  'RelatedPerson',
+  'Researcher',
+  'ResearchGroup',
+  'RightsHolder',
+  'Sponsor',
+  'Supervisor',
+  'WorkPackageLeader',
+  'Other',
+]
+const mapContributorType = (item) => {
+  // Normalise the config role (e.g. "Hosting institution") to a Zenodo type
+  // (e.g. "HostingInstitution") by stripping whitespace/casing.
+  const normalised = (item.role || item.type || '')
+    .replace(/[\s_-]/g, '')
+    .toLowerCase()
+  return (
+    CONTRIBUTOR_TYPES.find((type) => type.toLowerCase() === normalised) ||
+    'HostingInstitution'
+  )
+}
+
 export default (document, options) => {
   const fs = require('fs')
   const references = document.biblioFile
@@ -80,6 +119,35 @@ export default (document, options) => {
     journal_title: cleanupString(options.config.full_name),
     ...(document.issueIndex && { journal_volume: document.issueIndex }),
     publication_date: new Date(document.date).toISOString().substring(0, 10),
+    // Zenodo has no dedicated ISSN field; the journal's ISSN is declared as
+    // a related identifier (the article isPartOf the journal serial).
+    // cf https://developers.zenodo.org/#representation
+    ...(options.config.identifier?.ISSN && {
+      related_identifiers: [
+        {
+          relation: 'isPartOf',
+          scheme: 'issn',
+          identifier: options.config.identifier.ISSN,
+        },
+      ],
+    }),
+    // Recommended info: publisher of the proceedings (from config).
+    ...(options.config.publisher && {
+      imprint_publisher: options.config.publisher,
+    }),
+    // Recommended info: contributors declared in config (e.g. hosting
+    // institution). Map the config `role`/`type` onto Zenodo's controlled
+    // contributor-type vocabulary, defaulting to HostingInstitution.
+    ...(options.config.contributors?.length && {
+      contributors: options.config.contributors.map((item) => ({
+        name: item.name,
+        type: mapContributorType(item),
+      })),
+    }),
+    // The publication date from the markdown front-matter is carried by
+    // `publication_date` above. We intentionally do NOT emit a `dates` entry:
+    // Zenodo's legacy deposit API silently drops the start/end of a single
+    // point interval, leaving a meaningless `{ type: 'valid' }` on the record.
     // TODO
     // - same issue articles,
     // - cites relation (when a DOI is provided in the citation)
@@ -88,16 +156,19 @@ export default (document, options) => {
 
     title: document.article_title,
     creators: document.authors.map((item) => {
-      // TODO include all title & institution info
+      // Zenodo's `affiliation` is a single string, so concatenate every
+      // institution declared in the author's frontmatter (deduplicated,
+      // trimmed) rather than keeping only the first one.
+      const affiliation = (item.positions_and_institutions || [])
+        .map((p) => p?.institution?.trim())
+        .filter(Boolean)
+        .filter((inst, index, all) => all.indexOf(inst) === index)
+        .join('; ')
       return {
         name:
           item.lastname.trim() +
           (item.is_institution ? '' : ', ' + item.firstname?.trim()),
-        ...(item.positions_and_institutions &&
-          item.positions_and_institutions[0] &&
-          item.positions_and_institutions[0].institution && {
-            affiliation: item.positions_and_institutions[0].institution,
-          }),
+        ...(affiliation && { affiliation }),
         ...(item?.orcid && { orcid: item.orcid }),
       }
     }),

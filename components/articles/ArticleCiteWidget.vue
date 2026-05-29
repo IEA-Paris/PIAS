@@ -5,13 +5,13 @@
         <CiteModal
           v-if="!$route.name.startsWith('print')"
           :item="item"
-          text
+          icon-only
         ></CiteModal>
       </v-col>
       <v-col class="">
         <span
           class="cite-text text-caption pr-3 d-inline"
-          v-html="toCite[style === 'APA' ? 'apa' : style]"
+          v-html="localizedCite[styleKey]"
         ></span>
       </v-col>
       <v-col cols="auto" class="">
@@ -36,6 +36,7 @@
   </v-card>
 </template>
 <script>
+import { writeClipboard, htmlToPlainText } from '~/assets/utils/clipboard'
 export default {
   props: {
     toCite: {
@@ -55,20 +56,24 @@ export default {
     style() {
       return this.$store.state.articles.style
     },
+    // The store style ("APA") maps to the lowercase CSL template key ("apa").
+    styleKey() {
+      return this.style === 'APA' ? 'apa' : this.style
+    },
+    // Active i18n locale's rendered citations, falling back to the
+    // default-locale `toCite` map.
+    localizedCite() {
+      const iso = this.$i18n?.localeProperties?.iso
+      return (iso && this.item?.toCiteIntl?.[iso]) || this.toCite || {}
+    },
   },
 
   mounted() {},
   methods: {
     async copyToClipBoard() {
-      try {
-        await navigator.clipboard.writeText(
-          this.toCite[this.style === 'APA' ? 'apa' : this.style]
-            .replace(/(<([^>]+)>)/gi, '')
-            .replace('&#38;', '&')
-        )
-      } catch (error) {
-        console.log('error: ', error)
-      }
+      const text = htmlToPlainText(this.localizedCite[this.styleKey])
+      if (!text) return
+      await writeClipboard(text)
     },
   },
 }
