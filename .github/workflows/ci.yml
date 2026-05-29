@@ -27,6 +27,13 @@ env:
   ENV: ${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}
   AWS_REGION: 'eu-west-3' # paris
   NODE_OPTIONS: '--max_old_space_size=4096' # fix heap out of memory error (nuxt generate)
+  # `yarn` install used to hang for >15min at "[4/4] Building fresh
+  # packages" because puppeteer@20's postinstall downloads a ~120MB
+  # Chromium and stalls on the CI runner. Skip that download entirely;
+  # both the direct puppeteer use (generateThumbnails.js) and pagedjs-cli
+  # launch via puppeteer, which honours PUPPETEER_EXECUTABLE_PATH — set in
+  # the "Setup Chrome" step below to the runner's installed Chrome.
+  PUPPETEER_SKIP_DOWNLOAD: 'true'
 
 jobs:
   install:
@@ -122,6 +129,21 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
+
+      # Install a known-good Chrome and expose its path so puppeteer (used
+      # directly by generateThumbnails.js and indirectly by pagedjs-cli for
+      # PDFs) launches the system browser instead of a per-install download.
+      # Paired with PUPPETEER_SKIP_DOWNLOAD=true (job env) this removes the
+      # Chromium download that was hanging the install step.
+      - name: 🧭 Setup Chrome for puppeteer/paged.js
+        id: setup-chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+
+      - name: 🧭 Export Chrome path for puppeteer
+        shell: bash
+        run: echo "PUPPETEER_EXECUTABLE_PATH=${{ steps.setup-chrome.outputs.chrome-path }}" >> "$GITHUB_ENV"
 
       - name: 👨🏻‍💻 Install dependencies
         run: yarn
