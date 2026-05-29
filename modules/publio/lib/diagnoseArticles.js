@@ -1,8 +1,13 @@
+import isOffline from '../utils/isOffline'
+
 export default async (articles) => {
   const util = require('node:util')
   const fs = require('fs')
   const path = require('path')
   const exec = util.promisify(require('node:child_process').exec)
+  // In offline dev mode we never generate PDFs/thumbnails/SVGs nor touch
+  // Zenodo, so every per-article `todo` flag is forced off below.
+  const offline = isOffline()
 
   console.log('=== DIAGNOSE ARTICLES DEBUG ===')
   console.log('NODE_ENV:', process.env.NODE_ENV)
@@ -84,15 +89,20 @@ export default async (articles) => {
     // log honest and avoids pretending we'll touch articles we won't.
     article.todo = {
       gitDiffed: articleDiffed,
-      generatePDF: (articleDiffed || !hasPDF) && !article.custom_pdf,
+      generatePDF:
+        !offline && (articleDiffed || !hasPDF) && !article.custom_pdf,
       generateGraph:
-        (articleDiffed || !hasThumbnail) && !article.picture && !article.yt,
+        !offline &&
+        (articleDiffed || !hasThumbnail) &&
+        !article.picture &&
+        !article.yt,
       // Always attempt Zenodo sync for articles that want a DOI — the upsert
       // routine itself short-circuits when a matching record already exists
       // on Zenodo, so this is safe and ensures new/changed articles aren't
       // silently skipped just because their PDF is already present locally.
-      upsertOnZenodo: article.needDOI === true,
-      obtainDOI: article.needDOI && !article.DOI?.length,
+      // (Disabled wholesale in offline dev mode.)
+      upsertOnZenodo: !offline && article.needDOI === true,
+      obtainDOI: !offline && article.needDOI && !article.DOI?.length,
       publishOnZenodo: false,
     }
 

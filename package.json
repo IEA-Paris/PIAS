@@ -18,7 +18,7 @@
     "prepare": " APP_ID=${APP_ID:-PPIAS} &&  yarn clean ",
     "copy": "rm -rf ./static/* && cp -r ./submodules/$npm_package_config_name/config.js ./config.js && cp -r ./submodules/$npm_package_config_name/generated . && cp -r ./submodules/$npm_package_config_name/static . && cp -r ./admin ./static && cp -r ./submodules/$npm_package_config_name/bibliography ./static/ && cp -r ./submodules/$npm_package_config_name/pdfs ./static/ && cp -r ./submodules/$npm_package_config_name/thumbnails ./static/ && cp -r ./submodules/$npm_package_config_name/svg ./static/",
     "configCMS": "node scripts/configCMS.mjs",
-    "dev": "yarn copy && yarn prepare && yarn configCMS && nuxt",
+    "dev": "yarn copy && yarn prepare && yarn configCMS && OFFLINE=true nuxt",
     "build": "NODE_OPTIONS=--max-old-space-size=8192 nuxt build",
     "mock": "yarn copy && yarn prepare  && yarn configCMS && yarn generate && yarn start",
     "start": "nuxt start",

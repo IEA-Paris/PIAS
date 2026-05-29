@@ -44,6 +44,7 @@ import upsertOnZenodo from './lib/article/disseminate/upsertOnZenodo'
 import publishOnZenodo from './lib/article/disseminate/publishOnZenodo'
 
 // Others
+import isOffline from './utils/isOffline'
 import tsvToArticles from './lib/tsvToArticles/tsvToArticles'
 require('events').EventEmitter.prototype._maxListeners = 100
 const chalk = require('chalk')
@@ -125,6 +126,13 @@ export default function (moduleOptions) {
   })
 
   nuxt.hook('build:done', async (nuxt) => {
+    // In offline dev mode (OFFLINE=true, set by `yarn dev`) we skip PDF/
+    // thumbnail/SVG generation and all Zenodo/DOI dissemination so local dev
+    // stays fast and never reaches the network or spawns Puppeteer.
+    if (isOffline()) {
+      console.log('OFFLINE mode: skipping file generation & dissemination')
+      return true
+    }
     // For dev mode only, we start the PDF rendering process to allow debug and preview.
     // Only run the following code in non-production environments
     if (process.env.NODE_ENV !== 'production') {
@@ -193,11 +201,16 @@ export default function (moduleOptions) {
       // make an array of routes to print
       routesToPrint = makePrintRoutes(articles, options)
 
-      // Upsert on Zenodo/OpenAire & get DOI is none is available
-      articles = await upsertOnZenodo(articles, options, zenodoQueue)
-      console.log('articles to upserted on zenodo: ', articles.length)
+      // Upsert on Zenodo/OpenAire & get DOI is none is available.
+      // Skipped entirely in offline dev mode so no Zenodo/DOI request is made.
+      if (isOffline()) {
+        console.log('OFFLINE mode: skipping Zenodo upsert & DOI fetching')
+      } else {
+        articles = await upsertOnZenodo(articles, options, zenodoQueue)
+        console.log('articles to upserted on zenodo: ', articles.length)
 
-      updateArticlesDoiAndZid(articles)
+        updateArticlesDoiAndZid(articles)
+      }
     }
     return true
   })

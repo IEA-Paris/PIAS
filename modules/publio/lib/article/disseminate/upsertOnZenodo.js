@@ -1,7 +1,13 @@
 import { generateChecksum, deepEqual } from '../../../utils/contentUtilities'
+import isOffline from '../../../utils/isOffline'
 import buildZenodoDocument from './buildZenodoDocument'
 /// See main fn rationale below the subfunctions
 export default async (articles, options, queue) => {
+  // Never reach Zenodo (record listing, upserts, DOI minting) in offline dev mode.
+  if (isOffline()) {
+    console.log('OFFLINE mode: skipping upsertOnZenodo')
+    return articles
+  }
   try {
     const fs = require('fs')
     const path = require('path')
