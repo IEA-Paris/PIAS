@@ -1,6 +1,13 @@
 import { formatAuthors } from '../utils/transforms'
 
 export default (articles, options) => {
+  // PDF Creator metadata: who/what produced the file. Built from config so it
+  // names the maintainer, the stack, and the publishing institution.
+  const pdfCreator =
+    'Antoine Cordelois, Paris Institute for Advanced study, using Nuxt, ' +
+    'Publio and Paged.js, for ' +
+    (options.config.publisher || options.config.full_name || '')
+
   const pdfArticles = articles.filter((article) => {
     return !article.custom_pdf && article?.todo?.generatePDF
   })
@@ -14,8 +21,10 @@ export default (articles, options) => {
         // Route to content that should be converted into pdf.
         route: '/print/' + article.slug,
         file: article.slug + '.pdf',
-        // Default option is to remove the route after generation so it is not accessible
-        keep: false, // defaults to false
+        // Default option is to remove the route after generation so it is not
+        // accessible. Set PUBLIO_KEEP_PRINT=1 to keep /print/<slug>/index.html
+        // in dist/ for debugging or for the standalone `yarn pdf` script.
+        keep: process.env.PUBLIO_KEEP_PRINT === '1', // defaults to false
         // Specifify language for pdf. (Only when i18n is enabled!)
         // TODO : make it work with any language
         locale: article.language === 'English' ? 'en' : 'fr',
@@ -25,6 +34,7 @@ export default (articles, options) => {
 
           author: formatAuthors(article.authors).replace('&nbsp;', ' '),
           producer: options.config.name + ' - ' + options.config.full_name,
+          creator: pdfCreator,
 
           // Control the date the file is created.
           creationDate: article.createdAt,

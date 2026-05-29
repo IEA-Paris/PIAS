@@ -1,0 +1,504 @@
+/* =========================================================================
+ * Publio — Paged.js print stylesheet
+ *
+ * Drives the look of generated article PDFs. Loaded by pagedjs-cli via the
+ * Printer `styles` option, so it applies on top of the print page's own
+ * (scoped) styles when paged.js paginates the DOM in headless Chromium.
+ *
+ * Layout model (one PDF page == one .pagedjs_page box):
+ *   - A named `cover` page: full title, authors, DOI, metadata tags, abstract.
+ *   - Body pages (A4) with running header (short title) + footer
+ *     (citation line, page X of Y, ISSN / CC-BY).
+ *   - Real bottom-of-page footnotes via the @footnote margin box.
+ *   - A generated table of contents with dotted leaders + page numbers.
+ *
+ * Everything here is print-only by construction (it is injected only for PDF
+ * generation), so no @media print wrapper is needed.
+ * ========================================================================= */
+
+/* ----------------------------------------------------------------------- *
+ * Design tokens
+ * ----------------------------------------------------------------------- */
+:root {
+  --pdf-serif: 'Bodoni Moda', 'Tinos', 'Times New Roman', Georgia, serif;
+  --pdf-body: 'Tinos', 'Source Serif Pro', Georgia, 'Times New Roman', serif;
+  --pdf-sans: 'Open Sans', 'Helvetica Neue', Arial, sans-serif;
+
+  /* Palette — black/grey/white base with the site's primary blue as accent,
+   * for a clean, professional identity close to the live website. */
+  --pdf-ink: #1a1a1c; /* near-black body text */
+  --pdf-muted: #4a4a52; /* secondary text */
+  --pdf-faint: #6b6b73; /* running header/footer, captions */
+  --pdf-rule: #d4d4da; /* hairlines / borders */
+  --pdf-bg-soft: #f4f5f7; /* blockquote / code background */
+  --pdf-accent: #2196f3; /* primary blue (matches site) */
+  --pdf-accent-dark: #1565c0; /* darker blue for links/text on white */
+
+  --pdf-body-size: 10.5pt;
+  --pdf-body-leading: 1.5;
+}
+
+/* ----------------------------------------------------------------------- *
+ * Page geometry & margin boxes
+ * ----------------------------------------------------------------------- */
+@page {
+  size: A4;
+  /* Bottom margin a touch deeper so a long citation footer (many-author
+   * papers wrap to several lines) has vertical room and doesn't run off-page. */
+  margin: 22mm 20mm 24mm 20mm;
+
+  /* Running footer: shared parts. Per-side page numbers below. */
+  @bottom-left {
+    content: string(footer-citation);
+    font-family: var(--pdf-sans);
+    font-size: 7pt;
+    line-height: 1.3;
+    color: var(--pdf-faint);
+    /* Wider than the default so the citation wraps to fewer lines; the page
+     * number on the right needs only a sliver. */
+    max-width: 86%;
+    vertical-align: top;
+    padding-top: 3mm;
+  }
+  @bottom-right {
+    content: 'p. ' counter(page) ' / ' counter(pages);
+    font-family: var(--pdf-sans);
+    font-size: 8pt;
+    color: var(--pdf-faint);
+    vertical-align: top;
+    padding-top: 3mm;
+  }
+
+  /* Running header: short article title, picked up via string-set. */
+  @top-center {
+    content: string(running-title);
+    font-family: var(--pdf-sans);
+    font-size: 8pt;
+    letter-spacing: 0.04em;
+    color: var(--pdf-faint);
+    vertical-align: bottom;
+    padding-bottom: 4mm;
+  }
+
+  /* Footnote area at the foot of the text block. */
+  @footnote {
+    float: bottom;
+    border-top: 0.5pt solid var(--pdf-rule);
+    margin-top: 4mm;
+    padding-top: 1.5mm;
+  }
+}
+
+/* The cover gets its own bespoke page: no header/footer, tighter margins. */
+@page cover {
+  margin: 18mm 20mm 18mm 20mm;
+  @top-center {
+    content: none;
+  }
+  @bottom-left {
+    content: none;
+  }
+  @bottom-right {
+    content: none;
+  }
+}
+
+/* First body page after the cover shouldn't repeat the running title at the
+ * very top edge if the section heading is already there — keep it, it aids
+ * navigation. (Intentionally no override.) */
+
+/* ----------------------------------------------------------------------- *
+ * Running strings (fed from the DOM)
+ *   .pdf-running-title sets the header; .pdf-footer-citation sets the footer.
+ *   Both live in the page DOM but are visually hidden (consumed by string()).
+ * ----------------------------------------------------------------------- */
+.pdf-running-title {
+  string-set: running-title content(text);
+}
+.pdf-footer-citation {
+  string-set: footer-citation content(text);
+}
+.pdf-string-source {
+  /* Exist only to seed string-set for the running header/footer. Absolutely
+   * positioned inside the cover (which is the positioning context) and given
+   * zero size so they neither generate their own page nor shift the cover. */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  font-size: 0;
+}
+
+/* ----------------------------------------------------------------------- *
+ * Base typography
+ * ----------------------------------------------------------------------- */
+html {
+  font-size: 12pt;
+}
+body {
+  margin: 0;
+  padding: 0;
+  color: var(--pdf-ink);
+  font-family: var(--pdf-body);
+  font-size: var(--pdf-body-size);
+  line-height: var(--pdf-body-leading);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.article-body p {
+  margin: 0 0 0.7em 0;
+  text-align: justify;
+  text-align-last: left; /* don't stretch a paragraph's final line */
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  orphans: 2;
+  widows: 2;
+}
+.article-body p:first-of-type {
+  margin-top: 0;
+}
+
+/* Headings — Bodoni Moda, kept with following content. */
+.article-body h2,
+.article-body h3,
+.article-body h4,
+.pdf-section-title {
+  font-family: var(--pdf-serif);
+  color: var(--pdf-ink);
+  font-weight: 700;
+  break-after: avoid;
+  -webkit-column-break-after: avoid;
+  page-break-after: avoid;
+}
+.article-body h2,
+.pdf-section-title {
+  font-size: 17pt;
+  line-height: 1.15;
+  margin: 1.4em 0 0.5em;
+}
+/* Section dividers (Footnotes, Bibliography) get a branded accent rule. */
+.pdf-section-title {
+  padding-bottom: 1.5mm;
+  border-bottom: 1.5pt solid var(--pdf-accent);
+}
+.article-body h3 {
+  font-size: 13.5pt;
+  line-height: 1.2;
+  margin: 1.2em 0 0.4em;
+}
+.article-body h4 {
+  font-size: 11.5pt;
+  font-weight: 600;
+  margin: 1em 0 0.3em;
+}
+/* Don't let a heading land as the last line on a page. */
+.article-body h2 + *,
+.article-body h3 + *,
+.article-body h4 + * {
+  break-before: avoid;
+}
+
+.article-body a {
+  color: var(--pdf-accent-dark);
+  text-decoration: none;
+  border-bottom: 0.4pt solid var(--pdf-rule);
+}
+
+/* Lists */
+.article-body ul,
+.article-body ol {
+  margin: 0.4em 0 0.8em 0;
+  padding-left: 1.4em;
+}
+.article-body li {
+  margin-bottom: 0.3em;
+  text-align: left;
+}
+
+/* Blockquotes — clean framed pull quote, kept intact across pages. */
+.article-body blockquote {
+  margin: 1em 0;
+  padding: 0.6em 1em;
+  border-left: 2.5pt solid var(--pdf-accent);
+  background: var(--pdf-bg-soft);
+  font-size: 10pt;
+  line-height: 1.45;
+  break-inside: avoid;
+}
+.article-body blockquote p {
+  text-align: left;
+}
+
+/* Figures & images — never overflow the column, keep caption with image. */
+.article-body figure,
+.article-body img,
+.article-body svg {
+  max-width: 100%;
+  height: auto;
+}
+.article-body figure {
+  margin: 1em 0;
+  break-inside: avoid;
+}
+.article-body img {
+  display: block;
+  margin: 0 auto;
+  max-height: 200mm; /* never taller than the text block */
+}
+.article-body figcaption {
+  font-family: var(--pdf-sans);
+  font-size: 8pt;
+  color: var(--pdf-muted);
+  text-align: center;
+  margin-top: 0.4em;
+}
+
+/* Code — wrap rather than overflow. */
+.article-body pre,
+.article-body code {
+  font-family: 'Source Code Pro', 'Courier New', monospace;
+  font-size: 8.5pt;
+}
+.article-body pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  background: var(--pdf-bg-soft);
+  padding: 0.7em 0.9em;
+  border-radius: 2pt;
+  break-inside: avoid;
+}
+
+/* Tables — repeat header rows across page breaks, allow splitting. */
+.article-body table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 9pt;
+  margin: 1em 0;
+}
+.article-body thead {
+  display: table-header-group; /* repeat on each page the table spans */
+}
+.article-body tr {
+  break-inside: avoid;
+}
+.article-body th,
+.article-body td {
+  border: 0.4pt solid var(--pdf-rule);
+  padding: 3pt 5pt;
+  text-align: left;
+  vertical-align: top;
+}
+
+/* ----------------------------------------------------------------------- *
+ * Cover page
+ * ----------------------------------------------------------------------- */
+.pdf-cover {
+  page: cover;
+  break-after: page;
+}
+.pdf-cover-logo {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 10mm;
+}
+.pdf-cover-title {
+  font-family: var(--pdf-serif);
+  font-weight: 700;
+  font-size: 30pt;
+  line-height: 1.08;
+  margin: 0 0 5mm 0;
+  padding-bottom: 5mm;
+  color: var(--pdf-ink);
+  border-bottom: 2pt solid var(--pdf-accent);
+}
+.pdf-cover-authors {
+  font-family: var(--pdf-sans);
+  font-size: 11pt;
+  line-height: 1.5;
+  color: var(--pdf-ink);
+  margin-bottom: 5mm;
+  max-width: 150mm;
+}
+.pdf-cover .doi-badge,
+.pdf-cover-doi {
+  margin: 3mm 0 5mm 0;
+}
+
+/* Metadata blocks (cite, date, fields, keywords, abstract) */
+.pdf-meta-label {
+  font-family: var(--pdf-sans);
+  text-transform: uppercase;
+  font-size: 7.5pt;
+  letter-spacing: 0.18em;
+  color: var(--pdf-muted);
+  margin: 5mm 0 1.5mm 0;
+}
+.pdf-cite,
+.pdf-pubdate {
+  font-size: 9pt;
+  line-height: 1.4;
+  border-left: 3pt solid var(--pdf-accent);
+  padding: 0 0 0 3mm;
+  color: var(--pdf-muted);
+}
+.pdf-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5mm;
+}
+.pdf-tag {
+  font-family: var(--pdf-sans);
+  font-size: 8pt;
+  padding: 0.8mm 2.5mm;
+  border: 0.5pt solid var(--pdf-rule);
+  border-radius: 10pt;
+  color: var(--pdf-muted);
+}
+
+/* Abstract — full length, allowed to flow; if very long it simply pushes the
+ * body to start on the next page (cover always break-after: page).
+ * Label sits flush-left above (like TO CITE / PUBLICATION DATE); only the
+ * abstract text carries the accent rule + indent, matching .pdf-cite/.pdf-pubdate. */
+.pdf-abstract-block {
+  border-left: 3pt solid var(--pdf-accent);
+  padding-left: 3mm;
+}
+.pdf-abstract {
+  font-style: italic;
+  font-size: 10pt;
+  line-height: 1.5;
+  white-space: pre-line; /* keep intentional paragraph breaks in the abstract */
+  /* Left-aligned, not justified: justify + pre-line stretches the (short) line
+   * before every hard break into ugly rivers, and an italic narrow column
+   * reads better ragged-right. */
+  text-align: left;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+
+/* ----------------------------------------------------------------------- *
+ * Table of contents
+ * ----------------------------------------------------------------------- */
+.pdf-toc-block {
+  break-after: page;
+}
+.pdf-toc-title {
+  font-family: var(--pdf-serif);
+  font-weight: 700;
+  font-size: 18pt;
+  margin: 0 0 5mm 0;
+}
+.pdf-toc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-family: var(--pdf-sans);
+  font-size: 10pt;
+}
+.pdf-toc-item {
+  display: flex;
+  align-items: baseline;
+  margin: 1.6mm 0;
+}
+.pdf-toc-h3 {
+  padding-left: 6mm;
+  font-size: 9pt;
+  color: var(--pdf-muted);
+}
+.pdf-toc-item a {
+  text-decoration: none;
+  color: var(--pdf-ink);
+  display: inline-flex;
+  width: 100%;
+  align-items: baseline;
+}
+/* Dotted leader + page number resolved from the target heading.
+ * The flex + repeating-dots fallback renders even where leader() is weak. */
+.pdf-toc-item a::after {
+  content: target-counter(attr(href), page);
+  margin-left: 2mm;
+  font-variant-numeric: tabular-nums;
+  color: var(--pdf-muted);
+}
+.pdf-toc-item .pdf-toc-dots {
+  flex: 1;
+  margin: 0 1.5mm;
+  border-bottom: 0.5pt dotted var(--pdf-rule);
+  transform: translateY(-2pt);
+}
+
+/* ----------------------------------------------------------------------- *
+ * Footnotes
+ *   Inline relocation done by the footnote handler; paged.js draws the call
+ *   and marker. These rules style both the area and the markers.
+ * ----------------------------------------------------------------------- */
+.footnote {
+  float: footnote;
+  font-size: 8.5pt;
+  line-height: 1.35;
+}
+.article-body .footnote {
+  font-family: var(--pdf-body);
+}
+::footnote-call {
+  font-size: 0.7em;
+  vertical-align: super;
+  line-height: 0;
+  color: var(--pdf-ink);
+}
+::footnote-marker {
+  font-weight: 600;
+  color: var(--pdf-ink);
+  padding-right: 0.4em;
+}
+.pagedjs_footnote_area,
+.pagedjs_footnote_content {
+  font-size: 8.5pt;
+  line-height: 1.35;
+  color: var(--pdf-muted);
+}
+
+/* End-of-document footnotes fallback (used when inline relocation is off or
+ * could not be applied). */
+.pdf-footnotes-block {
+  break-before: page;
+}
+.pdf-footnotes-block ol {
+  font-size: 9pt;
+  line-height: 1.4;
+  padding-left: 1.2em;
+}
+.pdf-footnotes-block li {
+  margin-bottom: 0.5em;
+}
+
+/* ----------------------------------------------------------------------- *
+ * Bibliography
+ * ----------------------------------------------------------------------- */
+.pdf-bibliography-block {
+  break-before: page;
+}
+.pdf-bibliography-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 9.5pt;
+  line-height: 1.4;
+}
+.pdf-bibliography-list li {
+  margin-bottom: 0.6em;
+  padding-left: 1.4em;
+  text-indent: -1.4em; /* hanging indent for references */
+  text-align: left;
+}
+
+/* ----------------------------------------------------------------------- *
+ * Utility: force a page break before a section.
+ * ----------------------------------------------------------------------- */
+.pdf-page-break-before {
+  break-before: page;
+}

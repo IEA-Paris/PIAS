@@ -22,6 +22,7 @@ import insertToC from './lib/article/body/insertToC'
 import insertBibliography from './lib/article/insertBibliography'
 import insertCitationElements from './lib/article/insertCitationElements'
 import insertBibliographicalReferences from './lib/article/body/insertBibliographicalReferences'
+import insertCitationKeys from './lib/article/body/insertCitationKeys'
 import insertFootnotes from './lib/article/body/insertFootnotes'
 import formattingFixes from './lib/article/formattingFixes'
 import insertIssueData from './lib/article/insertIssueData'
@@ -245,6 +246,9 @@ export default function (moduleOptions) {
           insertVideo,
           insertImage,
           insertFormula,
+          // Convert textual references "(Author, YYYY)" to "@key" tokens before
+          // insertBodyStructureIndex resolves "@key" tokens into linked references.
+          insertCitationKeys,
           insertBodyStructureIndex,
         ]
       )

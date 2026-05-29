@@ -434,6 +434,7 @@
   "and": "and",
   "no-abstract-provided-for-this-article": "No abstract provided for this article.",
   "abstract": "Abstract",
+  "table-of-contents": "Contents",
   "keywords": "Keywords",
   "language": "Language",
   "this-article-is-in": "This article is written in {lang}",

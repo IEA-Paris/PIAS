@@ -27,7 +27,8 @@
     "lint:js": "eslint --ext \".js,.vue\" --ignore-path .gitignore .",
     "lint": "yarn lint:js",
     "test": "jest",
-    "batchImport": "node ./modules/publio/lib/tsvToArticles/tsvToArticles.js"
+    "batchImport": "node ./modules/publio/lib/tsvToArticles/tsvToArticles.js",
+    "pdf": "node ./scripts/generatePDF.mjs"
   },
   "dependencies": {
     "@mdi/font": "^6.2.95",
@@ -49,7 +50,8 @@
     "lite-youtube-embed": "^0.2.0",
     "mathjax-full": "^3.2.2",
     "nuxt": "2.15.7",
-    "puppeteer": "^19.1.0",
+    "pagedjs-cli": "0.4.3",
+    "puppeteer": "^20.9.0",
     "request": "^2.88.2",
     "vuetify": "^2.5.5"
   },

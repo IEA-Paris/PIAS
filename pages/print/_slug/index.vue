@@ -1,189 +1,134 @@
 <template>
-  <article class="printpanel page pdf a4" style="background-color: white">
-    <header>
-      <img
-        src="http://localhost:3000/icon.png"
-        alt="Avatar"
-        style="width: 70px; height: 70px; margin-top: 5mm"
-      />
-    </header>
-
-    <table class="paging">
-      <thead>
-        <tr>
-          <td>&nbsp;</td>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>
-            <div class="page-title" v-html="item.article_title"></div>
-            <div class="article-authors">
-              <ArticleAuthorsString
-                :authors="item.authors"
-                :initials="false"
-                full
-                show-institution
-                have-institutions-link
-              />
-            </div>
-            <DoiBadge
-              v-if="item.DOI && item.Zid"
-              :doi="item.DOI"
-              :zid="item.Zid.toString()"
-            ></DoiBadge>
-
-            <div v-if="item.toCite && item.toCite.apa" class="to-cite-wrapper">
-              <div class="article-label mb-2">
-                {{ $t('to-cite') }}
-              </div>
-              <div class="to-cite" v-html="item.toCite.apa"></div>
-            </div>
-
-            <div class="mb-6 publication-date-content">
-              <div class="article-label mt-4 mb-2">
-                {{ $t('publication-date') }}
-              </div>
-              {{
-                new Date(item.date).toLocaleDateString('en-GB', {
-                  // you can use undefined as first argument
-                  year: 'numeric',
-                  month: '2-digit',
-                  day: '2-digit',
-                })
-              }}
-            </div>
-            <template v-if="item.disciplines && item.discipline.length">
-              <div class="article-label mt-4 mb-2">{{ $t('fields') }}</div>
-
-              <div
-                v-if="item.disciplines && item.disciplines.length"
-                class="mb-2"
-              >
-                <Tag
-                  v-for="(discipline, index2) in item.disciplines"
-                  :key="index2"
-                  large
-                  :tag="discipline"
-                  :class="index2 === 0 ? 'my-1 mr-1' : 'ma-1'"
-                ></Tag>
-              </div>
-            </template>
-            <template v-if="item.thematics && item.thematic.length">
-              <div class="article-label mt-4 mb-2">{{ $t('themes') }}</div>
-
-              <div class="mb-6">
-                <Tag
-                  v-for="(thematic, index2) in item.thematics"
-                  :key="index2"
-                  large
-                  :thematic="thematic"
-                  :class="index2 === 0 ? 'my-1 mr-1' : 'ma-1'"
-                ></Tag>
-              </div>
-            </template>
-            <template v-if="item.types && item.types.length">
-              <div class="article-label mt-4 mb-2">{{ $t('types') }}</div>
-
-              <div class="mb-6">
-                <Tag
-                  v-for="(type, index2) in item.type"
-                  :key="index2"
-                  large
-                  :type="type"
-                  :class="index2 === 0 ? 'my-1 mr-1' : 'ma-1'"
-                ></Tag>
-              </div>
-            </template>
-            <template v-if="item.tag && item.tag.length">
-              <div class="article-label mt-4 mb-2">{{ $t('keywords') }}</div>
-
-              <div class="mb-4">
-                <Tag
-                  v-for="(tag, index2) in item.tag"
-                  :key="index2"
-                  large
-                  :tag="tag"
-                  :class="index2 === 0 ? 'my-1 mr-1' : 'ma-1'"
-                ></Tag>
-              </div>
-            </template>
-
-            <div
-              v-if="item.abstract && item.abstract.length"
-              class="article-abstract-frame mb-4"
-            >
-              <div class="article-label mt-12">
-                {{ $t('abstract') }}
-              </div>
-              <div class="article-abstract">
-                {{ item.abstract }}
-              </div>
-            </div>
-
-            <nuxt-content :document="item" class="article-body" />
-            <div
-              v-if="item.bibliography && item.bibliography.length"
-              class="bibliography-panel"
-            >
-              <h2 id="bibliography">
-                {{ $t('bibliography') }}
-              </h2>
-              <ArticleBibliography :item="item"></ArticleBibliography>
-            </div>
-            <div
-              v-if="item.footnotes && item.footnotes.length"
-              class="footnotes-panel"
-            >
-              <h2 id="footnotes" class="mt-3">
-                {{ $t('footnotes') }}
-              </h2>
-              <ArticleFootnotes :item="item"></ArticleFootnotes>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-      <tfoot>
-        <tr>
-          <td></td>
-        </tr>
-      </tfoot>
-    </table>
-    <footer id="footer">
-      <div class="footer-content">
-        <div v-if="nameIssue && item.toCite && item.toCite.apa">
-          <small v-html="item.toCite.apa"></small>
-          <small>
-            {{ new Date(item.date).getFullYear() }}/{{ issueNumber }} -
-            {{ nameIssue }} - Article No.{{ articleNumber }}.
-            {{ $t('freely-available') }}
-            <a
-              :href="`${$config.url}/articles/${item.slug}`"
-              style="text-decoration: none"
-              >{{ `${$config.url}/article/${item.slug}` }}</a
-            >
-            - ISSN {{ $config.identifier.ISSN }}/&copy;
-            {{ new Date().getFullYear() }}
-            <span
-              v-if="item.authors.length < 4"
-              v-html="formatedAuthors"
-            ></span>
-            <span v-else>{{ $t('the-authors') }}</span>
-          </small>
-        </div>
-        <div>
-          <small class="print-footer-text">
-            This is an open access article published under the
-            <a
-              href="https://creativecommons.org/licenses/by-nc/4.0/"
-              style="text-decoration: none"
-              >Creative Commons Attribution-NonCommercial 4.0 International
-              Public License (CC BY-NC 4.0)</a
-            >
-          </small>
-        </div>
+  <article class="pdf-article">
+    <!-- ===================== COVER PAGE ===================== -->
+    <section class="pdf-cover">
+      <!-- Hidden sources that seed the running header / footer via CSS
+           string-set. Placed at the very start of the cover so the strings are
+           defined before any body page renders, and kept inside a positioned
+           container so they don't generate their own page or shift the cover. -->
+      <div class="pdf-string-source" aria-hidden="true">
+        <span class="pdf-running-title">{{ runningTitle }}</span>
+        <span class="pdf-footer-citation">{{ footerCitation }}</span>
       </div>
-    </footer>
+
+      <img
+        class="pdf-cover-logo"
+        src="http://localhost:3000/icon.png"
+        alt="Journal logo"
+      />
+
+      <h1 class="pdf-cover-title" v-html="item.article_title"></h1>
+
+      <div class="pdf-cover-authors">
+        <ArticleAuthorsString
+          :authors="item.authors"
+          :initials="false"
+          full
+          show-institution
+          have-institutions-link
+        />
+      </div>
+
+      <div v-if="item.DOI && item.Zid" class="pdf-cover-doi">
+        <DoiBadge :doi="item.DOI" :zid="item.Zid.toString()"></DoiBadge>
+      </div>
+
+      <template v-if="item.toCite && item.toCite.apa">
+        <div class="pdf-meta-label">{{ $t('to-cite') }}</div>
+        <div class="pdf-cite" v-html="item.toCite.apa"></div>
+      </template>
+
+      <div class="pdf-meta-label">{{ $t('publication-date') }}</div>
+      <div class="pdf-pubdate">{{ formattedDate }}</div>
+
+      <template v-if="item.disciplines && item.disciplines.length">
+        <div class="pdf-meta-label">{{ $t('fields') }}</div>
+        <div class="pdf-tags">
+          <span
+            v-for="(discipline, i) in item.disciplines"
+            :key="'disc-' + i"
+            class="pdf-tag"
+            >{{ discipline }}</span
+          >
+        </div>
+      </template>
+
+      <template v-if="item.thematics && item.thematics.length">
+        <div class="pdf-meta-label">{{ $t('themes') }}</div>
+        <div class="pdf-tags">
+          <span
+            v-for="(thematic, i) in item.thematics"
+            :key="'them-' + i"
+            class="pdf-tag"
+            >{{ thematic }}</span
+          >
+        </div>
+      </template>
+
+      <template v-if="item.tag && item.tag.length">
+        <div class="pdf-meta-label">{{ $t('keywords') }}</div>
+        <div class="pdf-tags">
+          <span
+            v-for="(tag, i) in item.tag"
+            :key="'tag-' + i"
+            class="pdf-tag"
+            >{{ tag }}</span
+          >
+        </div>
+      </template>
+
+      <template v-if="item.abstract && item.abstract.length">
+        <div class="pdf-meta-label">{{ $t('abstract') }}</div>
+        <div class="pdf-abstract-block">
+          <div class="pdf-abstract">{{ item.abstract }}</div>
+        </div>
+      </template>
+    </section>
+
+    <!-- ===================== TABLE OF CONTENTS ===================== -->
+    <!-- Filled by the TOC paged.js handler (beforeParsed). Hidden if empty. -->
+    <section class="pdf-toc-block">
+      <h2 class="pdf-toc-title">{{ $t('table-of-contents') }}</h2>
+      <nav class="pdf-toc"></nav>
+    </section>
+
+    <!-- ===================== ARTICLE BODY ===================== -->
+    <!-- .use-inline-footnotes opts this document into the inline-footnote
+         relocation handler; remove the class to keep end-of-document notes. -->
+    <nuxt-content :document="item" class="article-body use-inline-footnotes" />
+
+    <!-- ===================== FOOTNOTES (fallback) ===================== -->
+    <!-- Rendered as plain semantic markup. The footnote handler removes this
+         block when it successfully relocates notes inline; if relocation is
+         disabled or fails, this stays as the visible footnotes section. -->
+    <section
+      v-if="item.footnotes && item.footnotes.length"
+      class="pdf-footnotes-block"
+    >
+      <h2 class="pdf-section-title">{{ $t('footnotes') }}</h2>
+      <ol>
+        <li
+          v-for="(footnote, index) in item.footnotes"
+          :id="'fn' + (index + 1)"
+          :key="'fn-' + index"
+        >
+          <nuxt-content :document="footnote" />
+        </li>
+      </ol>
+    </section>
+
+    <!-- ===================== BIBLIOGRAPHY ===================== -->
+    <section v-if="sortedBibliography.length" class="pdf-bibliography-block">
+      <h2 class="pdf-section-title">{{ $t('bibliography') }}</h2>
+      <ol class="pdf-bibliography-list">
+        <li
+          v-for="ref in sortedBibliography"
+          :id="ref.id"
+          :key="ref.id"
+          v-html="ref[bibliographyStyle]"
+        ></li>
+      </ol>
+    </section>
   </article>
 </template>
 <script>
@@ -250,241 +195,147 @@ export default {
     }
   },
   data() {
+    return {}
+  },
+  head() {
+    // Emit PDF metadata as <meta> tags + <title>. pagedjs-cli scrapes these
+    // and writes them into the PDF Info dictionary (Title/Author/Subject/
+    // Keywords/dates) and builds the outline. The generatePDF step adds a thin
+    // pdf-lib top-up for fields not covered here (e.g. Producer).
+    const title = this.plainTitle
+    const authors = formatAuthors(this.item.authors).replace(/&nbsp;/g, ' ')
+    const keywords = (this.item.tag || []).join(', ')
+    const lang = this.item.language === 'French' ? 'fr' : 'en'
     return {
-      /*  item: {}, */
+      htmlAttrs: { lang },
+      title,
+      // Override the site-wide titleTemplate ("%s - <journal>") so the PDF's
+      // Info-dictionary Title (scraped from <title> by pagedjs-cli) is just the
+      // clean article title.
+      titleTemplate: '%s',
+      meta: [
+        { hid: 'author', name: 'author', content: authors },
+        {
+          hid: 'subject',
+          name: 'subject',
+          content: this.item.abstract || title,
+        },
+        { hid: 'keywords', name: 'keywords', content: keywords },
+        {
+          hid: 'description',
+          name: 'description',
+          content: this.item.abstract || '',
+        },
+      ],
     }
   },
-  /*   async fetch() {
-    this.item = (
-      await this.$content('articles', { deep: true })
-        .where({
-          slug: this.$route.params.slug,
-        })
-        .fetch()
-    )[0]
-    this.$store.commit('setLoading', false)
-  }, */
   computed: {
+    // Title with any inline HTML stripped, for <title>/running head/metadata.
+    plainTitle() {
+      return (this.item.article_title || '')
+        .replace(/<[^>]+>/g, '')
+        .replace(/&nbsp;/g, ' ')
+        .trim()
+    },
+    runningTitle() {
+      const t = this.plainTitle
+      // Keep the running header to a single tidy line.
+      return t.length > 90 ? t.slice(0, 87).trimEnd() + '…' : t
+    },
+    formattedDate() {
+      return new Date(this.item.date).toLocaleDateString('en-GB', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      })
+    },
     formatedAuthors() {
       return this.item
         ? formatAuthors(this.item.authors, this.$i18n.$t, true)
         : ''
     },
+    // Short citation line repeated in the page footer.
+    // Author names exactly as the APA citation renders them (e.g. "Mounier, P.,
+    // & Las Casas, E."), pulled from the rendered toCite.apa string: strip HTML,
+    // then take everything before the "(YEAR)" that opens the citation body.
+    citationAuthors() {
+      const apa = this.item.toCite && this.item.toCite.apa
+      if (!apa) return ''
+      const plain = apa
+        .replace(/<[^>]+>/g, '')
+        // Decode the HTML entities citation-js emits (e.g. &#38; → &, &amp;).
+        .replace(/&#38;|&amp;/g, '&')
+        .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n))
+        .replace(/&nbsp;/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+      const m = plain.match(/^(.*?)\s*\(\d{4}[a-z]?\)/)
+      return (m ? m[1] : plain).replace(/[.\s]+$/, '')
+    },
+    // Copyright holder for the © notice: the author(s) for few-author papers,
+    // "the authors" once there are 4+ (matches the legacy footer + keeps the
+    // line short). A CC licence is granted ON TOP of copyright, so naming the
+    // holder here is correct and complementary to the CC BY notice.
+    copyrightHolder() {
+      const authors = this.item.authors || []
+      if (!authors.length) return ''
+      return authors.length < 4 ? this.citationAuthors : this.$t('the-authors')
+    },
+    footerCitation() {
+      const year = new Date(this.item.date).getFullYear()
+      const issn = this.$config.identifier && this.$config.identifier.ISSN
+      // Prefer the issue's full name; fall back to its title, then the slug.
+      const issueName =
+        (this.issue && (this.issue.name_of_the_issue || this.issue.title)) ||
+        this.nameIssue
+      // Volume number — same value the APA citation renders as "Vol. N".
+      const volume = this.item.issueIndex || this.issueNumber
+      const parts = []
+      if (this.citationAuthors) parts.push(this.citationAuthors)
+      if (issueName) {
+        const vol = volume ? ` – Vol. ${volume}` : ''
+        parts.push(
+          `${issueName}${vol} – ${this.$t('article')} No.${this.articleNumber}`
+        )
+      }
+      if (this.$config.name) parts.push(this.$config.name)
+      if (issn) parts.push(`ISSN ${issn}`)
+      parts.push(
+        this.copyrightHolder ? `© ${year} ${this.copyrightHolder}` : `© ${year}`
+      )
+      parts.push('CC BY 4.0')
+      return parts.join('  ·  ')
+    },
+    bibliographyStyle() {
+      return this.$store.state.articles.style
+    },
+    sortedBibliography() {
+      const biblio = this.item.bibliography
+      if (!biblio || !Array.isArray(biblio) || !biblio.length) return []
+      return biblio
+        .slice()
+        .sort((a, b) =>
+          (a[this.bibliographyStyle] || '').localeCompare(
+            b[this.bibliographyStyle] || ''
+          )
+        )
+    },
   },
 }
 </script>
 <style lang="scss">
-@media print {
-  .page {
-    page-break-after: always;
-  }
-  @page {
-    format: A4;
-    size: 210mm 297mm;
-    margin: 0 0 1.5rem 0; // for page numbers
-  }
-  .language-text.line-numbers .v-application code {
-    all: initial;
-    max-width: 18cm;
-  }
-  .publication-date-content {
-    font-size: 13px;
-    border-left: 5px #2c2c2d solid;
-    padding: 0 15px;
-  }
-
-  .to-cite-wrapper {
-    .to-cite > .csl-bib-body > .csl-entry {
-      font-size: 0.7em;
-      line-height: 1.2em;
-      text-align: left;
-    }
-    border-left: 5px #5b5b66 solid;
-    padding: 0 15px;
-    font-size: 0.4em;
-  }
-
-  .footer-content {
-    padding: 0 2rem;
-    font-size: 13px;
-  }
-
-  .page-title {
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-    font-size: 35px !important;
-  }
-
-  .index {
-    display: none !important;
-  }
-
-  .nuxt-content blockquote {
-    border: 0.2rem solid black !important;
-    background-color: #e6e6e658;
-    font-weight: 500;
-    font-size: 0.8rem !important;
-    line-height: 0.8rem !important;
-    padding: 20px;
-  }
-  .nuxt-content.article-body p,
-  .to-cite .csl-bib-body,
-  .footnotes-panel,
-  .nuxt-content.article-body ul li {
-    color: #000 !important;
-    font-size: 16px !important;
-    margin-bottom: 15px;
-    margin-top: 10px;
-    line-height: 26px !important;
-    text-align: justify;
-    width: 100%;
-    max-width: 18cm;
-  }
-  .nuxt-content.article-body p {
-    text-align: justify;
-  }
-  .csl-bib-body,
-  .footnotes-panel,
-  .nuxt-content.article-body ul li,
-  .nuxt-content.article-body ul li {
-    text-align: left;
-  }
-  .bibliography-panel,
-  .footnotes-panel {
-    margin-left: -1rem !important;
-    font-size: 14px !important;
-    text-align: left;
-    page-break-before: always;
-  }
-  .nuxt-content.article-body blockquote h2 {
-    margin-top: 0px;
-  }
-  .nuxt-content.article-body h2,
-  #bibliography,
-  #footnotes {
-    font-size: 30px !important;
-    margin-bottom: 20px;
-    margin-top: 40px;
-    word-spacing: 2px;
-    line-height: 40px !important;
-  }
-  #bibliography,
-  #footnotes {
-    margin-left: 1rem;
-  }
-  .nuxt-content.article-body h3 {
-    font-size: 28px !important;
-    line-height: 34px !important;
-    margin-bottom: 20px;
-    margin-top: 40px;
-  }
-
-  .nuxt-content.article-body h4 {
-    font-size: 24px !important;
-    font-weight: 500;
-    line-height: 30px !important;
-    margin-bottom: 20px;
-    margin-top: 40px;
-  }
-
-  .article-authors {
-    font-family: 'Open sans', sans-serif;
-    padding: 1em 0;
-    max-width: 16cm;
-    display: inline-block;
-  }
-  .article-abstract-frame {
-    border-left: 5px #000 solid;
-    padding: 0 15px;
-  }
-  .article-abstract {
-    font-style: italic;
-    margin-top: -1rem;
-    font-size: 14px;
-    white-space: pre-line;
-  }
-
-  .article-label {
-    text-transform: uppercase;
-    font-size: 10px;
-    margin-top: 2em;
-    margin-bottom: 0.6em;
-    color: #252525;
-    letter-spacing: 0.2em;
-  }
-
-  html,
-  body {
-    margin: 0 !important;
-    padding: 0 !important;
-    visibility: hidden;
-  }
-
-  .page {
-    position: relative;
-    overflow: hidden;
-    visibility: visible;
-    padding: 0 !important;
-    margin: 0 !important;
-    page-break-after: always;
-    page-break-inside: avoid !important;
-    border: none !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-  }
-
-  table.paging {
-    max-width: 38em;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  table.paging tfoot td {
-    height: 0.8in;
-  }
-
-  table.paging thead td {
-    height: 0.8in;
-    width: 100%;
-  }
-
-  header,
-  footer {
-    position: fixed;
-  }
-
-  footer {
-    bottom: 0;
-  }
+/* Screen preview of the /print/<slug> route. The PDF look is driven entirely
+ * by modules/publio/css/pdf-paged.css (injected by pagedjs-cli at generation
+ * time); this block only makes the route legible when opened in a browser. */
+.pdf-article {
+  background: #fff;
+  max-width: 210mm;
+  margin: 0 auto;
+  padding: 20mm;
+  color: #1a1a1c;
+  font-family: 'Tinos', Georgia, serif;
 }
-
-.v-divider {
-  margin: 0 1em;
-}
-
-footer {
-  height: 0.9in;
-}
-
-header {
-  height: 1.5in;
-  position: absolute;
-  top: 0;
-}
-
-header,
-footer {
-  width: 100%;
-}
-
-.page-number {
-  display: table-footer-group;
-}
-
-.footer-divider {
-  margin: 3mm 0 3mm 0;
-}
-.footer-content {
-  line-height: 0.7rem;
+.pdf-string-source {
+  display: none;
 }
 </style>
