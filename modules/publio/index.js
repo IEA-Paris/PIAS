@@ -24,7 +24,7 @@ import insertCitationElements from './lib/article/insertCitationElements'
 import insertBibliographicalReferences from './lib/article/body/insertBibliographicalReferences'
 import insertCitationKeys from './lib/article/body/insertCitationKeys'
 import insertFootnotes from './lib/article/body/insertFootnotes'
-import formattingFixes from './lib/article/formattingFixes'
+import applyFormattingFixes from './lib/article/applyFormattingFixes'
 import insertIssueData from './lib/article/insertIssueData'
 import insertAuthorData from './lib/article/insertAuthorData'
 
@@ -271,6 +271,11 @@ export default function (moduleOptions) {
 
   nuxt.hook('content:file:beforeInsert', (article, database) => {
     if (article.dir.startsWith('/articles') && article.published) {
+      // Normalise problematic characters (NBSP, zero-width chars, curly quotes,
+      // etc.) across the body AND all frontmatter string values before any other
+      // transformer runs, so downstream processing, markdown rendering and
+      // paged.js PDF generation never see them.
+      article = applyFormattingFixes(article)
       ;[article, media, authors, issues, options] = processArticle(
         // main item
         article,
