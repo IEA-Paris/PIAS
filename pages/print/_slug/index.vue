@@ -8,7 +8,7 @@
            container so they don't generate their own page or shift the cover. -->
       <div class="pdf-string-source" aria-hidden="true">
         <span class="pdf-running-title">{{ runningTitle }}</span>
-        <span class="pdf-footer-citation">{{ footerCitation }}</span>
+        <span class="pdf-footer-citation" v-html="footerCitation"></span>
       </div>
 
       <img
@@ -272,6 +272,22 @@ export default {
       const m = plain.match(/^(.*?)\s*\(\d{4}[a-z]?\)/)
       return (m ? m[1] : plain).replace(/[.\s]+$/, '')
     },
+    // Author names built straight from item.authors ("Lastname, F."), so this
+    // works even when the citation pipeline hasn't populated toCite.apa (some
+    // articles have no rendered APA string). Used as the dependable source for
+    // the copyright holder and as a fallback for the footer's leading authors.
+    plainAuthors() {
+      const authors = this.item.authors || []
+      return authors
+        .map((a) => {
+          const last = (a.lastname || '').trim()
+          const first = (a.firstname || '').trim()
+          const initial = first ? `, ${first.charAt(0)}.` : ''
+          return last ? last + initial : first
+        })
+        .filter(Boolean)
+        .join(', ')
+    },
     // Copyright holder for the © notice: the author(s) for few-author papers,
     // "the authors" once there are 4+ (matches the legacy footer + keeps the
     // line short). A CC licence is granted ON TOP of copyright, so naming the
@@ -279,7 +295,7 @@ export default {
     copyrightHolder() {
       const authors = this.item.authors || []
       if (!authors.length) return ''
-      return authors.length < 4 ? this.citationAuthors : this.$t('the-authors')
+      return authors.length < 4 ? this.plainAuthors : this.$t('the-authors')
     },
     footerCitation() {
       const year = new Date(this.item.date).getFullYear()
@@ -291,7 +307,10 @@ export default {
       // Volume number — same value the APA citation renders as "Vol. N".
       const volume = this.item.issueIndex || this.issueNumber
       const parts = []
-      if (this.citationAuthors) parts.push(this.citationAuthors)
+      // Leading author list: the APA-formatted names when available, else the
+      // names built directly from item.authors.
+      const footerAuthors = this.citationAuthors || this.plainAuthors
+      if (footerAuthors) parts.push(footerAuthors)
       if (issueName) {
         const vol = volume ? ` – Vol. ${volume}` : ''
         parts.push(
@@ -299,11 +318,15 @@ export default {
         )
       }
       if (this.$config.name) parts.push(this.$config.name)
-      if (issn) parts.push(`ISSN ${issn}`)
+      // Non-breaking spaces (&nbsp;) keep these labels glued to their value so
+      // they never wrap across two lines in the footer.
+      if (issn) parts.push(`ISSN&nbsp;${issn}`)
       parts.push(
-        this.copyrightHolder ? `© ${year} ${this.copyrightHolder}` : `© ${year}`
+        this.copyrightHolder
+          ? `©&nbsp;${year}&nbsp;${this.copyrightHolder}`
+          : `©&nbsp;${year}`
       )
-      parts.push('CC BY 4.0')
+      parts.push('CC&nbsp;BY&nbsp;4.0')
       return parts.join('  ·  ')
     },
     bibliographyStyle() {

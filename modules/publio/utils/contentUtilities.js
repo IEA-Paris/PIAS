@@ -68,17 +68,25 @@ export const storeReport = () => {
     ;(acc[article] = acc[article] || []).push(reference)
     return acc
   }, {})
+  // The report is retro-committed to the submodule each CI run. Keep the
+  // volatile `createdAt` out of the change-detection so an unchanged payload
+  // doesn't churn a commit every run: only rewrite the file when the actual
+  // conflicts/missingReferences differ from the report already on disk.
+  const payload = { conflicts: _conflicts, missingReferences: missingByArticle }
+  const dumpOpts = { noRefs: true, sortKeys: true }
+  const body = yaml.dump(payload, dumpOpts)
+  const reportPath = './generated/report.md'
+  if (fs.existsSync(reportPath)) {
+    const prev = fs.readFileSync(reportPath, 'utf8')
+    const parsed = matter(prev)
+    // Strip the timestamp before comparing; everything else is the payload.
+    const { createdAt, ...prevPayload } = parsed.data || {}
+    if (yaml.dump(prevPayload, dumpOpts) === body) return
+  }
   return fs.writeFileSync(
-    './generated/report.md',
+    reportPath,
     `---
-${yaml.dump(
-  {
-    createdAt: dateTime,
-    conflicts: _conflicts,
-    missingReferences: missingByArticle,
-  },
-  { noRefs: true, sortKeys: true }
-)}
+${yaml.dump({ createdAt: dateTime, ...payload }, dumpOpts)}
 ---`
   )
 }

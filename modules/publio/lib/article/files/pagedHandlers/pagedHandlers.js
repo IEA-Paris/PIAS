@@ -280,10 +280,77 @@
     }
   }
 
+  /* ----------------------------------------------------------------------- *
+   * 5. Footer width — scale the @bottom-left citation box to its text length
+   *
+   * paged.js lays the bottom margin as a 3-column grid and sizes the left box
+   * to its content; a `width`/`max-width` set via an @page rule injected from
+   * the Nuxt <head> is NOT picked up (paged.js reads @page rules only from the
+   * stylesheets it is given, before our injected one exists). The reliable hook
+   * is here: after each page is laid out we measure the citation length from the
+   * surviving source span and set the box width directly on the generated DOM,
+   * so a short citation gets a narrow box (wrapping sooner) and a long one widens
+   * toward the page edge.
+   * ----------------------------------------------------------------------- */
+  class FooterWidthHandler extends Paged.Handler {
+    constructor(...args) {
+      super(...args)
+      this.widthPct = null
+    }
+
+    // Read the citation once from the source span (textContent already has real
+    // non-breaking spaces, so each counts as one char — &nbsp; doesn't inflate).
+    beforeParsed(content) {
+      try {
+        const src = content.querySelector('.pdf-footer-citation')
+        const len = src ? src.textContent.trim().length : 0
+        if (!len) return
+        // Width the box so the citation lands on ~2 lines: less text → narrower
+        // box, more text → wider, capped at full width (after which it grows in
+        // height). At ~7pt the full-width (100%) box fits ≈95 chars per line, so
+        // two lines need a width that holds len/2 chars. Segments are glued with
+        // &nbsp; and split only at "·". A full-width 7pt line fits ≈120 chars;
+        // we target a slightly lower 105 so short citations get a touch more
+        // width (fewer lines) while still scaling visibly by length.
+        const CHARS_PER_FULL_LINE = 105
+        const TARGET_LINES = 2
+        const MIN_W = 45 // never thinner than this (shortest citations)
+        const MAX_W = 86 // page-number slot lives to the right of this
+        const needed = (len / TARGET_LINES / CHARS_PER_FULL_LINE) * 100
+        this.widthPct = Math.round(Math.min(MAX_W, Math.max(MIN_W, needed)))
+      } catch (e) {
+        this.widthPct = null
+      }
+    }
+
+    // Each laid-out page gets its own margin boxes; size the left one. The box
+    // is a flex item sized to content by default, so pin width + flex-basis and
+    // let the content fill it, forcing the citation to wrap at the target width.
+    afterPageLayout(pageFragment) {
+      try {
+        if (!this.widthPct) return
+        const box = pageFragment.querySelector('.pagedjs_margin-bottom-left')
+        if (!box) return
+        const w = this.widthPct + '%'
+        box.style.width = w
+        box.style.maxWidth = w
+        box.style.flex = '0 0 ' + w
+        const content = box.querySelector('.pagedjs_margin-content')
+        if (content) content.style.width = '100%'
+      } catch (e) {
+        console.warn(
+          '[pagedHandlers] Footer-width handler skipped:',
+          e && e.message
+        )
+      }
+    }
+  }
+
   Paged.registerHandlers(
     TocHandler,
     FootnoteHandler,
     LinkHandler,
-    CoverFitHandler
+    CoverFitHandler,
+    FooterWidthHandler
   )
 })()

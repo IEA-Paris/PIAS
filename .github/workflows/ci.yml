@@ -197,6 +197,15 @@ jobs:
           rsync -av --delete ../../static/thumbnails/   ./thumbnails/
           rsync -av --delete ../../static/svg/          ./svg/
           rsync -av --delete ../../static/bibliography/ ./bibliography/
+          # generated/ (report.md = conflicts + missing references, filters.js)
+          # is written by publio to the PIAS-root ./generated/ — which is
+          # gitignored in PIAS but TRACKED in the submodule. It's copied IN at
+          # the start of the run but, until now, never mirrored back, so the
+          # submodule's copy had been frozen since 2024. Source is the PIAS-root
+          # scratch copy (../../generated/), NOT static/ — generated/ is never
+          # copied into static/. --delete keeps the regenerated .gitkeep and
+          # prunes stale entries.
+          rsync -av --delete ../../generated/           ./generated/
           # For the rest of static/, mirror back to the submodule's static/,
           # excluding the asset dirs handled above plus admin and sw.js.
           rsync -av \
