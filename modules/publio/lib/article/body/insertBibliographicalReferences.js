@@ -1,7 +1,10 @@
 import referenceRegex from '../../../utils/referenceRegex'
 import classicReferenceRegex from '../../../utils/classicReferenceRegex'
+import { recordMissingReference } from '../../../utils/contentUtilities'
 
-const insertBibliographicalReferences = (node, biblio) => {
+// `slug` is the article slug, forwarded so unresolved `@key` tokens can be attributed to
+// their source article in the generated report (see insertCitationKeys / storeReport).
+const insertBibliographicalReferences = (node, biblio, slug) => {
   try {
     const replaceRegularReference = (node, match) => {
       console.log('match: ', match)
@@ -70,8 +73,9 @@ const insertBibliographicalReferences = (node, biblio) => {
         const citedKey = element.substring(1).toLowerCase()
         const ref = biblio.find((item) => item.id.toLowerCase() === citedKey)
         if (!ref) {
-          // TODO write it in a file somewhere to use it in CMS
           console.log('REFERENCE NOT FOUND IN BIB FILE: ', element)
+          // Collect it (with its article slug) for the generated report / CMS.
+          recordMissingReference(slug, element)
         } else {
           ref.link = true
           // edit the node to include the link
@@ -110,7 +114,7 @@ const insertBibliographicalReferences = (node, biblio) => {
       node = replaceReference(node)
     } else if (node?.children?.length > 0) {
       node.children = node.children.map((child) =>
-        insertBibliographicalReferences(child, biblio)
+        insertBibliographicalReferences(child, biblio, slug)
       )
     }
     return node

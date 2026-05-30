@@ -61,7 +61,8 @@ export default (node, article, media, authors, issues, options) => {
                   article.bibliography?.length
                     ? insertBibliographicalReferences(
                         node,
-                        article.bibliography
+                        article.bibliography,
+                        article.slug
                       )
                     : node,
                 ],

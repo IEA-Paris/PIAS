@@ -1,3 +1,4 @@
+import PQueue from 'p-queue'
 import isOffline from '../../../utils/isOffline'
 const chalk = require('chalk')
 
@@ -25,6 +26,26 @@ const chalk = require('chalk')
 
 const SCHOLEXPLORER_BASE = 'https://api.scholexplorer.openaire.eu/v3/Links'
 const OPENCITATIONS_BASE = 'https://api.opencitations.net/index/v2'
+
+// Each open index throttles independently, so each gets its own queue. We were
+// hitting "429 Too Many Requests" because every article fired 4 requests at
+// once (2 per source) with no global ceiling — the inner Promise.all bounds
+// nothing once the outer loop runs back-to-back. These queues cap the *global*
+// in-flight + sustained rate per host regardless of how the call sites fan out.
+//
+// OpenCitations anonymous access is the strictest (and the source of the 429s
+// in the build log), so it gets the most conservative budget. Both stay well
+// under each service's documented ceiling to leave headroom for jitter/retries.
+const scholexQueue = new PQueue({
+  concurrency: 3,
+  intervalCap: 5,
+  interval: 1000,
+})
+const openCitationsQueue = new PQueue({
+  concurrency: 2,
+  intervalCap: 5,
+  interval: 2000,
+})
 
 // Canonicalise a DOI to its bare lowercase form (strip any doi.org prefix +
 // surrounding whitespace), matching what buildExportMeta does for exports.
@@ -65,13 +86,19 @@ const scholexEntry = (end, selfDoi) => {
 const fetchScholExplorer = async (doi) => {
   // `relation=Cites` on targetPid → only inbound citations; sourcePid → the
   // article's own reference list (relation direction is implicit).
+  // Each request goes through the shared queue so concurrent articles can't
+  // exceed the host's rate limit.
   const [incoming, outgoing] = await Promise.all([
-    fetchJson(
-      `${SCHOLEXPLORER_BASE}?targetPid=${encodeURIComponent(
-        doi
-      )}&relation=Cites`
+    scholexQueue.add(() =>
+      fetchJson(
+        `${SCHOLEXPLORER_BASE}?targetPid=${encodeURIComponent(
+          doi
+        )}&relation=Cites`
+      )
     ),
-    fetchJson(`${SCHOLEXPLORER_BASE}?sourcePid=${encodeURIComponent(doi)}`),
+    scholexQueue.add(() =>
+      fetchJson(`${SCHOLEXPLORER_BASE}?sourcePid=${encodeURIComponent(doi)}`)
+    ),
   ])
   const citing = (incoming.result || [])
     .map((r) => scholexEntry(r.source, doi))
@@ -100,8 +127,12 @@ const openCitationsRows = (rows, otherKey, selfDoi) =>
 const fetchOpenCitations = async (doi, token) => {
   const headers = token ? { authorization: token } : {}
   const [citations, references] = await Promise.all([
-    fetchJson(`${OPENCITATIONS_BASE}/citations/doi:${doi}`, headers),
-    fetchJson(`${OPENCITATIONS_BASE}/references/doi:${doi}`, headers),
+    openCitationsQueue.add(() =>
+      fetchJson(`${OPENCITATIONS_BASE}/citations/doi:${doi}`, headers)
+    ),
+    openCitationsQueue.add(() =>
+      fetchJson(`${OPENCITATIONS_BASE}/references/doi:${doi}`, headers)
+    ),
   ])
   return {
     citing: openCitationsRows(citations, 'citing', doi),
@@ -137,43 +168,48 @@ export default async (articles, options) => {
     )
   }
 
-  for (const article of articles) {
-    const doi = bareDoi(article.DOI || article.doi || '')
-    if (!doi) continue
+  // Fan every article out at once: the per-host queues (not this loop) are what
+  // bound the request rate now, so there's no reason to serialise articles.
+  // Each article still queries both sources independently so one
+  // failing/throttling never blocks the other, and a build is never broken by
+  // a network error.
+  await Promise.all(
+    articles.map(async (article) => {
+      const doi = bareDoi(article.DOI || article.doi || '')
+      if (!doi) return
 
-    // Query both sources independently so one failing/throttling never blocks
-    // the other, and a build is never broken by a network error.
-    const [scholex, opencit] = await Promise.all([
-      fetchScholExplorer(doi).catch((error) => {
-        console.warn(
-          chalk.yellow(
-            `⚠ ScholExplorer lookup failed for "${article.slug}" (${doi}): ${error.message}`
+      const [scholex, opencit] = await Promise.all([
+        fetchScholExplorer(doi).catch((error) => {
+          console.warn(
+            chalk.yellow(
+              `⚠ ScholExplorer lookup failed for "${article.slug}" (${doi}): ${error.message}`
+            )
+          )
+          return { citing: [], cited: [] }
+        }),
+        fetchOpenCitations(doi, ocToken).catch((error) => {
+          console.warn(
+            chalk.yellow(
+              `⚠ OpenCitations lookup failed for "${article.slug}" (${doi}): ${error.message}`
+            )
+          )
+          return { citing: [], cited: [] }
+        }),
+      ])
+
+      const citing = mergeByDoi(scholex.citing, opencit.citing)
+      const cited = mergeByDoi(scholex.cited, opencit.cited)
+
+      if (citing.length || cited.length) {
+        article.citedBy = { citing, cited }
+        console.log(
+          chalk.green(
+            `citation links: "${article.slug}" — ${citing.length} citing, ${cited.length} references`
           )
         )
-        return { citing: [], cited: [] }
-      }),
-      fetchOpenCitations(doi, ocToken).catch((error) => {
-        console.warn(
-          chalk.yellow(
-            `⚠ OpenCitations lookup failed for "${article.slug}" (${doi}): ${error.message}`
-          )
-        )
-        return { citing: [], cited: [] }
-      }),
-    ])
-
-    const citing = mergeByDoi(scholex.citing, opencit.citing)
-    const cited = mergeByDoi(scholex.cited, opencit.cited)
-
-    if (citing.length || cited.length) {
-      article.citedBy = { citing, cited }
-      console.log(
-        chalk.green(
-          `citation links: "${article.slug}" — ${citing.length} citing, ${cited.length} references`
-        )
-      )
-    }
-  }
+      }
+    })
+  )
 
   return articles
 }

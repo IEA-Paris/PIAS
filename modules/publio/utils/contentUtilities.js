@@ -12,6 +12,22 @@ import referenceRegex from './referenceRegex'
 import slugify from './slugify'
 import { formatAuthors } from './transforms'
 export const _conflicts = []
+// Textual in-text references (e.g. "(Bourdieu, 1980)") that could not be resolved to a
+// bibliography entry during article processing, collected across all articles so they
+// can be surfaced in the generated report (and, later, the CMS). Each entry records the
+// article it came from and the raw reference text. See insertCitationKeys.js.
+export const _missing = []
+
+// Record an unresolved reference. `slug` is the article slug it appeared in (may be
+// undefined for non-article content); `reference` is the raw matched text. De-duplicated
+// per (slug, reference) so the same citation appearing in multiple passes is stored once.
+export const recordMissingReference = (slug, reference) => {
+  const ref = (reference || '').trim()
+  if (!ref) return
+  const article = slug || 'unknown'
+  if (_missing.some((m) => m.article === article && m.reference === ref)) return
+  _missing.push({ article, reference: ref })
+}
 const fieldsToDelete = [
   'slug',
   'body',
@@ -46,11 +62,21 @@ export const storeReport = () => {
   const time =
     today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds()
   const dateTime = date + ' ' + time
+  // Group the flat list of unresolved references by article slug so the report reads as
+  // { slug: [ref, ref, …] } rather than a long undifferentiated array.
+  const missingByArticle = _missing.reduce((acc, { article, reference }) => {
+    ;(acc[article] = acc[article] || []).push(reference)
+    return acc
+  }, {})
   return fs.writeFileSync(
     './generated/report.md',
     `---
 ${yaml.dump(
-  { createdAt: dateTime, conflicts: _conflicts },
+  {
+    createdAt: dateTime,
+    conflicts: _conflicts,
+    missingReferences: missingByArticle,
+  },
   { noRefs: true, sortKeys: true }
 )}
 ---`
@@ -598,7 +624,9 @@ ${doc.text ? doc.text : ''}`
   // TODO make selective depending on website settings
   disciplines.forEach((area) => {})
 } */
-export const insertReferencesInAbstract = (text, biblio) => {
+// `slug` is the article slug, forwarded so unresolved `@key` tokens can be attributed to
+// their source article in the generated report (see recordMissingReference / storeReport).
+export const insertReferencesInAbstract = (text, biblio, slug) => {
   const matches = text.match(referenceRegex)
   if (matches !== null) {
     const element = matches[0]
@@ -607,12 +635,14 @@ export const insertReferencesInAbstract = (text, biblio) => {
       (item) => item.id === element.toLowerCase().substring(1)
     )
     if (!ref) {
-      // TODO write it in a file somewhere to use it in CMS
       console.log('REFERENCE NOT FOUND IN BIB FILE: ', element)
+      // Collect it (with its article slug) for the generated report / CMS.
+      recordMissingReference(slug, element)
     } else {
       text = insertReferencesInAbstract(
         text.replace(element, ref.citation),
-        biblio
+        biblio,
+        slug
       )
     }
     // edit the node to include the link
@@ -621,10 +651,12 @@ export const insertReferencesInAbstract = (text, biblio) => {
   return text
 }
 
-export const replaceReferenceInFootnote = (footnote, biblio) => {
+// `slug` is the article slug, forwarded so unresolved `@key` tokens can be attributed to
+// their source article in the generated report (see recordMissingReference / storeReport).
+export const replaceReferenceInFootnote = (footnote, biblio, slug) => {
   if (!footnote.value && footnote.children.length) {
     footnote.children = footnote.children.map((footNoteChild) =>
-      replaceReferenceInFootnote(footNoteChild, biblio)
+      replaceReferenceInFootnote(footNoteChild, biblio, slug)
     )
   } else if (footnote.value) {
     const matches = footnote.value.match(referenceRegex)
@@ -637,6 +669,8 @@ export const replaceReferenceInFootnote = (footnote, biblio) => {
         )
         if (!ref) {
           console.log('REFERENCE NOT FOUND IN BIB FILE: ', element)
+          // Collect it (with its article slug) for the generated report / CMS.
+          recordMissingReference(slug, element)
           continue
         }
         ref.link = true

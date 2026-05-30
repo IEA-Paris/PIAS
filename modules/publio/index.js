@@ -48,6 +48,7 @@ import fetchCitationLinks from './lib/article/disseminate/fetchCitationLinks'
 // Others
 import isOffline from './utils/isOffline'
 import tsvToArticles from './lib/tsvToArticles/tsvToArticles'
+import { migrateSlugifyPaths } from './lib/migrateSlugifyPaths.mjs'
 require('events').EventEmitter.prototype._maxListeners = 100
 const chalk = require('chalk')
 const defaults = require('./module.defaults')
@@ -62,6 +63,21 @@ export default function (moduleOptions) {
   let options = Object.assign({}, defaults, moduleOptions, this.options.publio)
   process.on('warning', (e) => console.warn(e.stack))
   let articles, media, authors, issues, url, routesToPrint, changedFiles
+
+  // Before Nuxt Content parses anything, make sure no article/issue path contains
+  // a space (or other git-ref-unsafe char) and that no article is left loose at
+  // the articles root. Otherwise editorial-workflow saves in the CMS build a
+  // branch `cms/articles/<path>` that GitHub rejects ("is not a valid ref name").
+  // Idempotent: a clean tree is an instant no-op. See lib/migrateSlugifyPaths.mjs.
+  try {
+    migrateSlugifyPaths({
+      apply: true,
+      submodule: process.env.npm_package_config_name || 'PPIAS',
+      quiet: true,
+    })
+  } catch (e) {
+    console.warn('[publio] migrateSlugifyPaths skipped:', e.message)
+  }
 
   // "once" is a dirty way to prevent Nuxt to retrigger the content parsing when we insert new files.
   // TODO alternatives welcomed

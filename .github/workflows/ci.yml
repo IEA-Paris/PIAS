@@ -6,17 +6,17 @@ on:
   workflow_dispatch:
     inputs:
       cacheClean:
-        description: 'CI Cache Clean'
+        description: "CI Cache Clean"
         required: false
-        default: ''
+        default: ""
       name:
-        description: 'Name of the proceedings to update'
+        description: "Name of the proceedings to update"
         required: true
-        default: 'PFIAS'
+        default: "PPIAS"
       domain:
-        description: 'Subdomain of the proceedings to update'
+        description: "Subdomain of the proceedings to update"
         required: true
-        default: 'france'
+        default: "paris"
 #  push:
 #    branches:
 #      - main
@@ -25,15 +25,15 @@ on:
 
 env:
   ENV: ${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}
-  AWS_REGION: 'eu-west-3' # paris
-  NODE_OPTIONS: '--max_old_space_size=4096' # fix heap out of memory error (nuxt generate)
+  AWS_REGION: "eu-west-3" # paris
+  NODE_OPTIONS: "--max_old_space_size=4096" # fix heap out of memory error (nuxt generate)
   # `yarn` install used to hang for >15min at "[4/4] Building fresh
   # packages" because puppeteer@20's postinstall downloads a ~120MB
   # Chromium and stalls on the CI runner. Skip that download entirely;
   # both the direct puppeteer use (generateThumbnails.js) and pagedjs-cli
   # launch via puppeteer, which honours PUPPETEER_EXECUTABLE_PATH — set in
   # the "Setup Chrome" step below to the runner's installed Chrome.
-  PUPPETEER_SKIP_DOWNLOAD: 'true'
+  PUPPETEER_SKIP_DOWNLOAD: "true"
 
 jobs:
   install:
@@ -147,6 +147,17 @@ jobs:
 
       - name: 👨🏻‍💻 Install dependencies
         run: yarn
+
+      # Slugify any article/issue path that contains a space (or other
+      # git-ref-unsafe char) and move loose root articles into their issue
+      # folder, BEFORE the build. Without this, DecapCMS editorial-workflow
+      # saves build a branch `cms/articles/<path>` that GitHub rejects
+      # ("is not a valid ref name"). Idempotent: a clean tree is a no-op. The
+      # publio module also runs this at build time, but doing it explicitly
+      # here guarantees the retro-push below commits slugified paths even if
+      # the submodule was pulled with legacy spaced names.
+      - name: 🔤 Slugify content paths (CMS branch-name safety)
+        run: node modules/publio/lib/migrateSlugifyPaths.mjs --apply --submodule=${{ github.event.inputs.name }}
 
       - name: 🧪 Configure the CMS
         run: yarn configCMS
@@ -380,23 +391,23 @@ jobs:
           echo "_Diff range: \`${PRE_SHA:0:7}..${POST_SHA:0:7}\` in submodule \`${PROCEEDINGS}\`._" >> "$summary"
 
       - name: 🤫 Setting up AWS credentials
-        uses: 'aws-actions/configure-aws-credentials@v1'
+        uses: "aws-actions/configure-aws-credentials@v1"
         with:
           aws-access-key-id: ${{ env.ENV == 'prod' && secrets.AWS_ACCESS_KEY_ID ||  secrets.AWS_ACCESS_KEY_ID_DEV }}
           aws-secret-access-key: ${{ env.ENV == 'prod' && secrets.AWS_SECRET_ACCESS_KEY || secrets.AWS_SECRET_ACCESS_KEY_DEV }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: 🤫 Getting cloudfront secrets
-        uses: 'marvinpinto/action-inject-ssm-secrets@latest'
+        uses: "marvinpinto/action-inject-ssm-secrets@latest"
         with:
-          ssm_parameter: '/${{ github.event.inputs.name }}/cloudfront/id'
-          env_variable_name: 'ssm_cloudfront_id'
+          ssm_parameter: "/${{ github.event.inputs.name }}/cloudfront/id"
+          env_variable_name: "ssm_cloudfront_id"
 
       - name: 🤫 Getting S3 secrets
-        uses: 'marvinpinto/action-inject-ssm-secrets@latest'
+        uses: "marvinpinto/action-inject-ssm-secrets@latest"
         with:
-          ssm_parameter: '/${{ github.event.inputs.name}}/s3/name'
-          env_variable_name: 'ssm_s3_name'
+          ssm_parameter: "/${{ github.event.inputs.name}}/s3/name"
+          env_variable_name: "ssm_s3_name"
 
       # Content-aware deploy in three passes. The previous single
       # `aws s3 sync --delete` re-uploaded the WHOLE site (~4400 objects)
@@ -490,5 +501,5 @@ jobs:
         uses: srt32/uptime@v0.2.1
         # TODO replace hard coded references to the repo with variables
         with:
-          url-to-hit: 'https://${{ github.event.inputs.domain }}.pias.science'
-          expected-statuses: '200,301'
+          url-to-hit: "https://${{ github.event.inputs.domain }}.pias.science"
+          expected-statuses: "200,301"

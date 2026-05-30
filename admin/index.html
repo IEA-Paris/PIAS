@@ -7,7 +7,14 @@
     <title>Content Manager</title>
   </head>
   <body>
-    <!-- Include the script that builds the page and powers Decap CMS -->
-    <script src="https://unpkg.com/decap-cms@^3.1.10/dist/decap-cms.js"></script>
+    <!-- Include the script that builds the page and powers Decap CMS. -->
+    <script src="https://unpkg.com/decap-cms@^3.12.2/dist/decap-cms.js"></script>
+    <!-- citation-js 0.5.7 browser bundle (same version used server-side in the
+         publio build), so client-side bibtex parsing yields identical entry keys.
+         Exposes a global `require`; `require('citation-js')` returns Cite. -->
+    <script src="https://unpkg.com/citation-js@0.5.7/build/citation.min.js"></script>
+    <!-- Custom editor components: Citation picker + Footnote inserter.
+         Copied to static/admin/widgets.js by the `copy` npm script. -->
+    <script src="./widgets.js"></script>
   </body>
 </html>

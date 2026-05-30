@@ -1,7 +1,7 @@
 export default {
   footer: [
     { text: 'about', path: '/' },
-    { text: 'editorial_policy', path: '/editorial_policy' },
+    { text: 'editorial-policy', path: '/editorial_policy' },
     { text: 'contact', path: '/contact' },
     { text: 'newsletter', path: '/newsletter' },
     { text: 'support', path: '/support' },

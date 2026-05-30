@@ -26,8 +26,11 @@ export default (node, article, media, authors, issues, options) => {
                 children: [{ type: 'text', value: index + 1 + ' : ' }],
               },
               ...(article.bibliography?.length
-                ? replaceReferenceInFootnote(footnote, article.bibliography)
-                    .children
+                ? replaceReferenceInFootnote(
+                    footnote,
+                    article.bibliography,
+                    article.slug
+                  ).children
                 : footnote.children),
             ],
             type: 'root',

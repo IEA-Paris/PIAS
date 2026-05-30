@@ -15,10 +15,35 @@ export default async (authors = [], articles, content) => {
     const updatedAuthorsDocuments = [...(first || []), ...(second || [])].map(
       (item) => {
         const { createdAt, ...rest } = item // remove createdAt property
-        const authorArticles =
-          item?.articles?.filter((article) =>
-            articles.find((art) => !(art.slug === article && art.published))
-          ) || []
+        // Keep only the article slugs that still correspond to an existing,
+        // published article — and de-duplicate. publio otherwise only ever
+        // *appends* to an author's `articles` list, so renamed (e.g. slugified),
+        // deleted or unpublished articles would linger forever as stale entries.
+        const authorArticles = Array.from(
+          new Set(
+            (item?.articles || []).filter((article) =>
+              articles.some((art) => art.slug === article && art.published)
+            )
+          )
+        )
+
+        // Derive the author's `issue` list from their live articles rather than
+        // trusting the accumulated array (same append-only/never-prune problem:
+        // it otherwise keeps renamed/spaced issue paths forever). Each article
+        // carries its issue path (`content/issues/<slug>.md`), so the set of
+        // issues an author belongs to is exactly the issues of their published
+        // articles.
+        const authorIssue = Array.from(
+          new Set(
+            authorArticles
+              .map(
+                (slug) =>
+                  articles.find((art) => art.slug === slug && art.published)
+                    ?.issue
+              )
+              .filter(Boolean)
+          )
+        )
 
         const fileContents = item.path
           ? fs.readFileSync(
@@ -71,6 +96,7 @@ export default async (authors = [], articles, content) => {
             !!rest.editorial_committee,
           positions_and_institutions: positionsAndInstitutions,
           articles: authorArticles || [],
+          issue: authorIssue,
         }
       }
     )
