@@ -49,10 +49,13 @@
         const body = content.querySelector('.article-body')
         if (!body) return
 
+        // Only h2/h3 headings count, both toward the TOC entries and toward the
+        // threshold below: print the TOC only when there are 6 OR MORE of them.
+        const TOC_MIN_HEADINGS = 6
         const headings = Array.from(body.querySelectorAll('h2, h3'))
-        if (!headings.length) {
-          // Nothing to list — hide the whole TOC block so we don't print an
-          // empty "Contents" heading.
+        if (headings.length < TOC_MIN_HEADINGS) {
+          // Too few headings — hide the whole TOC block so we don't print a
+          // near-empty "Contents" heading on short articles.
           const block = content.querySelector('.pdf-toc-block')
           if (block) block.style.display = 'none'
           return

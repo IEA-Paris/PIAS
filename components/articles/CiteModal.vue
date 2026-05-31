@@ -270,7 +270,11 @@ import { writeClipboard, htmlToPlainText } from '~/assets/utils/clipboard'
 // `article.exports` map produced at build time by
 // modules/publio/lib/article/files/generateBibliographyFilesForExport.js
 const EXPORT_DESCRIPTORS = [
-  { key: 'bibtex', icon: 'mdi-language-latex', hint: 'BibTeX / LaTeX (.bib)' },
+  {
+    key: 'bibtex',
+    icon: 'mdi-book-open-page-variant',
+    hint: 'BibTeX / LaTeX (.bib)',
+  },
   {
     key: 'ris',
     icon: 'mdi-book-open-variant',
