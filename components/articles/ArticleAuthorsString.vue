@@ -108,11 +108,12 @@ export default {
 }
 .institutions-group {
   margin-top: 10px;
-  line-height: 0.8rem;
+  line-height: 1rem;
   .institutions.small {
     sup {
       font-style: normal;
     }
+    line-height: 0.8rem;
     word-wrap: normal;
     line-break: normal;
     font-size: 10px;
@@ -128,6 +129,7 @@ export default {
     word-wrap: normal;
     line-break: normal;
     font-size: 12px;
+    line-height: 1rem;
     font-weight: 300;
     font-style: italic;
     font-weight: 300;

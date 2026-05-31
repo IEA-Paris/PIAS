@@ -28,6 +28,220 @@ export const recordMissingReference = (slug, reference) => {
   if (_missing.some((m) => m.article === article && m.reference === ref)) return
   _missing.push({ article, reference: ref })
 }
+
+// Soft, advisory list of institution spelling variants that were auto-merged
+// into a single affiliation (same canonical key but differing original strings,
+// e.g. "ETH Zurich" vs "ETH Zurich, Switzerland", or a FR/EN pair). Unlike
+// `_conflicts` these never block and never drop data — they merely tell the
+// editor which spelling was kept so they can harmonise it in the CMS author doc.
+export const _spellingVariants = []
+const recordSpellingVariant = (id, kept, variant, articles = []) => {
+  if (!kept || !variant || kept === variant) return
+  const existing = _spellingVariants.find(
+    (v) =>
+      v.kept === kept &&
+      v.variant === variant &&
+      JSON.stringify(v.id) === JSON.stringify(id)
+  )
+  if (existing) {
+    existing.articles = Array.from(
+      new Set([...(existing.articles || []), ...(articles || [])])
+    )
+    return
+  }
+  _spellingVariants.push({ id, kept, variant, articles: [...(articles || [])] })
+}
+
+// Soft, advisory list of institution fields that appear to hold MORE THAN ONE
+// institution in a single string (a data-entry error — two affiliations joined
+// by " / "). We never guess how to split them (a real name could contain a
+// slash); we only flag the value so an editor fixes it at the source article.
+export const _combinedInstitutions = []
+const recordCombinedInstitution = (id, institution, articles = []) => {
+  if (!institution) return
+  const existing = _combinedInstitutions.find(
+    (v) =>
+      v.institution === institution &&
+      JSON.stringify(v.id) === JSON.stringify(id)
+  )
+  if (existing) {
+    existing.articles = Array.from(
+      new Set([...(existing.articles || []), ...(articles || [])])
+    )
+    return
+  }
+  _combinedInstitutions.push({
+    id,
+    institution,
+    articles: [...(articles || [])],
+  })
+}
+
+// Canonical comparison key for an institution free-text string: slugify only
+// (lowercase + accent-fold + punctuation). For COMPARISON/dedupe only — never
+// stored. DELIBERATELY conservative: we do NOT translate languages or collapse
+// prefixes, because doing so risks merging distinct affiliations and pooling
+// positions that don't belong together (e.g. inventing "Director @ LSE").
+// Strings that differ by more than case/accents/punctuation simply coexist.
+export const canonicalInstitutionKey = (institution) =>
+  institution ? slugify(String(institution)) : ''
+
+// Drop empty/whitespace-only positions; always return an array.
+export const pruneEmptyPositions = (positions) =>
+  (Array.isArray(positions) ? positions : [])
+    .map((p) => (typeof p === 'string' ? p.trim() : p))
+    .filter((p) => p && p.length)
+
+// Normalise an author record up front so the merge sees clean, consistent
+// data: trimmed names (so the same person isn't represented as 'Saadi ' vs
+// 'Saadi'), and affiliations with a non-empty trimmed institution and pruned
+// positions. Applied to BOTH the per-article authors and the author documents
+// loaded from disk, so pre-existing committed docs self-heal on the next run.
+// Names keep their accents (significant for identity); only whitespace trimmed.
+export const normalizeAuthor = (author) => {
+  if (!author) return author
+  return {
+    ...author,
+    firstname: (author.firstname || '').trim(),
+    lastname: (author.lastname || '').trim(),
+    positions_and_institutions: (author.positions_and_institutions || [])
+      .filter((pi) => pi && String(pi.institution || '').trim())
+      .map((pi) => ({
+        ...pi,
+        institution: String(pi.institution).trim(),
+        positions: pruneEmptyPositions(pi.positions),
+      })),
+  }
+}
+
+/**
+ * Merge two lists of { institution, positions } affiliation entries. Replaces
+ * the old index-based array merge for `positions_and_institutions`, which
+ * produced spurious "institution" conflicts whenever a person had different
+ * (legitimate) affiliations across articles.
+ *
+ * Each { institution, positions } pair is treated as an ATOMIC unit: positions
+ * belong to the institution they were declared with and are NEVER pooled across
+ * entries (pooling fabricated affiliation/position pairs such as
+ * "Director @ London School of Economics" that never existed).
+ *
+ * Conservative deduplication — two entries merge only when their institution
+ * strings are identical after slugify (case / accents / punctuation), i.e. the
+ * SAME institution written the same way. No language translation, no prefix
+ * collapse: spellings that differ by more than case/accents simply coexist as
+ * distinct affiliations (a person can legitimately have several). When two
+ * entries share a canonical key but carry DIFFERENT positions, they are kept
+ * separate — we never invent a combined position list.
+ *
+ * A final pruning pass removes same-language spelling duplicates (one canonical
+ * key is a dash-bounded prefix of another, e.g. "London School of Economics" vs
+ * "…, United Kingdom") by keeping the position-bearing / most-specific entry and
+ * dropping the redundant one — but ONLY when the kept entry already covers every
+ * position of the dropped one, so a position is never lost or moved. Dropped
+ * spellings are recorded as soft advisories for the editor.
+ *
+ * Returns the merged list sorted for stable, minimal diffs. `id`/`articles` are
+ * forwarded only for the advisory.
+ */
+export const mergeAffiliations = (
+  prevList = [],
+  nextList = [],
+  id,
+  articles = []
+) => {
+  // dedupeKey (canonicalKey + ' ' + sorted positions) -> entry
+  const byPair = new Map()
+
+  const add = (entry) => {
+    if (!entry) return
+    const original = String(entry.institution || '').trim()
+    if (!original) return
+    const key = canonicalInstitutionKey(original)
+    if (!key) return
+    // A single institution field holding two institutions joined by " / " is a
+    // data-entry error; flag it for the editor but keep the value intact (we do
+    // not guess the split — a real institution name could contain a slash).
+    if (/\s\/\s/.test(original)) {
+      recordCombinedInstitution(id, original, articles)
+    }
+    const positions = pruneEmptyPositions(entry.positions)
+    const dedupeKey = key + ' ' + [...positions].sort().join('')
+
+    const existing = byPair.get(dedupeKey)
+    if (!existing) {
+      byPair.set(dedupeKey, { key, institution: original, positions })
+      return
+    }
+    // Same institution + same positions: a true duplicate. Keep the richer
+    // (longer) original spelling and flag the variant for the editor.
+    if (existing.institution !== original) {
+      const kept =
+        original.length > existing.institution.length
+          ? original
+          : existing.institution
+      const dropped = kept === original ? existing.institution : original
+      existing.institution = kept
+      recordSpellingVariant(id, kept, dropped, articles)
+    }
+  }
+
+  ;[...(prevList || []), ...(nextList || [])].forEach(add)
+
+  const entries = Array.from(byPair.values())
+
+  // Prune redundant duplicates while NEVER moving a position. Two entries are
+  // "related" when one canonical key is a dash-bounded prefix of the other
+  // (same-language spelling variants such as "london-school-of-economics" vs
+  // "london-school-of-economics-united-kingdom"). Cross-language spellings have
+  // unrelated keys and are left to coexist (flagged as advisories elsewhere).
+  const related = (a, b) =>
+    a !== b &&
+    a.key &&
+    b.key &&
+    (a.key === b.key ||
+      b.key.startsWith(a.key + '-') ||
+      a.key.startsWith(b.key + '-'))
+
+  // Drop entry E when a related entry F makes it redundant, i.e. F already
+  // carries every position E has (E empty, or E.positions ⊆ F.positions) and F
+  // is the "better" representative (more positions, else more specific/longer
+  // key, else longer string). This removes bare-name and country-suffix
+  // duplicates and keeps the position-bearing / most descriptive spelling,
+  // without ever fabricating an affiliation/position pair.
+  // Strict total order so that of two mutually-related entries EXACTLY one is
+  // kept (otherwise both could drop each other). More positions wins; then more
+  // specific (longer key); then longer string; final asymmetric tiebreak on the
+  // string so the comparison is never symmetric-true.
+  const better = (f, e) => {
+    if (f.positions.length !== e.positions.length) {
+      return f.positions.length > e.positions.length
+    }
+    if (f.key.length !== e.key.length) return f.key.length > e.key.length
+    if (f.institution.length !== e.institution.length) {
+      return f.institution.length > e.institution.length
+    }
+    return f.institution > e.institution
+  }
+
+  return entries
+    .filter((e, _i, all) => {
+      const f = all.find(
+        (o) =>
+          related(e, o) &&
+          e.positions.every((p) => o.positions.includes(p)) &&
+          better(o, e)
+      )
+      if (f && e.institution !== f.institution) {
+        recordSpellingVariant(id, f.institution, e.institution, articles)
+      }
+      return !f
+    })
+    .sort(
+      (a, b) =>
+        a.key.localeCompare(b.key) || a.institution.localeCompare(b.institution)
+    )
+    .map(({ institution, positions }) => ({ institution, positions }))
+}
 const fieldsToDelete = [
   'slug',
   'body',
@@ -55,6 +269,118 @@ function processFrontmatter(md, options) {
   return matter.stringify(matter(frontmatter))
 }
 
+// Build the on-disk path (relative to the submodule content root) of the
+// author document for a given { firstname, lastname } id, mirroring the
+// filename logic in insertDocuments so the editor can open the exact CMS file.
+// Returns e.g. "content/authors/l/lahlou_saadi".
+const authorDocPath = (id = {}) => {
+  const fileName = slugify(
+    (id.lastname || '') +
+      (id.firstname && id.firstname.length ? '_' + id.firstname : '')
+  )
+  return 'content/authors/' + fileName[0] + '/' + fileName
+}
+
+// Decap CMS deep link into the author entry editor. For a nested collection
+// (folder: content/authors) the entry route is
+// /admin/#/collections/authors/entries/<path-below-the-collection-folder>,
+// e.g. content/authors/s/slater-mel.md → .../entries/s/slater-mel.
+// config.url is the site origin (never hardcode the domain).
+const authorCmsLink = (id) => {
+  const entryPath = authorDocPath(id).replace(/^content\/authors\//, '')
+  return `${config.url}/admin/#/collections/authors/entries/${entryPath}`
+}
+
+const authorLabel = (id = {}) =>
+  [id.firstname, id.lastname].filter(Boolean).join(' ').trim() || 'unknown'
+
+// Turn the raw, per-merge _conflicts entries into an editor-actionable shape,
+// grouped per (author, field) with deduplicated competing values and their
+// source articles, plus the author doc path and a CMS deep link.
+const buildConflictReport = () => {
+  const byAuthorField = new Map()
+  for (const { id, key, prev, next, articles = [] } of _conflicts) {
+    const groupKey = JSON.stringify(id) + '::' + key
+    if (!byAuthorField.has(groupKey)) {
+      byAuthorField.set(groupKey, {
+        author: authorLabel(id),
+        field: key,
+        authorDoc: authorDocPath(id) + '.md',
+        cmsLink: authorCmsLink(id),
+        _values: new Map(), // value -> Set(articles)
+      })
+    }
+    const group = byAuthorField.get(groupKey)
+    // `prev` is the kept/existing value; `next` is the incoming one. Provenance
+    // articles are only known for the incoming value.
+    if (!group._values.has(prev)) group._values.set(prev, new Set())
+    if (!group._values.has(next)) group._values.set(next, new Set())
+    articles.forEach((a) => group._values.get(next).add(a))
+  }
+  return Array.from(byAuthorField.values()).map(({ _values, ...rest }) => ({
+    ...rest,
+    values: Array.from(_values.entries()).map(([value, articles]) => ({
+      value,
+      articles: Array.from(articles),
+    })),
+  }))
+}
+
+// Group the soft spelling-variant advisories per author, listing the kept
+// spelling and the dropped variants the editor may want to harmonise.
+const buildSpellingVariantReport = () => {
+  const byAuthorKept = new Map()
+  for (const { id, kept, variant, articles = [] } of _spellingVariants) {
+    const groupKey = JSON.stringify(id) + '::' + kept
+    if (!byAuthorKept.has(groupKey)) {
+      byAuthorKept.set(groupKey, {
+        author: authorLabel(id),
+        authorDoc: authorDocPath(id) + '.md',
+        cmsLink: authorCmsLink(id),
+        kept,
+        _variants: new Map(), // variant -> Set(articles)
+      })
+    }
+    const group = byAuthorKept.get(groupKey)
+    if (!group._variants.has(variant)) group._variants.set(variant, new Set())
+    articles.forEach((a) => group._variants.get(variant).add(a))
+  }
+  return Array.from(byAuthorKept.values()).map(({ _variants, ...rest }) => ({
+    ...rest,
+    variants: Array.from(_variants.keys()),
+  }))
+}
+
+// Group the combined-institution advisories (a single institution field that
+// holds two institutions joined by " / ") per author, with the offending
+// value(s) and source articles, plus the CMS link to fix them at the source.
+const buildCombinedInstitutionReport = () => {
+  const byAuthor = new Map()
+  for (const { id, institution, articles = [] } of _combinedInstitutions) {
+    const groupKey = JSON.stringify(id)
+    if (!byAuthor.has(groupKey)) {
+      byAuthor.set(groupKey, {
+        author: authorLabel(id),
+        authorDoc: authorDocPath(id) + '.md',
+        cmsLink: authorCmsLink(id),
+        _values: new Map(), // institution -> Set(articles)
+      })
+    }
+    const group = byAuthor.get(groupKey)
+    if (!group._values.has(institution)) {
+      group._values.set(institution, new Set())
+    }
+    articles.forEach((a) => group._values.get(institution).add(a))
+  }
+  return Array.from(byAuthor.values()).map(({ _values, ...rest }) => ({
+    ...rest,
+    institutions: Array.from(_values.entries()).map(([value, articles]) => ({
+      value,
+      articles: Array.from(articles),
+    })),
+  }))
+}
+
 export const storeReport = () => {
   const today = new Date()
   const date =
@@ -71,8 +397,13 @@ export const storeReport = () => {
   // The report is retro-committed to the submodule each CI run. Keep the
   // volatile `createdAt` out of the change-detection so an unchanged payload
   // doesn't churn a commit every run: only rewrite the file when the actual
-  // conflicts/missingReferences differ from the report already on disk.
-  const payload = { conflicts: _conflicts, missingReferences: missingByArticle }
+  // conflicts/spellingVariants/missingReferences differ from the report on disk.
+  const payload = {
+    conflicts: buildConflictReport(),
+    spellingVariants: buildSpellingVariantReport(),
+    combinedInstitutions: buildCombinedInstitutionReport(),
+    missingReferences: missingByArticle,
+  }
   const dumpOpts = { noRefs: true, sortKeys: true }
   const body = yaml.dump(payload, dumpOpts)
   const reportPath = './generated/report.md'
@@ -266,18 +597,6 @@ export const filterAndMerge = (first, second) => {
     // does it have the same firstname/lastname than a doc author?
     const referencedDocIndex = second.findIndex((doc) => {
       if (doc.is_institution && author.is_institution) {
-        if (author.lastname === 'Ecole normale Supérieure Paris, France') {
-          console.log(
-            author?.lastname.trim().toLowerCase() +
-              ' vs ' +
-              doc?.lastname.trim().toLowerCase() +
-              'is' +
-              (author.lastname &&
-                doc.lastname &&
-                author?.lastname.trim().toLowerCase() ===
-                  doc?.lastname.trim().toLowerCase())
-          )
-        }
         return (
           author.lastname &&
           doc.lastname &&
@@ -332,8 +651,24 @@ export const mergeDeep = (objects, id) => {
       const oVal = obj[key]
       if (obj[key] !== undefined || prev[key] !== undefined) {
         if (prev[key] === undefined) prev[key] = oVal
+        // Affiliations are merged as a SET keyed by canonical institution name,
+        // NOT by array index — index-merging was the dominant source of
+        // spurious "institution" conflicts. Route here even when only one side
+        // has the array, so a first-seen author's list is still canonicalised
+        // and deduplicated. See mergeAffiliations.
+        if (
+          key === 'positions_and_institutions' &&
+          (Array.isArray(pVal) || Array.isArray(oVal))
+        ) {
+          prev[key] = mergeAffiliations(
+            Array.isArray(pVal) ? pVal : [],
+            Array.isArray(oVal) ? oVal : [],
+            id,
+            obj.articles
+          )
+        }
         // if we deal with an array
-        if (Array.isArray(pVal) && Array.isArray(oVal)) {
+        else if (Array.isArray(pVal) && Array.isArray(oVal)) {
           // check its items type
           if (
             (pVal[0] && typeof pVal[0] === 'object') ||
@@ -379,12 +714,17 @@ export const mergeDeep = (objects, id) => {
               prev[key]
             } VS ${oVal} in ${key} with id ${JSON.stringify(id)}`
           )
+          // Record a hard conflict on a scalar field (orcid, website, …) where
+          // two articles genuinely disagree. We keep only what an editor needs
+          // to arbitrate in the CMS — the field, the two competing values and
+          // the incoming value's source articles — not a spread of the whole
+          // object. storeReport() aggregates these per (author, field).
           _conflicts.push({
             id,
             key,
-            prev: prev[key],
-            next: oVal,
-            ...obj,
+            prev: prev[key].trim(),
+            next: oVal.trim(),
+            articles: obj.articles || [],
           })
         } else if (typeof prev[key] === 'string') prev[key] = prev[key].trim()
 

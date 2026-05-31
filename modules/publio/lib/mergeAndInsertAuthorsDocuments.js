@@ -1,7 +1,12 @@
 import fs from 'fs'
 import parseMD from 'parse-md'
 import { drawEllipse } from 'pdf-lib'
-import { filterAndMerge, insertDocuments } from '../utils/contentUtilities'
+import {
+  filterAndMerge,
+  insertDocuments,
+  normalizeAuthor,
+  pruneEmptyPositions,
+} from '../utils/contentUtilities'
 import config from '../../../config'
 
 export default async (authors = [], articles, content) => {
@@ -10,7 +15,39 @@ export default async (authors = [], articles, content) => {
 
     const authorsDocuments = await content('authors', { deep: true }).fetch()
 
-    const { first, second } = filterAndMerge(authors, authorsDocuments)
+    // Normalise both the incoming article authors and the author docs loaded
+    // from disk through the same pass (trim names, prune empty positions and
+    // empty-institution affiliations) so they merge consistently and any stale
+    // empties in already-committed docs self-heal on this run.
+    const normalizedAuthors = (authors || []).map(normalizeAuthor)
+
+    // The articles are the source of truth for affiliations. A committed author
+    // doc's positions_and_institutions is DERIVED data that may carry historical
+    // corruption from the old index-based merge (e.g. a position pooled onto the
+    // wrong institution). So for every author that still appears in an article,
+    // discard the doc's stored affiliations and rebuild them purely from the
+    // articles. Authors with no current article keep their doc affiliations
+    // (there is nothing fresher to derive them from).
+    const identityKey = (a) =>
+      a?.is_institution
+        ? 'inst:' + (a.lastname || '').trim().toLowerCase()
+        : 'person:' +
+          (a.firstname || '').trim().toLowerCase() +
+          '|' +
+          (a.lastname || '').trim().toLowerCase()
+    const articleAuthorIds = new Set(normalizedAuthors.map(identityKey))
+    const normalizedDocuments = (authorsDocuments || [])
+      .map(normalizeAuthor)
+      .map((doc) =>
+        articleAuthorIds.has(identityKey(doc))
+          ? { ...doc, positions_and_institutions: [] }
+          : doc
+      )
+
+    const { first, second } = filterAndMerge(
+      normalizedAuthors,
+      normalizedDocuments
+    )
 
     const updatedAuthorsDocuments = [...(first || []), ...(second || [])].map(
       (item) => {
@@ -54,35 +91,17 @@ export default async (authors = [], articles, content) => {
 
         const { content } = fileContents ? parseMD(fileContents) : false
 
-        const positionsAndInstitutions = []
-        // prune empty positions
-        rest.positions_and_institutions =
-          // make sure it existts
-          (rest.positions_and_institutions &&
-            // then only keep the ones that have an institution
-            Object.keys(rest.positions_and_institutions).map((el) => {
-              // only if it has an institution
-              if (
-                rest.positions_and_institutions[el] &&
-                rest.positions_and_institutions[el].institution?.length
-              ) {
-                // prune positions as well
-                rest.positions_and_institutions[el].positions =
-                  (rest.positions_and_institutions[el].positions &&
-                    Array.isArray(
-                      rest.positions_and_institutions[el].positions
-                    ) &&
-                    rest.positions_and_institutions[el].positions.filter(
-                      (el) => el && el.length
-                    )) ||
-                  []
-                positionsAndInstitutions.push(
-                  rest.positions_and_institutions[el]
-                )
-              }
-              return el
-            })) ||
-          []
+        // Affiliations are already normalised (empty institutions dropped,
+        // positions pruned) by normalizeAuthor before the merge, and merged as
+        // a deduplicated set by mergeAffiliations. Defensive prune of empty
+        // positions in case a single-article author skipped the merge path.
+        const positionsAndInstitutions = (rest.positions_and_institutions || [])
+          .filter((pi) => pi && String(pi.institution || '').trim())
+          .map((pi) => ({
+            ...pi,
+            institution: String(pi.institution).trim(),
+            positions: pruneEmptyPositions(pi.positions),
+          }))
 
         return {
           ...rest,

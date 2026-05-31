@@ -183,7 +183,7 @@ export default {
   margin-left: 2.4rem;
 }
 .logo-container-white {
-  border: 4px white solid;
+  border: 2px white solid;
 }
 .menu-logo-1 {
   font-size: 6rem;

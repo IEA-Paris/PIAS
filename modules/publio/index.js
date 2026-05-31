@@ -8,6 +8,7 @@ import {
   insertDocuments,
   updateArticlesDoiAndZid,
   storeReport,
+  normalizeAuthor,
 } from './utils/contentUtilities'
 
 // Article formating
@@ -304,8 +305,11 @@ export default function (moduleOptions) {
       authors = [
         ...(authors || []),
         ...(article.authors.map((author) => {
+          // Normalise up front (trim names, prune empty positions/institutions)
+          // so the same person merges consistently and empty positions never
+          // reach the merge as spurious differences.
           return {
-            ...author,
+            ...normalizeAuthor(author),
             articles: [article.slug],
             tags: article.tags,
             years: [article.years],

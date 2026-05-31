@@ -11,11 +11,17 @@
         <span class="pdf-footer-citation" v-html="footerCitation"></span>
       </div>
 
-      <img
-        class="pdf-cover-logo"
-        src="http://localhost:3000/icon.png"
-        alt="Journal logo"
-      />
+      <!-- Masthead: logo on the left, journal full name to its right. The
+           name uses config.full_name_html when present (it carries tidy
+           non-breaking spaces + a line break) and falls back to full_name. -->
+      <header class="pdf-cover-masthead">
+        <img class="pdf-cover-logo" src="/icon.png" alt="Journal logo" />
+        <div
+          v-if="journalFullName"
+          class="pdf-cover-journal"
+          v-html="journalFullName"
+        ></div>
+      </header>
 
       <h1 class="pdf-cover-title" v-html="item.article_title"></h1>
 
@@ -230,6 +236,15 @@ export default {
     }
   },
   computed: {
+    // Journal name for the cover masthead. Prefer the HTML variant
+    // (full_name_html) — it carries non-breaking spaces and a deliberate line
+    // break for a tidy two-line wordmark — and fall back to the plain
+    // full_name. Empty string when the journal defines neither (or set false),
+    // which hides the masthead text via v-if.
+    journalFullName() {
+      const cfg = this.$config || {}
+      return cfg.full_name_html || cfg.full_name || ''
+    },
     // Title with any inline HTML stripped, for <title>/running head/metadata.
     plainTitle() {
       return (this.item.article_title || '')
@@ -360,5 +375,27 @@ export default {
 }
 .pdf-string-source {
   display: none;
+}
+/* Screen-only mirror of the masthead (the PDF version lives in pdf-paged.css). */
+.pdf-cover-masthead {
+  display: flex;
+  align-items: center;
+  gap: 5mm;
+  margin-bottom: 9mm;
+  padding-bottom: 3.5mm;
+  border-bottom: 0.75pt solid #d4d4da;
+}
+.pdf-cover-masthead .pdf-cover-logo {
+  width: 64px;
+  height: 64px;
+  flex: 0 0 auto;
+}
+.pdf-cover-journal {
+  font-family: 'Bodoni Moda', 'Tinos', Georgia, serif;
+  font-weight: 300;
+  font-size: 12pt;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  color: #4a4a52;
 }
 </style>

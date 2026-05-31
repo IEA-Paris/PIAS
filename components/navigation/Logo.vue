@@ -80,7 +80,6 @@ export default {
 </script>
 <style>
 .logo-container {
-  border: 4px black solid;
   width: 120px;
   height: 120px;
   margin-top: 0.6em;

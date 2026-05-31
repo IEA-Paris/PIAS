@@ -300,10 +300,37 @@ body {
   page: cover;
   break-after: page;
 }
+
+/* Masthead — logo + journal wordmark on one baseline-aligned row, closed by a
+ * thin accent keyline that echoes the title's underline below it. This gives
+ * the cover a clear journal identity above the article title. */
+.pdf-cover-masthead {
+  display: flex;
+  align-items: center;
+  gap: 5mm;
+  margin-bottom: 9mm;
+  padding-bottom: 3.5mm;
+  border-bottom: 0.75pt solid var(--pdf-rule);
+}
 .pdf-cover-logo {
   width: 64px;
   height: 64px;
-  margin-bottom: 10mm;
+  flex: 0 0 auto;
+  margin: 0; /* spacing now handled by the masthead row */
+}
+/* Journal full name, set as a restrained serif wordmark: Bodoni Moda, small
+ * tracking, sitting to the right of the logo. font-size is generous because
+ * full_name_html breaks to two lines on most journals. */
+.pdf-cover-journal {
+  font-family: var(--pdf-serif);
+  /* Light weight to match the thin strokes of the logo wordmark — the journal
+   * name sits as a quiet identifier, not a competing headline. */
+  font-weight: 300;
+  font-size: 12pt;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  color: var(--pdf-muted);
+  font-feature-settings: 'liga' 1, 'kern' 1;
 }
 .pdf-cover-title {
   font-family: var(--pdf-serif);
