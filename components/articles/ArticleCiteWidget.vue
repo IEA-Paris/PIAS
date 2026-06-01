@@ -1,6 +1,6 @@
 <template>
   <v-card class="pa-3 mt-3 ml-4" flat>
-    <v-row no-gutters>
+    <v-row no-gutters align="center">
       <v-col cols="auto" class="mr-3">
         <CiteModal
           v-if="!$route.name.startsWith('print')"

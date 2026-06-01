@@ -70,6 +70,7 @@
                 text
                 class="mb-3 px-3 font-italic authorsBtn"
                 style=""
+                @click="onAuthorsClick"
                 v-html="formatAuthorsProxy()"
               >
               </v-btn>
@@ -88,6 +89,7 @@
 </template>
 <script>
 import { formatAuthors, highlight } from '~/assets/utils/transforms'
+import { getAuthorSlug } from '~/assets/utils/slugify'
 export default {
   props: {
     item: {
@@ -103,6 +105,17 @@ export default {
   methods: {
     goBack() {
       this.$router.go(-1)
+    },
+    onAuthorsClick() {
+      if (this.item.authors.length === 1) {
+        // Single author: go straight to their author page.
+        this.$router.push(`/author/${getAuthorSlug(this.item.authors[0])}`)
+      } else if (this.$route.hash !== '#authors') {
+        // Multiple authors: open the article's "about" panel, which lists the
+        // authors and their affiliations. The parent page watches the
+        // #authors hash to expand panel 0.
+        this.$router.push({ hash: 'authors' })
+      }
     },
     formatAuthorsProxy() {
       if (this.item.authors.length > 1) {
