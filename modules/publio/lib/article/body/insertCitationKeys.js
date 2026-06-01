@@ -344,6 +344,12 @@ const insertCitationKeysInNode = (node, biblio, slug) => {
 
     if (node.type === 'text') {
       node = replaceReference(node)
+    } else if (node?.tag === 'blockquote') {
+      // Skip blockquotes: epigraph attributions ("— Bruno Latour, 2004") are not
+      // in-text citations, and converting them to "@key" tokens here would both
+      // strip the human-readable name and feed a reference that doesn't render
+      // correctly inside a blockquote to insertBibliographicalReferences.
+      return node
     } else if (node?.children?.length > 0) {
       node.children = node.children.map((child) =>
         insertCitationKeysInNode(child, biblio, slug)

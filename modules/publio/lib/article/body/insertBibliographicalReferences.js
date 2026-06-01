@@ -7,7 +7,6 @@ import { recordMissingReference } from '../../../utils/contentUtilities'
 const insertBibliographicalReferences = (node, biblio, slug) => {
   try {
     const replaceRegularReference = (node, match) => {
-      console.log('match: ', match)
       let isOpening = false
       let isClosing = false
       if (match?.startsWith('(')) {
@@ -19,9 +18,7 @@ const insertBibliographicalReferences = (node, biblio, slug) => {
         isClosing = true
       }
       const authors = match.split(',')[0]?.trim()
-      console.log('authors: ', authors)
       const years = match.split(',')[1]?.trim()
-      console.log('years: ', years)
       const bibMatch = biblio.find((item) => {
         return (
           item.id.toLowerCase().includes(authors.toLowerCase()) &&
@@ -29,12 +26,10 @@ const insertBibliographicalReferences = (node, biblio, slug) => {
         )
       })
       if (bibMatch) {
-        console.log('bibMatch: ', bibMatch.id)
         node.value = node.value.replace(
           match,
           (isOpening ? '(' : '') + '@' + bibMatch.id + (isClosing ? ')' : '')
         )
-        console.log('node.value: ', node.value)
       }
 
       return node
@@ -99,11 +94,17 @@ const insertBibliographicalReferences = (node, biblio, slug) => {
                   },
                 ],
               },
-              node.value.split(element).slice(1).join(element) &&
-                replaceReference({
-                  type: 'text',
-                  value: node.value.split(element).slice(1).join(element),
-                }),
+              // Recurse into the trailing text only when there IS some — an empty
+              // tail (citation at end of node) must NOT push a falsy/"" child, which
+              // is not a valid node and breaks Nuxt Content's renderer.
+              ...(node.value.split(element).slice(1).join(element)
+                ? [
+                    replaceReference({
+                      type: 'text',
+                      value: node.value.split(element).slice(1).join(element),
+                    }),
+                  ]
+                : []),
             ],
           }
         }
@@ -112,6 +113,12 @@ const insertBibliographicalReferences = (node, biblio, slug) => {
     }
     if (node.type === 'text') {
       node = replaceReference(node)
+    } else if (node?.tag === 'blockquote') {
+      // Don't resolve references inside blockquotes. Epigraph attributions like
+      // "— Bruno Latour, 2004" get false-positive-matched as in-text citations
+      // (and the resulting linked-reference span doesn't render correctly nested
+      // in a blockquote). Leave the quote's text untouched.
+      return node
     } else if (node?.children?.length > 0) {
       node.children = node.children.map((child) =>
         insertBibliographicalReferences(child, biblio, slug)
