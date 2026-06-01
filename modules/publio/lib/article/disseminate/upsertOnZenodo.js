@@ -120,10 +120,18 @@ export default async (articles, options, queue) => {
       )
       // check if the file exists
       if (fs.existsSync(resolvedPath)) {
-        document.fileBuffer = fs.readFileSync(resolvedPath)
+        // Read the PDF only to compute its checksum, then DROP the buffer. The
+        // article objects mutated here are the same ones Nuxt Content serialises
+        // into its LokiJS database (db-*.json) at generate time. A PDF buffer is
+        // megabytes; keeping it on every one of the ~hundreds of articles pushes
+        // the serialised DB past V8's max string length and crashes the build
+        // with "RangeError: Invalid string length". The actual upload step
+        // (publishOnZenodo / generateDOI) re-reads the file from disk itself, so
+        // nothing downstream needs this buffer to persist.
+        const fileBuffer = fs.readFileSync(resolvedPath)
 
         // get PDF checksum
-        document.checksum = generateChecksum(document.fileBuffer)
+        document.checksum = generateChecksum(fileBuffer)
         console.log('FOUND a PDF file to upload for ', document.article_title)
       } else {
         console.log(

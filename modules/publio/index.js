@@ -266,6 +266,19 @@ export default function (moduleOptions) {
         // (works citing / cited by each article) for the "Cited by" panel.
         articles = await fetchCitationLinks(articles, options)
       }
+
+      // These same `articles` objects are what Nuxt Content serialises into its
+      // LokiJS database (db-*.json). Any transient, build-only field left on
+      // them is written into that DB. `fileBuffer` is a multi-megabyte PDF
+      // Buffer attached during the Zenodo upsert/publish steps; on a corpus of
+      // hundreds of articles its serialisation blows past V8's max string
+      // length and the generate step dies with
+      // "RangeError: Invalid string length". Strip it (and the derived checksum)
+      // here, after dissemination is done with it and before render/DB save.
+      for (const article of articles || []) {
+        delete article.fileBuffer
+        delete article.checksum
+      }
     }
     return true
   })
