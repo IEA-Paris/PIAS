@@ -327,9 +327,11 @@ export default {
       const footerAuthors = this.citationAuthors || this.plainAuthors
       if (footerAuthors) parts.push(footerAuthors)
       if (issueName) {
-        const vol = volume ? ` – Vol. ${volume}` : ''
+        const vol = volume ? ` – Vol.&nbsp;${volume}` : ''
         parts.push(
-          `${issueName}${vol} – ${this.$t('article')} No.${this.articleNumber}`
+          `${issueName}${vol} – ${this.$t('article')}&nbsp;No.${
+            this.articleNumber
+          }`
         )
       }
       if (this.$config.name) parts.push(this.$config.name)
