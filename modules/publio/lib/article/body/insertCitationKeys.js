@@ -253,15 +253,34 @@ const insertCitationKeysInNode = (node, biblio, slug) => {
       // comma ("e.g., King" would otherwise split to author "e.g.").
       const stripped = stripStopwords(core)
       const authorSegment = stripped.split(',')[0]?.trim()
-      // The year is the first 4-digit run after the comma (handles "2017", "2017a",
-      // "2017, p. 12" etc.).
-      const year = stripped.split(',').slice(1).join(',').match(/\d{4}/)?.[0]
+      // The year is the first 4-digit run after the comma, optionally followed by a
+      // lowercase disambiguation suffix ("2017", "2017a", "2017, p. 12" etc.). citation-js
+      // does NOT preserve that suffix (it stores only the bare year in issued.date-parts),
+      // so the only place it survives is the bibtex key id ("goffman1963a"); we capture it
+      // here to disambiguate same-author/same-year entries below.
+      const yearMatch = stripped
+        .split(',')
+        .slice(1)
+        .join(',')
+        .match(/(\d{4})([a-z])?/)
+      const year = yearMatch?.[1]
+      const yearSuffix = yearMatch?.[2]
       if (!authorSegment || !year) return node
 
       const authorTokens = extractAuthorTokens(authorSegment)
-      const bibMatch = biblio.find((item) =>
+      // All bib entries matching author + year. Usually one; when several share an
+      // author and year ("goffman1963a" / "goffman1963b") the cited suffix letter picks
+      // the right one, falling back to the first match when no suffix is cited or it
+      // matches none (preserving prior first-match behaviour).
+      const candidates = biblio.filter((item) =>
         matchesReference(item, authorTokens, year)
       )
+      const bibMatch =
+        (yearSuffix &&
+          candidates.find((item) =>
+            item.id.toLowerCase().endsWith(year + yearSuffix.toLowerCase())
+          )) ||
+        candidates[0]
 
       if (bibMatch) {
         node.value = node.value.replace(
@@ -302,11 +321,15 @@ const insertCitationKeysInNode = (node, biblio, slug) => {
       //   - unclosed groups split across lines/nodes:  "(Rochet & Tirole, 2006"
       //   - a trailing locator before the close:        "(e.g., King, 2010, p. 294"
       //   - a continuation fragment opening a node:     " Rysman, 2009)"
-      // We capture from an opening "(" (or start-of-node) through the first 4-digit year,
-      // then let replaceRegularReference parse out author+year as usual. Anything already
-      // caught verbatim by the primary pass is de-duplicated away below.
+      // We capture from an opening "(" (or start-of-node) through the first 4-digit year
+      // (plus its optional "a"/"b" disambiguation suffix — capturing it here is what stops
+      // the orphan "a)"/"b)" being left behind when the captured text is rewritten), then
+      // let replaceRegularReference parse out author+year as usual. Anything already caught
+      // verbatim by the primary pass is de-duplicated away below.
       const supplementary =
-        node.value.match(/\([^()]*?,\s*\d{4}|^[^()]*?,\s*\d{4}\)?/g) || []
+        node.value.match(
+          /\([^()]*?,\s*\d{4}[a-z]?|^[^()]*?,\s*\d{4}[a-z]?\)?/g
+        ) || []
 
       const matches = [...primary, ...supplementary]
       if (!matches.length) return node

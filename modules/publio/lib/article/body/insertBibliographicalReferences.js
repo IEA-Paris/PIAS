@@ -71,6 +71,24 @@ const insertBibliographicalReferences = (node, biblio, slug) => {
           console.log('REFERENCE NOT FOUND IN BIB FILE: ', element)
           // Collect it (with its article slug) for the generated report / CMS.
           recordMissingReference(slug, element)
+          // The first token didn't resolve, but later tokens in the SAME text node
+          // still might — keep walking past it. Splitting on `element` and recursing on
+          // the tail mirrors the resolved branch below; without this, one unresolved key
+          // (e.g. a malformed "@goffman1963aa") would block every later reference in the
+          // node from ever being linked.
+          const tail = node.value.split(element).slice(1).join(element)
+          if (tail) {
+            const rest = replaceReference({ type: 'text', value: tail })
+            node = {
+              type: 'element',
+              tag: 'span',
+              props: { class: 'node' },
+              children: [
+                { type: 'text', value: node.value.split(element)[0] + element },
+                rest,
+              ],
+            }
+          }
         } else {
           ref.link = true
           // edit the node to include the link
