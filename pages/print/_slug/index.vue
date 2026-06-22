@@ -144,7 +144,7 @@ import filtersRaw from '~/generated/filters'
 export default {
   layout: 'print',
   props: {},
-  async asyncData({ $content, params, payload }) {
+  async asyncData({ $content, params, payload, app }) {
     const item =
       (payload && payload.item) ||
       (
@@ -154,6 +154,27 @@ export default {
           })
           .fetch()
       )[0]
+
+    // The print route is statically pre-rendered and then paginated by headless
+    // Chromium (see modules/publio/lib/article/files/generatePDF.js). Because the
+    // i18n strategy is 'no_prefix', every route shares a single locale, so the
+    // UI labels ($t('bibliography'), $t('footnotes')…) would otherwise render in
+    // whatever locale the generate run happens to carry. Pin the locale to the
+    // article's own language: French only when frontmatter language === 'French',
+    // English otherwise.
+    //
+    // setLocale() alone is unreliable during `nuxt generate`: it loads the lazy
+    // message bundle but the i18n routing layer can reset the active locale
+    // before this page renders, leaving $t() resolving against the wrong locale.
+    // So we await setLocale() to guarantee the bundle is loaded, then assign the
+    // active locale synchronously on both the i18n wrapper and the underlying
+    // vue-i18n instance so the SSR render of this page uses it.
+    if (app && app.i18n) {
+      const locale = item.language === 'French' ? 'fr' : 'en'
+      await app.i18n.setLocale(locale)
+      app.i18n.locale = locale
+      if (app.i18n.i18n) app.i18n.i18n.locale = locale
+    }
 
     const dirArticle = item.dir.slice(9)
     let articleNumber = 1
