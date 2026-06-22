@@ -140,11 +140,31 @@
 <script>
 import { formatAuthors } from '~/assets/utils/transforms'
 import filtersRaw from '~/generated/filters'
+import enMessages from '~/translations/en.json'
+import frMessages from '~/translations/fr.json'
 
 export default {
   layout: 'print',
+  // Component-local i18n instance. The print route is statically pre-rendered
+  // and then paginated by headless Chromium (see
+  // modules/publio/lib/article/files/generatePDF.js). It must render in the
+  // article's OWN language regardless of the site/build locale. Relying on the
+  // global i18n (app.i18n.setLocale) is unreliable under `nuxt generate`: routes
+  // render concurrently against a shared, lazily-loaded instance, so the active
+  // locale at HTML-snapshot time is whatever the generator happened to leave it
+  // at — which leaked French labels ("Bibliographie", "Résumé") into English
+  // PDFs. A per-component i18n block sidesteps the shared instance entirely: the
+  // $t() calls in this template resolve against these eagerly-imported messages,
+  // and we pin its locale from the article frontmatter in created() below.
+  i18n: {
+    messages: { en: enMessages, fr: frMessages },
+    fallbackLocale: 'en',
+    // sync:false keeps this instance independent of the root locale so the
+    // global locale can never override the article-specific one mid-render.
+    sync: false,
+  },
   props: {},
-  async asyncData({ $content, params, payload, app }) {
+  async asyncData({ $content, params, payload }) {
     const item =
       (payload && payload.item) ||
       (
@@ -154,27 +174,6 @@ export default {
           })
           .fetch()
       )[0]
-
-    // The print route is statically pre-rendered and then paginated by headless
-    // Chromium (see modules/publio/lib/article/files/generatePDF.js). Because the
-    // i18n strategy is 'no_prefix', every route shares a single locale, so the
-    // UI labels ($t('bibliography'), $t('footnotes')…) would otherwise render in
-    // whatever locale the generate run happens to carry. Pin the locale to the
-    // article's own language: French only when frontmatter language === 'French',
-    // English otherwise.
-    //
-    // setLocale() alone is unreliable during `nuxt generate`: it loads the lazy
-    // message bundle but the i18n routing layer can reset the active locale
-    // before this page renders, leaving $t() resolving against the wrong locale.
-    // So we await setLocale() to guarantee the bundle is loaded, then assign the
-    // active locale synchronously on both the i18n wrapper and the underlying
-    // vue-i18n instance so the SSR render of this page uses it.
-    if (app && app.i18n) {
-      const locale = item.language === 'French' ? 'fr' : 'en'
-      await app.i18n.setLocale(locale)
-      app.i18n.locale = locale
-      if (app.i18n.i18n) app.i18n.i18n.locale = locale
-    }
 
     const dirArticle = item.dir.slice(9)
     let articleNumber = 1
@@ -223,6 +222,14 @@ export default {
   },
   data() {
     return {}
+  },
+  created() {
+    // Pin THIS component's i18n locale to the article's language. created()
+    // runs synchronously during the SSR render (dev and `nuxt generate` alike),
+    // before the template's $t() calls, so the rendered labels are always in the
+    // article's own language. this.$i18n here is the component-local instance
+    // declared in the `i18n` option above, not the global one.
+    this.$i18n.locale = this.item.language === 'French' ? 'fr' : 'en'
   },
   head() {
     // Emit PDF metadata as <meta> tags + <title>. pagedjs-cli scrapes these
