@@ -287,7 +287,7 @@ body {
 }
 .article-body th,
 .article-body td {
-  border: 0.4pt solid var(--pdf-rule);
+  border: none;
   padding: 3pt 5pt;
   text-align: left;
   vertical-align: top;
@@ -295,10 +295,7 @@ body {
 .article-body th {
   font-weight: 600;
 }
-/* Mnemonic tables (e.g. SPEAKING/PRIMATE) carry no column labels; collapse the
- * empty header cells so the header doesn't print as a blank bordered strip. */
 .article-body th:empty {
-  border: 0;
   padding: 0;
   line-height: 0;
 }

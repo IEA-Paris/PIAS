@@ -248,8 +248,6 @@ $stepper-elevation: 0;
   margin-bottom: 1rem;
 }
 
-// Tables — mirror the PDF look (collapsed borders, hairline rules in the
-// site grey, grey body text matching .nuxt-content p) so web and print agree.
 .nuxt-content table {
   width: 100%;
   border-collapse: collapse;
@@ -260,7 +258,7 @@ $stepper-elevation: 0;
 }
 .nuxt-content th,
 .nuxt-content td {
-  border: 1px solid #d4d4da;
+  border: none;
   padding: 8px 12px;
   text-align: left;
   vertical-align: top;
@@ -269,10 +267,7 @@ $stepper-elevation: 0;
   font-weight: 600;
   color: rgba(0, 0, 0, 0.75);
 }
-// Mnemonic tables (e.g. SPEAKING/PRIMATE) carry no column labels; collapse the
-// empty header cells so the header doesn't render as a blank bordered strip.
 .nuxt-content th:empty {
-  border: 0;
   padding: 0;
   line-height: 0;
 }

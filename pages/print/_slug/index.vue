@@ -223,14 +223,6 @@ export default {
   data() {
     return {}
   },
-  created() {
-    // Pin THIS component's i18n locale to the article's language. created()
-    // runs synchronously during the SSR render (dev and `nuxt generate` alike),
-    // before the template's $t() calls, so the rendered labels are always in the
-    // article's own language. this.$i18n here is the component-local instance
-    // declared in the `i18n` option above, not the global one.
-    this.$i18n.locale = this.item.language === 'French' ? 'fr' : 'en'
-  },
   head() {
     // Emit PDF metadata as <meta> tags + <title>. pagedjs-cli scrapes these
     // and writes them into the PDF Info dictionary (Title/Author/Subject/
@@ -388,6 +380,14 @@ export default {
           )
         )
     },
+  },
+  created() {
+    // Pin THIS component's i18n locale to the article's language. created()
+    // runs synchronously during the SSR render (dev and `nuxt generate` alike),
+    // before the template's $t() calls, so the rendered labels are always in the
+    // article's own language. this.$i18n here is the component-local instance
+    // declared in the `i18n` option above, not the global one.
+    this.$i18n.locale = this.item.language === 'French' ? 'fr' : 'en'
   },
 }
 </script>
