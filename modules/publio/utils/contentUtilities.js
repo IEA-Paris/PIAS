@@ -1034,3 +1034,10 @@ export const replaceReferenceInFootnote = (footnote, biblio, slug) => {
   }
   return footnote
 }
+
+// Read a .bib file and escape bare $ signs so citation-js never tries to parse
+// them as LaTeX math delimiters (no math is expected in our bib files).
+export const readBibFile = (filePath) => {
+  const raw = fs.readFileSync(filePath, 'utf8')
+  return raw.replace(/(?<!\\)\$/g, '\\$')
+}

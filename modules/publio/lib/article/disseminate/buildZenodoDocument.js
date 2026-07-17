@@ -1,5 +1,5 @@
 import Citation from 'citation-js'
-import { cleanupString } from '../../../utils/contentUtilities'
+import { cleanupString, readBibFile } from '../../../utils/contentUtilities'
 
 // Map a config contributor (which describes its role in free text) onto
 // Zenodo's controlled contributor-type vocabulary.
@@ -40,12 +40,9 @@ const mapContributorType = (item) => {
 }
 
 export default (document, options) => {
-  const fs = require('fs')
   const references = document.biblioFile
-    ? // sorry for the lack of functionalism :p
-      new Citation(
-        fs.readFileSync('./static/' + document.biblioFile, 'utf8')
-      ).data.map((item) =>
+    ? new Citation(readBibFile('./static/' + document.biblioFile)).data.map(
+        (item) =>
         new Citation(item)
           .format('bibliography', {
             format: 'text',

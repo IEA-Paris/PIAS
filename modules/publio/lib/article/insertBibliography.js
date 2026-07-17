@@ -1,4 +1,5 @@
 import Citation from 'citation-js'
+import { readBibFile } from '../../utils/contentUtilities'
 const fs = require('fs')
 const insertLinks = (text) =>
   text.replace(
@@ -10,9 +11,7 @@ export default (article, media, authors, issues, options) => {
   // generate bibliography if required
   if (article.bibliography?.length) {
     article.biblioFile = article.bibliography
-    const raw = fs.readFileSync('./static' + article.bibliography, 'utf8')
-    // Escape bare $ signs so citation-js doesn't treat them as LaTeX math delimiters.
-    const data = raw.replace(/(?<!\\)\$/g, '\\$')
+    const data = readBibFile('./static' + article.bibliography)
     const cites = new Citation(data)
     article.bibliography = cites.data.map((item) => {
       return {
