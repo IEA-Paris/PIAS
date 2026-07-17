@@ -10,7 +10,9 @@ export default (article, media, authors, issues, options) => {
   // generate bibliography if required
   if (article.bibliography?.length) {
     article.biblioFile = article.bibliography
-    const data = fs.readFileSync('./static' + article.bibliography, 'utf8')
+    const raw = fs.readFileSync('./static' + article.bibliography, 'utf8')
+    // Escape bare $ signs so citation-js doesn't treat them as LaTeX math delimiters.
+    const data = raw.replace(/(?<!\\)\$/g, '\\$')
     const cites = new Citation(data)
     article.bibliography = cites.data.map((item) => {
       return {
